@@ -1,0 +1,6 @@
+CREATE TABLE agendamentos (
+    id SERIAL PRIMARY KEY,
+    cliente_id INT REFERENCES clientes(id) ON DELETE CASCADE,
+    data DATE NOT NULL,
+    hora TIME NOT NULL
+);

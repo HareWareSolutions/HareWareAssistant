@@ -1,0 +1,69 @@
+from datetime import datetime, timedelta
+
+
+def normalizar_data(data):
+    return data.strftime("%d/%m/%Y") if data else None
+
+
+def extrair_data(frase):
+    meses = {
+        "janeiro": 1, "fevereiro": 2, "março": 3, "abril": 4, "maio": 5, "junho": 6,
+        "julho": 7, "agosto": 8, "setembro": 9, "outubro": 10, "novembro": 11, "dezembro": 12
+    }
+    numeros_por_extenso = {
+        "um": 1, "dois": 2, "três": 3, "quatro": 4, "cinco": 5, "seis": 6, "sete": 7, "oito": 8, "nove": 9,
+        "dez": 10, "onze": 11, "doze": 12, "treze": 13, "quatorze": 14, "quinze": 15, "dezesseis": 16,
+        "dezessete": 17, "dezoito": 18, "dezenove": 19, "vinte": 20, "vinte e um": 21, "vinte e dois": 22,
+        "vinte e três": 23, "vinte e quatro": 24, "vinte e cinco": 25, "vinte e seis": 26, "vinte e sete": 27,
+        "vinte e oito": 28, "vinte e nove": 29, "trinta": 30, "trinta e um": 31
+    }
+    dias_semana = {
+        "segunda": 0, "terça": 1, "quarta": 2, "quinta": 3, "sexta": 4, "sábado": 5, "domingo": 6
+    }
+
+    palavras = frase.lower().split()
+    dia, mes, ano = None, datetime.now().month, datetime.now().year
+
+    for i, palavra in enumerate(palavras):
+        if palavra.isdigit() and 1 <= int(palavra) <= 31:
+            dia = int(palavra)
+        elif palavra in numeros_por_extenso:
+            dia = numeros_por_extenso[palavra]
+        elif palavra in meses:
+            mes = meses[palavra]
+        elif palavra.isdigit() and len(palavra) == 4:
+            ano = int(palavra)
+        elif "/" in palavra:
+            partes = palavra.split("/")
+            if len(partes) >= 2:
+                dia, mes = int(partes[0]), int(partes[1])
+            if len(partes) == 3:
+                ano = int(partes[2])
+
+    if dia:
+        return datetime(ano, mes, dia).date()
+
+    hoje = datetime.now()
+    if "hoje" in palavras:
+        return hoje.date()
+    elif "amanhã" in palavras:
+        return (hoje + timedelta(days=1)).date()
+
+    for dia_semana, indice in dias_semana.items():
+        if dia_semana in palavras:
+            dia_atual = hoje.weekday()
+            delta = (indice - dia_atual) % 7
+            if delta == 0:
+                delta = 7
+            return (hoje + timedelta(days=delta)).date()
+
+    return None
+
+
+def transformar_data_e_hora(data_hora_str: str):
+    data_hora = datetime.strptime(data_hora_str, "%d/%m/%Y %H:%M")
+    data = data_hora.date()
+    hora = data_hora.time()
+    return data, hora
+
+
