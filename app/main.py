@@ -166,7 +166,7 @@ async def incluir_agendamento(data: str, hora: str, contato: int):
     except ValueError:
         raise HTTPException(status_code=400, detail="Formato de 'hora' inválido. Use 'HH:MM'.")
 
-    db = get_db()
+    db = next(get_db())
     sucesso = gravar_agendamento(db, data_convertida, hora, contato)
     if sucesso:
         return {"status": "success", "message": "Agendamento incluído com sucesso."}
@@ -177,7 +177,7 @@ async def incluir_agendamento(data: str, hora: str, contato: int):
 @app.post("/cancelar-agendamento")
 async def cancelarAgendamento(id_agendamento: int):
 
-    db = get_db()
+    db = next(get_db())
     sucesso = deletar_agendamento(db, id_agendamento)
     if sucesso:
         return {"status": "success", "message": "Agendamento cancelado com sucesso."}
@@ -187,7 +187,7 @@ async def cancelarAgendamento(id_agendamento: int):
 
 @app.post("/pesquisar-agenda-dia")
 async def pesquisarAgendaDia(data: str):
-    db = get_db()
+    db = next(get_db())
     agendamentos = buscar_agendamentos_por_data_api(db, data)
 
     if agendamentos is not None:

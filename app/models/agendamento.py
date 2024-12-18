@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time
 from sqlalchemy.orm import Session, relationship
 from app.db.db import Base
+from datetime import datetime
 
 
 class Agendamento(Base):
@@ -38,19 +39,21 @@ def buscar_agendamentos_por_data(db: Session, data):
 
 
 def buscar_agendamentos_por_data_api(db: Session, data):
+    data_formatada = datetime.strptime(data, "%d/%m/%Y").date()
+
     agendamentos = db.query(
-        Agendamento.id_agendamento,
+        Agendamento.id,
         Agendamento.data,
         Agendamento.hora,
-        Agendamento.id_contato
-    ).filter(Agendamento.data == data).all()
+        Agendamento.contato_id
+    ).filter(Agendamento.data == data_formatada).all()
 
     return [
         {
-            "id_agendamento": agendamento.id_agendamento,
+            "id_agendamento": agendamento.id,
             "data": agendamento.data,
             "hora": agendamento.hora,
-            "id_contato": agendamento.id_contato
+            "id_contato": agendamento.contato_id
         }
         for agendamento in agendamentos
     ]
