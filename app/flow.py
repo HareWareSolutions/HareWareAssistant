@@ -91,7 +91,7 @@ def fluxo_conversa_poll(opcao, telefone):
             data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data)
-            agendamentos = buscar_agendamentos_por_data(db, data)
+            agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
             horarios_livres = verificar_horarios(agendamentos)
 
             if not horarios_livres:
@@ -132,8 +132,9 @@ def fluxo_conversa_poll(opcao, telefone):
                 return f"Agendamento realizado para o dia {data_normalizada} às {opcao}."
             else:
                 data = registro_status.observacao
+                data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
                 deletar_status(db, telefone)
-                novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data)
+                novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data_agendamento)
                 agendamentos = buscar_agendamentos_por_data(db, data)
                 horarios_livres = verificar_horarios(agendamentos)
 
