@@ -155,7 +155,6 @@ async def receive_message(request: Request):
 
 @app.post("/incluir-agendamento")
 async def incluir_agendamento(data: str, hora: str, contato: int):
-
     try:
         data_convertida = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
     except ValueError:
@@ -167,63 +166,58 @@ async def incluir_agendamento(data: str, hora: str, contato: int):
         raise HTTPException(status_code=400, detail="Formato de 'hora' inválido. Use 'HH:MM'.")
 
     db = next(get_db())
-    sucesso = gravar_agendamento(db, data_convertida, hora, contato)
-    if sucesso:
-        return {"status": "success", "message": "Agendamento incluído com sucesso."}
-    else:
-        raise HTTPException(status_code=500, detail="Erro ao gravar o agendamento.")
+    try:
+        sucesso = gravar_agendamento(db, data_convertida, hora, contato)
+        if sucesso:
+            return {"status": "success", "message": "Agendamento incluído com sucesso."}
+        else:
+            raise HTTPException(status_code=500, detail="Erro ao gravar o agendamento.")
+    finally:
+        db.close()
 
 
 @app.post("/cancelar-agendamento")
 async def cancelarAgendamento(id_agendamento: int):
-
     db = next(get_db())
-    sucesso = deletar_agendamento(db, id_agendamento)
-    if sucesso:
-        return {"status": "success", "message": "Agendamento cancelado com sucesso."}
-    else:
-        raise HTTPException(status_code=500, detail="Erro ao deletar o agendamento.")
+    try:
+        sucesso = deletar_agendamento(db, id_agendamento)
+        if sucesso:
+            return {"status": "success", "message": "Agendamento cancelado com sucesso."}
+        else:
+            raise HTTPException(status_code=500, detail="Erro ao deletar o agendamento.")
+    finally:
+        db.close()
 
 
 @app.post("/pesquisar-agenda-dia")
 async def pesquisarAgendaDia(data: str):
     db = next(get_db())
-    agendamentos = buscar_agendamentos_por_data_api(db, data)
+    try:
+        agendamentos = buscar_agendamentos_por_data_api(db, data)
 
-    if agendamentos is not None:
-        agendamentos_dia = []
-        for agendamento in agendamentos:
-            id_agendamento = agendamento.get("id_agendamento")
-            data = agendamento.get("data")
-            hora = agendamento.get("hora")
-            id_contato = agendamento.get("id_contato")
+        if agendamentos is not None:
+            agendamentos_dia = []
+            for agendamento in agendamentos:
+                id_agendamento = agendamento.get("id_agendamento")
+                data = agendamento.get("data")
+                hora = agendamento.get("hora")
+                id_contato = agendamento.get("id_contato")
 
-            contato = buscar_contato_id(db, id_contato)
+                contato = buscar_contato_id(db, id_contato)
 
-            reserva = {
-                "id_agendamento": id_agendamento,
-                "data": data,
-                "hora": hora,
-                "id_contato": id_contato,
-                "telefone": contato.numero_celular,
-                "nome": contato.nome
-            }
+                reserva = {
+                    "id_agendamento": id_agendamento,
+                    "data": data,
+                    "hora": hora,
+                    "id_contato": id_contato,
+                    "telefone": contato.numero_celular,
+                    "nome": contato.nome
+                }
 
-            agendamentos_dia.append(reserva)
+                agendamentos_dia.append(reserva)
 
-        return {"retorno": agendamentos_dia}
-    else:
-        {"retorno": "Não há agendamentos para esta data."}
-
-
-@app.post("/listar-agendamentos-contato")
-async def listarAgendaContato():
-    return {"status": "endpoint não liberado"}
-
-
-@app.post("/login")
-async def login(usuario: str, senha: str):
-    if usuario == "HareWareAdmin" and senha == "12345":
-        return {"status": "success", "message": "Administrador logado."}
-    else:
-        raise HTTPException(status_code=500, detail="Usuário ou senha inválidos.")
+            return {"retorno": agendamentos_dia}
+        else:
+            return {"retorno": "Não há agendamentos para esta data."}
+    finally:
+        db.close()
