@@ -262,7 +262,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
         else:
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
-            return f'Você poderia me dizer o seu nome novamente?'
+            return {"texto": f'Você poderia me dizer o seu nome novamente?'}
 
     if registro_status.status == 'EAC': #EAC: Escolha de Ação
         if opcao == 'Ver cardápio':
