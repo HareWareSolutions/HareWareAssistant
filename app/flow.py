@@ -264,6 +264,15 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
             return {"texto": f'Você poderia me dizer o seu nome novamente?'}
 
+    if registro_contato.status == 'DRP': #DRP: Deseja realizar agendamento
+        if opcao == "Sim":
+            deletar_status(db, telefone)
+            novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
+            return {"texto": 'Ok! Escreva em uma única mensagem todo o seu pedido'}
+        else:
+            deletar_status(db, telefone)
+            return {'texto': 'Tudo bem! Qualquer coisa é só mandar um oi...'}
+
     if registro_status.status == 'EAC': #EAC: Escolha de Ação
         if opcao == 'Ver cardápio':
             deletar_status(db, telefone)
@@ -272,7 +281,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
         elif opcao == 'Realizar pedido':
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
-            return 'Ok! Escreva em uma única mensagem todo o seu pedido'
+            return {"texto": 'Ok! Escreva em uma única mensagem todo o seu pedido'}
         elif opcao == 'Cancelar pedido':
             deletar_status(db, telefone)
             return {'texto': 'Para cancelar um pedido ligue para este número: (19) 99670-5890'}
