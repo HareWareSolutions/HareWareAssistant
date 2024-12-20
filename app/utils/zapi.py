@@ -82,7 +82,7 @@ def send_poll_zapi(env, number, question, options):
 def send_document_zapi(env, number, document_url, file_name):
     client_token_zapi, zapi_instance, token_zapi = get_credentials(env)
 
-    url = f"https://api.z-api.io/instances/{zapi_instance}/token/{token_zapi}/send-document"
+    url = f"https://api.z-api.io/instances/{zapi_instance}/token/{token_zapi}/send-document/pdf"
     headers = {
         'Content-Type': 'application/json',
         'Client-Token': client_token_zapi
