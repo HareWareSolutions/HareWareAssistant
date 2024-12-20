@@ -38,9 +38,6 @@ async def receber_mensagem_foa(request: Request):
             logging.info(f"Número de telefone não encontrado.")
             return {"status": "error", "message": "Número de telefone não encontrado"}
 
-        if numero_celular != "5519997581672":
-            return {"status": "error", "message": "Telefone não autorizado"}
-
         if data.get("type") == "ReceivedCallback" and data.get("pollVote"):
 
             poll_data = data["pollVote"]

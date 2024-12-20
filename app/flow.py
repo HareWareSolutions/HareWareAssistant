@@ -277,7 +277,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
         if opcao == 'Ver cardápio':
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'DRP', datetime.now(), None)
-            return {'DRP': ['Sim', 'Não'], 'cardapio': 'https://drive.google.com/uc?export=download&id=1XyT_k2XTPJR9-_2MgOxq2zm3nxNRkfRI'}
+            return {'DRP': ['Sim', 'Não'], 'cardapio': 'https://drive.google.com/uc?export=download&id=172Xbx55g_pLczsZT0PCjyCfw1cH6rswQ'}
         elif opcao == 'Realizar pedido':
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
