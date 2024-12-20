@@ -257,7 +257,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None)
             registro_contato = buscar_contato(db, telefone)
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'EAC')
+            novo_status = gravar_status(db, telefone, 'EAC', datetime.now(), None)
             return {'EAC': ['Ver cardápio', 'Realizar pedido', 'Cancelar pedido'], 'mensagem': f'Prazer em conhecê-lo {nome}!'}
         else:
             deletar_status(db, telefone)
