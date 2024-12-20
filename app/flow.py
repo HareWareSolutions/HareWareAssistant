@@ -291,8 +291,9 @@ def fluxo_conversa_poll_foa(opcao, telefone):
 
     if registro_status.status == 'CPD': #CPD: Confirmação de pedido
         if opcao == 'Confirmo meu pedido':
+            id_pedido = registro_status.observacao
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'ERE', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'ERE', datetime.now(), id_pedido)
             return {'ERE': ['Entrega', 'Retirada'], 'mensagem': 'Você gostaria que seu pedido fosse entregue no endereço ou prefere retirar pessoalmente? Lembrando a entrega só é válida em Araras e está 15 reais.'}
         elif opcao == 'Quero alterar':
             deletar_status(db, telefone)
