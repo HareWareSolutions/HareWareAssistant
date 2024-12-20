@@ -38,7 +38,7 @@ async def receber_mensagem_foa(request: Request):
             logging.info(f"Número de telefone não encontrado.")
             return {"status": "error", "message": "Número de telefone não encontrado"}
 
-        if numero_celular != 5519997581672:
+        if numero_celular != "5519997581672":
             return {"status": "error", "message": "Telefone não autorizado"}
 
         if data.get("type") == "ReceivedCallback" and data.get("pollVote"):
@@ -219,6 +219,19 @@ async def receber_mensagem_foa(request: Request):
             if 'CDT' in resposta:
                 pergunta = resposta['mensagem']
                 opcoes = [{'name': opcao} for opcao in resposta['CED']]
+
+                send_poll_zapi(
+                    env='mmania',
+                    number=numero_celular,
+                    question=pergunta,
+                    options=opcoes
+                )
+
+                return {"status": "success"}
+
+            elif 'CNM' in resposta:
+                pergunta = resposta['CNM']
+                opcoes = [{'name': 'Sim'}, {'name': 'Não'}]
 
                 send_poll_zapi(
                     env='mmania',
