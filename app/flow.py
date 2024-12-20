@@ -214,7 +214,7 @@ def fluxo_conversa_foa(prompt, telefone):
             return {'CNM': f'Seu nome é {prompt}?'}
 
     else:
-        if registro_status.status is None:
+        if registro_status is None:
             novo_status = gravar_status(db, telefone, 'EAC', datetime.now(), None)
             return {'EAC': ['Ver cardápio', 'Realizar pedido', 'Cancelar pedido'], 'mensagem': f'Olá {registro_contato.nome}!'}
 
