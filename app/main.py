@@ -218,7 +218,7 @@ async def receber_mensagem_foa(request: Request):
 
             if 'CDT' in resposta:
                 pergunta = resposta['mensagem']
-                opcoes = [{'name': opcao} for opcao in resposta['CED']]
+                opcoes = [{'name': opcao} for opcao in resposta['CDT']]
 
                 send_poll_zapi(
                     env='mmania',
