@@ -318,12 +318,12 @@ def fluxo_conversa_poll_foa(opcao, telefone):
 
     if registro_status.status == 'CED': #CED: Confirmação de endereço
         if opcao == 'Sim':
-            id_pedido = int(registro_status.id)
+            id_pedido = int(registro_status.observacao)
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), id_pedido)
             return {'texto': 'Para quando é o pedido? \n(Caso tenha preferencia de horário pode escrever também)'}
         else:
-            id_pedido = int(registro_status.id)
+            id_pedido = int(registro_status.observacao)
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IED', datetime.now(), id_pedido)
             return {'texto': 'Me informe o seu endereço novamente.'}
