@@ -335,7 +335,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             pedido = buscar_pedido_id(db, id_pedido)
             return {'finalizado': pedido}
         else:
-            id_pedido = int(registro_status.id)
+            id_pedido = int(registro_status.observacao)
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), id_pedido)
             return {'texto': 'Poderia me informar a data de entrega do pedido novamente?'}
