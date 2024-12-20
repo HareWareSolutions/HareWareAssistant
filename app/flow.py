@@ -225,7 +225,7 @@ def fluxo_conversa_foa(prompt, telefone):
                 pedido = buscar_pedido_id(db, int(registro_status.observacao))
                 pedido_alterado = alterar_pedido(db, id=pedido.id, pedido=prompt)
 
-            deletar_status(db)
+            deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'CPD', datetime.now(), pedido.id)
             return {'CPD': ['Confirmo meu pedido', 'Quero alterar', 'Desistir do pedido'], 'mensagem': f'Você confirma o seu pedido? \n\n{prompt}'}
 
