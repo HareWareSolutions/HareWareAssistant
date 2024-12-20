@@ -330,7 +330,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
 
     if registro_status.status == 'CDT':
         if opcao == "Sim":
-            id_pedido = int(registro_status.id)
+            id_pedido = int(registro_status.observacao)
             deletar_status(db, telefone)
             pedido = buscar_pedido_id(db, id_pedido)
             return {'finalizado': pedido}
