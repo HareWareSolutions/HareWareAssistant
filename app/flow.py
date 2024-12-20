@@ -241,7 +241,7 @@ def fluxo_conversa_foa(prompt, telefone):
             pedido_alterado = alterar_pedido(db, id=pedido.id, data_entrega=prompt)
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'CDT', datetime.now(), pedido.id)
-            return {'CDT': ['Sim', 'Não'], 'mensagem': f'Confirma a data de entrega do pedido? \n\n prompt'}
+            return {'CDT': ['Sim', 'Não'], 'mensagem': f'Confirma a data de entrega do pedido? \n\n {prompt}'}
 
 
 def fluxo_conversa_poll_foa(opcao, telefone):
