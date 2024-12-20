@@ -232,14 +232,14 @@ def fluxo_conversa_foa(prompt, telefone):
         if registro_status.status == 'IED': #IED: Informar endereço
             pedido = buscar_pedido_id(db, int(registro_status.observacao))
             pedido_alterado = alterar_pedido(db, id=pedido.id, entrega=prompt)
-            deletar_status(db)
+            deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'CED', datetime.now(), pedido.id)
             return {'CED': ['Sim', 'Não'], 'mensagem': f'O seu endereço está correto?\n\n{prompt}'}
 
         if registro_status.status == 'IDT': #IDT: Informar data
             pedido = buscar_pedido_id(db, int(registro_status.observacao))
             pedido_alterado = alterar_pedido(db, id=pedido.id, data_entrega=prompt)
-            deletar_status(db)
+            deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'CDT', datetime.now(), pedido.id)
             return {'CDT': ['Sim', 'Não'], 'mensagem': f'Confirma a data de entrega do pedido? \n\n prompt'}
 
