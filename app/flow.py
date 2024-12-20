@@ -264,7 +264,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
             return {"texto": f'Você poderia me dizer o seu nome novamente?'}
 
-    if registro_contato.status == 'DRP': #DRP: Deseja realizar agendamento
+    if registro_status.status == 'DRP': #DRP: Deseja realizar agendamento
         if opcao == "Sim":
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
