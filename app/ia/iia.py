@@ -1,7 +1,7 @@
 import pickle
 from ..utils.BuilderProcessor import TextProcessorBuilder
 
-with open('/Users/enzogiordanoaraujo/IA-projects/HareWare-Assistant/app/ml_models/model_iia.pkl', 'rb') as f:
+with open('C:/APIs/HareWareAssistant/app/ml_models/model_iia.pkl', 'rb') as f:
     clf, vectorizer = pickle.load(f)
 
 

@@ -22,4 +22,4 @@ def reconhecer_entidades(texto):
         return f"Ocorreu um erro: {str(e)}"
 
 
-reconhecer_entidades("quero para a data 15/04 as 8 horas")
+reconhecer_entidades("eu quero um bolo de cenoura vulcão, um bolo de chocolate e um de morango")
