@@ -96,6 +96,26 @@ async def receber_mensagem_foa(request: Request):
 
                 return {"status": "success"}
 
+            if 'opcao2' in resposta:
+                mensagem = resposta['opcao2']
+                cardapio = resposta['cardapio']
+
+                send_document_zapi(
+                    env='mmania',
+                    number=numero_celular,
+                    document_url=cardapio,
+                    file_name='cardapio_mmania_de_bolo.pdf'
+                )
+
+                send_message_zapi(
+                    env='mmania',
+                    number=numero_celular,
+                    message=mensagem,
+                    delay_typing=1
+                )
+
+                return {"status": "success"}
+
             if 'finalizado' in resposta:
                 id_pedido = resposta['finalizado'].id
                 pedido = resposta['finalizado'].pedido

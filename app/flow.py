@@ -281,7 +281,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
         elif opcao == 'Realizar pedido':
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
-            return {"texto": 'Ok! Escreva em uma única mensagem todo o seu pedido'}
+            return {"opcao2": 'Ok! Escreva em uma única mensagem todo o seu pedido', 'cardapio': 'https://drive.google.com/uc?export=download&id=172Xbx55g_pLczsZT0PCjyCfw1cH6rswQ'}
         elif opcao == 'Cancelar pedido':
             deletar_status(db, telefone)
             return {'texto': 'Para cancelar um pedido ligue para este número: (19) 99670-5890'}
