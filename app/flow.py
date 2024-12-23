@@ -319,7 +319,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             pedido = buscar_pedido_id(db, int(registro_status.observacao))
             excluir_pedido(db, pedido.id)
             deletar_status(db, telefone)
-            return {'Texto': 'Que pena! Caso mude de ideia mande um oi! Até a próxima!!!'}
+            return {'texto': 'Que pena! Caso mude de ideia mande um oi! Até a próxima!!!'}
 
     if registro_status.status == 'CED': #CED: Confirmação de endereço
         if opcao == 'Sim':
