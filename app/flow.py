@@ -294,7 +294,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             id_pedido = registro_status.observacao
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'ERE', datetime.now(), id_pedido)
-            return {'ERE': ['Entrega', 'Retirada'], 'mensagem': 'Você gostaria que seu pedido fosse entregue no endereço ou prefere retirar pessoalmente? Lembrando a entrega só é válida em Araras e está 15 reais.'}
+            return {'ERE': ['Entrega', 'Retirada', 'Desistir do pedido'], 'mensagem': 'Você gostaria que seu pedido fosse entregue no endereço ou prefere retirar pessoalmente? Lembrando a entrega só é válida em Araras e está 15 reais.'}
         elif opcao == 'Quero alterar':
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
@@ -309,12 +309,17 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IED', datetime.now(), id_pedido)
             return {'texto': 'Certo, me informe o seu endereço'}
-        else:
+        elif opcao == "Retirada":
             pedido = buscar_pedido_id(db, int(registro_status.observacao))
             pedido_alterado = alterar_pedido(db, id=pedido.id, entrega='Retirada')
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), pedido.id)
             return {'texto': 'Para quando é o pedido? \n(Caso tenha preferencia de horário pode escrever também)'}
+        else:
+            pedido = buscar_pedido_id(db, int(registro_status.observacao))
+            excluir_pedido(db, pedido.id)
+            deletar_status(db, telefone)
+            return {'Texto': 'Que pena! Caso mude de ideia mande um oi! Até a próxima!!!'}
 
     if registro_status.status == 'CED': #CED: Confirmação de endereço
         if opcao == 'Sim':
