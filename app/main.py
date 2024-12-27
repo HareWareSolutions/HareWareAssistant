@@ -422,7 +422,7 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
 
     db = next(get_db(empresa))
     try:
-        data_agendamento = datetime.strptime(data, "%y-%m-%d").date()
+        data_agendamento = datetime.strptime(data, "%d/%m/%Y").date()
         agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
         horarios_disponiveis = verificar_horarios(agendamentos)
 
