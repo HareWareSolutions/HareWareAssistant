@@ -464,14 +464,16 @@ async def pesquisarAgendaDia(empresa: str, data: str):
             agendamentos_dia = []
             for agendamento in agendamentos:
                 id_agendamento = agendamento.get("id_agendamento")
-                data_str = agendamento.get("data")
+                data_obj = agendamento.get("data")
                 hora_str = agendamento.get("hora")
                 id_contato = agendamento.get("id_contato")
 
-                try:
-                    data_formatada = datetime.strptime(data_str, "%Y-%m-%d").strftime("%d/%m/%Y")
-                except ValueError:
-                    data_formatada = data_str
+                if isinstance(data_obj, datetime):
+                    data_formatada = data_obj.strftime("%d/%m/%Y")
+                elif isinstance(data_obj, date):
+                    data_formatada = data_obj.strftime("%d/%m/%Y")
+                else:
+                    data_formatada = data_obj
 
                 try:
                     hora_formatada = datetime.strptime(hora_str, "%H:%M:%S").strftime("%H:%M")
