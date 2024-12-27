@@ -409,7 +409,7 @@ async def receive_message(request: Request):
 
 
 @app.post("/incluir-agendamento")
-async def incluir_agendamento(data: str, hora: str, contato: int):
+async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
     try:
         data_convertida = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
     except ValueError:
@@ -420,7 +420,7 @@ async def incluir_agendamento(data: str, hora: str, contato: int):
     except ValueError:
         raise HTTPException(status_code=400, detail="Formato de 'hora' inválido. Use 'HH:MM'.")
 
-    db = next(get_db('hareware'))
+    db = next(get_db(empresa))
     try:
         data_agendamento = datetime.strptime(data, "%y-%m-%d").date()
         agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
@@ -442,8 +442,8 @@ async def incluir_agendamento(data: str, hora: str, contato: int):
 
 
 @app.post("/cancelar-agendamento")
-async def cancelarAgendamento(id_agendamento: int):
-    db = next(get_db('hareware'))
+async def cancelarAgendamento(empresa: str, id_agendamento: int):
+    db = next(get_db(empresa))
     try:
         sucesso = deletar_agendamento(db, id_agendamento)
         if sucesso:
@@ -455,8 +455,8 @@ async def cancelarAgendamento(id_agendamento: int):
 
 
 @app.post("/pesquisar-agenda-dia")
-async def pesquisarAgendaDia(data: str):
-    db = next(get_db('hareware'))
+async def pesquisarAgendaDia(empresa: str, data: str):
+    db = next(get_db(empresa))
     try:
         agendamentos = buscar_agendamentos_por_data_api(db, data)
 
