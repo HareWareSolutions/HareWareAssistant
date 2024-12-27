@@ -464,16 +464,26 @@ async def pesquisarAgendaDia(empresa: str, data: str):
             agendamentos_dia = []
             for agendamento in agendamentos:
                 id_agendamento = agendamento.get("id_agendamento")
-                data = agendamento.get("data")
-                hora = agendamento.get("hora")
+                data_str = agendamento.get("data")
+                hora_str = agendamento.get("hora")
                 id_contato = agendamento.get("id_contato")
+
+                try:
+                    data_formatada = datetime.strptime(data_str, "%Y-%m-%d").strftime("%d/%m/%Y")
+                except ValueError:
+                    data_formatada = data_str
+
+                try:
+                    hora_formatada = datetime.strptime(hora_str, "%H:%M:%S").strftime("%H:%M")
+                except ValueError:
+                    hora_formatada = hora_str
 
                 contato = buscar_contato_id(db, id_contato)
 
                 reserva = {
                     "id_agendamento": id_agendamento,
-                    "data": data,
-                    "hora": hora,
+                    "data": data_formatada,
+                    "hora": hora_formatada,
                     "id_contato": id_contato,
                     "telefone": contato.numero_celular,
                     "nome": contato.nome
