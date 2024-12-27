@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, time
 from app.db.db import get_db
 from app.models.contato import buscar_contato_id, criar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, buscar_agendamentos_por_contato_id_formatado, buscar_agendamentos_por_contato_id, deletar_agendamento
@@ -408,35 +408,51 @@ async def receive_message(request: Request):
         return {"status": "error", "message": str(e)}
 
 
-@app.post("/incluir-agendamento")
-async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
-    try:
-        data_convertida = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Formato de 'data' inválido. Use 'DD/MM/YYYY'.")
-
-    try:
-        datetime.strptime(hora, "%H:%M")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Formato de 'hora' inválido. Use 'HH:MM'.")
-
+@app.post("/pesquisar-agenda-dia")
+async def pesquisarAgendaDia(empresa: str, data: str):
     db = next(get_db(empresa))
     try:
-        data_agendamento = datetime.strptime(data, "%d/%m/%Y").date()
-        agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
-        horarios_disponiveis = verificar_horarios(agendamentos)
+        agendamentos = buscar_agendamentos_por_data_api(db, data)
 
-        hora_agendamento = datetime.strptime(hora, "%H:%M").time()
-        hora_formatada = hora_agendamento.strftime("%H:%M")
+        if agendamentos is not None:
+            agendamentos_dia = []
+            for agendamento in agendamentos:
+                id_agendamento = agendamento.get("id_agendamento")
+                data_obj = agendamento.get("data")
+                hora_obj = agendamento.get("hora")
+                id_contato = agendamento.get("id_contato")
 
-        if hora_formatada in horarios_disponiveis:
-            sucesso = gravar_agendamento(db, data_convertida, hora, contato)
-            if sucesso:
-                return {"status": "success", "message": "Agendamento incluído com sucesso."}
-            else:
-                raise HTTPException(status_code=500, detail="Erro ao gravar o agendamento.")
+                if isinstance(data_obj, datetime):
+                    data_formatada = data_obj.strftime("%d/%m/%Y")
+                elif isinstance(data_obj, date):
+                    data_formatada = data_obj.strftime("%d/%m/%Y")
+                else:
+                    data_formatada = data_obj
+
+                if isinstance(hora_obj, time):
+                    hora_formatada = hora_obj.strftime("%H:%M")
+                else:
+                    try:
+                        hora_formatada = datetime.strptime(hora_obj, "%H:%M:%S").strftime("%H:%M")
+                    except ValueError:
+                        hora_formatada = hora_obj
+
+                contato = buscar_contato_id(db, id_contato)
+
+                reserva = {
+                    "id_agendamento": id_agendamento,
+                    "data": data_formatada,
+                    "hora": hora_formatada,
+                    "id_contato": id_contato,
+                    "telefone": contato.numero_celular,
+                    "nome": contato.nome
+                }
+
+                agendamentos_dia.append(reserva)
+
+            return {"retorno": agendamentos_dia}
         else:
-            raise HTTPException(status_code=500, detail="Já há um agendamento para esse horário nesta data.")
+            return {"retorno": "Não há agendamentos para esta data."}
     finally:
         db.close()
 
