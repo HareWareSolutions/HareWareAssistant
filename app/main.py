@@ -496,6 +496,8 @@ async def pesquisarAgendaDia(empresa: str, data: str):
 
                 agendamentos_dia.append(reserva)
 
+            agendamentos_dia.sort(key=lambda x: x["hora"])
+
             return {"retorno": agendamentos_dia}
         else:
             return {"retorno": "Não há agendamentos para esta data."}
