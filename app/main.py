@@ -408,51 +408,35 @@ async def receive_message(request: Request):
         return {"status": "error", "message": str(e)}
 
 
-@app.post("/pesquisar-agenda-dia")
-async def pesquisarAgendaDia(empresa: str, data: str):
+@app.post("/incluir-agendamento")
+async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
+    try:
+        data_convertida = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Formato de 'data' inválido. Use 'DD/MM/YYYY'.")
+
+    try:
+        datetime.strptime(hora, "%H:%M")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Formato de 'hora' inválido. Use 'HH:MM'.")
+
     db = next(get_db(empresa))
     try:
-        agendamentos = buscar_agendamentos_por_data_api(db, data)
+        data_agendamento = datetime.strptime(data, "%d/%m/%Y").date()
+        agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
+        horarios_disponiveis = verificar_horarios(agendamentos)
 
-        if agendamentos is not None:
-            agendamentos_dia = []
-            for agendamento in agendamentos:
-                id_agendamento = agendamento.get("id_agendamento")
-                data_obj = agendamento.get("data")
-                hora_obj = agendamento.get("hora")
-                id_contato = agendamento.get("id_contato")
+        hora_agendamento = datetime.strptime(hora, "%H:%M").time()
+        hora_formatada = hora_agendamento.strftime("%H:%M")
 
-                if isinstance(data_obj, datetime):
-                    data_formatada = data_obj.strftime("%d/%m/%Y")
-                elif isinstance(data_obj, date):
-                    data_formatada = data_obj.strftime("%d/%m/%Y")
-                else:
-                    data_formatada = data_obj
-
-                if isinstance(hora_obj, time):
-                    hora_formatada = hora_obj.strftime("%H:%M")
-                else:
-                    try:
-                        hora_formatada = datetime.strptime(hora_obj, "%H:%M:%S").strftime("%H:%M")
-                    except ValueError:
-                        hora_formatada = hora_obj
-
-                contato = buscar_contato_id(db, id_contato)
-
-                reserva = {
-                    "id_agendamento": id_agendamento,
-                    "data": data_formatada,
-                    "hora": hora_formatada,
-                    "id_contato": id_contato,
-                    "telefone": contato.numero_celular,
-                    "nome": contato.nome
-                }
-
-                agendamentos_dia.append(reserva)
-
-            return {"retorno": agendamentos_dia}
+        if hora_formatada in horarios_disponiveis:
+            sucesso = gravar_agendamento(db, data_convertida, hora, contato)
+            if sucesso:
+                return {"status": "success", "message": "Agendamento incluído com sucesso."}
+            else:
+                raise HTTPException(status_code=500, detail="Erro ao gravar o agendamento.")
         else:
-            return {"retorno": "Não há agendamentos para esta data."}
+            raise HTTPException(status_code=500, detail="Já há um agendamento para esse horário nesta data.")
     finally:
         db.close()
 
@@ -481,7 +465,7 @@ async def pesquisarAgendaDia(empresa: str, data: str):
             for agendamento in agendamentos:
                 id_agendamento = agendamento.get("id_agendamento")
                 data_obj = agendamento.get("data")
-                hora_str = agendamento.get("hora")
+                hora_obj = agendamento.get("hora")
                 id_contato = agendamento.get("id_contato")
 
                 if isinstance(data_obj, datetime):
@@ -491,10 +475,13 @@ async def pesquisarAgendaDia(empresa: str, data: str):
                 else:
                     data_formatada = data_obj
 
-                try:
-                    hora_formatada = datetime.strptime(hora_str, "%H:%M:%S").strftime("%H:%M")
-                except ValueError:
-                    hora_formatada = hora_str
+                if isinstance(hora_obj, time):
+                    hora_formatada = hora_obj.strftime("%H:%M")
+                else:
+                    try:
+                        hora_formatada = datetime.strptime(hora_obj, "%H:%M:%S").strftime("%H:%M")
+                    except ValueError:
+                        hora_formatada = hora_obj
 
                 contato = buscar_contato_id(db, id_contato)
 
