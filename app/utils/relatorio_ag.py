@@ -38,11 +38,11 @@ def gerar_relatorio_pdf(nome_empresa, dados_agendamentos, data_relatorio):
     cabecalho_empresa = Paragraph(f"<font size=28><b>{nome_empresa}</b></font>", style_cabecalho)
     fuso_horario = pytz.timezone('America/Sao_Paulo')
     data_atual = datetime.now(fuso_horario).strftime("%d/%m/%Y %H:%M:%S")
-    nome_relatorio = Paragraph(f"<font size=16><b>Relação de agendamentos do dia {data_atual}</b></font>", style_subcabecalho)
+    nome_relatorio = Paragraph(f"<font size=16><b>Relação de agendamentos do dia {data_relatorio}</b></font>", style_subcabecalho)
     cabecalho_data = Paragraph(f"<font size=14><i>Relatório gerado em: {data_atual}</i></font>", style_subcabecalho)
 
     elementos = [cabecalho_empresa, nome_relatorio, cabecalho_data]
-    elementos.append(Spacer(1, 60))
+    elementos.append(Spacer(1, 40))
 
     dados_tabela = [['ID Agendamento', 'Data', 'Hora', 'Telefone', 'ID Contato']]
 
