@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, date, time
 from app.db.db import get_db
+from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, buscar_agendamentos_por_contato_id_formatado, buscar_agendamentos_por_contato_id, deletar_agendamento
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
@@ -9,6 +10,7 @@ from fastapi import FastAPI, Request, HTTPException
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
 from app.utils.rotinasHoras import verificar_horarios
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 logging.basicConfig(level=logging.INFO)
 
@@ -512,3 +514,58 @@ async def logar(usuario: str, senha: str):
         return {"id": 1, "nome": "HareWare", "empresa": "hareware"}
     else:
         return {"status": "Usuário ou senha incorretos"}
+
+
+@app.post("/gerar-relatorio-agendamento")
+async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
+
+    db = next(get_db(empresa))
+    try:
+        agendamentos = buscar_agendamentos_por_data_api(db, data)
+
+        if agendamentos is not None:
+            agendamentos_dia = []
+            for agendamento in agendamentos:
+                id_agendamento = agendamento.get("id_agendamento")
+                data_obj = agendamento.get("data")
+                hora_obj = agendamento.get("hora")
+                id_contato = agendamento.get("id_contato")
+
+                if isinstance(data_obj, datetime):
+                    data_formatada = data_obj.strftime("%d/%m/%Y")
+                elif isinstance(data_obj, date):
+                    data_formatada = data_obj.strftime("%d/%m/%Y")
+                else:
+                    data_formatada = data_obj
+
+                if isinstance(hora_obj, time):
+                    hora_formatada = hora_obj.strftime("%H:%M")
+                else:
+                    try:
+                        hora_formatada = datetime.strptime(hora_obj, "%H:%M:%S").strftime("%H:%M")
+                    except ValueError:
+                        hora_formatada = hora_obj
+
+                contato = buscar_contato_id(db, id_contato)
+
+                reserva = {
+                    "id_agendamento": id_agendamento,
+                    "data": data_formatada,
+                    "hora": hora_formatada,
+                    "id_contato": id_contato,
+                    "telefone": contato.numero_celular,
+                    "nome": contato.nome
+                }
+
+                agendamentos_dia.append(reserva)
+
+            agendamentos_dia.sort(key=lambda x: x["hora"])
+
+            nome_arquivo = f"relatorio_agendamentos_{nome_empresa}_{datetime.now()}.pdf"
+            relatorio = gerar_relatorio_pdf(nome_arquivo, nome_empresa, agendamentos_dia)
+
+            return FileResponse(relatorio, media_type='application/pdf', filename=f"relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+        else:
+            return {"retorno": "Não há agendamentos para esta data."}
+    finally:
+        db.close()
