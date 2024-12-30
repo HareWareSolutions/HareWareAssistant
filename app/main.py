@@ -573,14 +573,9 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
                 "Content-Disposition": f"attachment; filename={nome_arquivo}"
             })
 
-            try:
-                return response
-            finally:
-                try:
-                    os.remove(caminho_pdf)
-                except Exception as e:
-                    print(f"Erro ao excluir o arquivo {caminho_pdf}: {e}")
+            return response
         else:
             return {"retorno": "Não há agendamentos para esta data."}
     finally:
         db.close()
+        os.remove(caminho_pdf)
