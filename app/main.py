@@ -10,7 +10,7 @@ from fastapi import FastAPI, Request, HTTPException
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
 from app.utils.rotinasHoras import verificar_horarios
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 
 logging.basicConfig(level=logging.INFO)
 
@@ -564,7 +564,7 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
             nome_arquivo = f"relatorio_agendamentos_{nome_empresa}_{datetime.now()}.pdf"
             relatorio = gerar_relatorio_pdf(nome_empresa, agendamentos_dia)
 
-            return FileResponse(relatorio, media_type='application/pdf', filename=f"relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+            return StreamingResponse(relatorio, media_type='application/pdf', headers={"Content-Disposition": f"attachment; filename=relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"})
         else:
             return {"retorno": "Não há agendamentos para esta data."}
     finally:
