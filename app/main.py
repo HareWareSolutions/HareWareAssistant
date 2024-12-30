@@ -564,7 +564,7 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str, back
 
             nome_arquivo = f"relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
             caminho_pdf = f"C:/APIs/HareWareAssistant/app/relatorios/{nome_arquivo}"
-            relatorio = gerar_relatorio_pdf(nome_empresa, agendamentos_dia)
+            relatorio = gerar_relatorio_pdf(nome_empresa, agendamentos_dia, data)
 
             with open(caminho_pdf, "wb") as f:
                 f.write(relatorio.getvalue())
