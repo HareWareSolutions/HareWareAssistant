@@ -573,10 +573,9 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
                 "Content-Disposition": f"attachment; filename={nome_arquivo}"
             })
 
-
-
             return response
         else:
             return {"retorno": "Não há agendamentos para esta data."}
     finally:
         db.close()
+        os.remove(caminho_pdf)
