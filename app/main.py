@@ -7,7 +7,7 @@ from app.models.contato import buscar_contato_id, criar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, buscar_agendamentos_por_contato_id_formatado, buscar_agendamentos_por_contato_id, deletar_agendamento
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
 from pydantic import BaseModel
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
 from app.utils.rotinasHoras import verificar_horarios
 from fastapi.middleware.cors import CORSMiddleware
@@ -573,15 +573,18 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
                 "Content-Disposition": f"attachment; filename={nome_arquivo}"
             })
 
-            @response.call_on_close
-            def remove_file():
-                try:
-                    os.remove(caminho_pdf)
-                except Exception as e:
-                    print(f"Erro ao excluir o arquivo {caminho_pdf}: {e}")
+            BackgroundTasks.add_task(remover_arquivo, caminho_pdf)
 
             return response
         else:
             return {"retorno": "Não há agendamentos para esta data."}
     finally:
         db.close()
+
+
+def remover_arquivo(caminho_pdf: str):
+    try:
+        os.remove(caminho_pdf)
+        print(f"Arquivo {caminho_pdf} removido com sucesso.")
+    except Exception as e:
+        print(f"Erro ao excluir o arquivo {caminho_pdf}: {e}")
