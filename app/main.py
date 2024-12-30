@@ -567,7 +567,7 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
             relatorio = gerar_relatorio_pdf(nome_empresa, agendamentos_dia)
 
             with open(caminho_pdf, "wb") as f:
-                f.write(relatorio)
+                f.write(relatorio.getvalue())
 
             response = FileResponse(caminho_pdf, media_type='application/pdf', headers={
                 "Content-Disposition": f"attachment; filename={nome_arquivo}"
