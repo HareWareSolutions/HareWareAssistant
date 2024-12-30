@@ -1,6 +1,5 @@
 import logging
 import os
-from io import BytesIO
 from datetime import datetime, date, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
@@ -520,6 +519,7 @@ async def logar(usuario: str, senha: str):
 
 @app.post("/gerar-relatorio-agendamento")
 async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
+
     db = next(get_db(empresa))
     try:
         agendamentos = buscar_agendamentos_por_data_api(db, data)
@@ -564,36 +564,23 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
 
             nome_arquivo = f"relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
             caminho_pdf = f"C:/APIs/HareWareAssistant/app/relatorios/{nome_arquivo}"
-
-            diretorio_relatorios = os.path.dirname(caminho_pdf)
-            if not os.path.exists(diretorio_relatorios):
-                os.makedirs(diretorio_relatorios)
-
             relatorio = gerar_relatorio_pdf(nome_empresa, agendamentos_dia)
-
-            if not relatorio.getvalue():
-                return {"retorno": "Erro ao gerar o relatório PDF. Conteúdo vazio."}
 
             with open(caminho_pdf, "wb") as f:
                 f.write(relatorio.getvalue())
-
-            if os.path.exists(caminho_pdf):
-                print(f"Arquivo PDF salvo com sucesso em {caminho_pdf}")
-            else:
-                print(f"Erro ao salvar o arquivo PDF em {caminho_pdf}")
 
             response = FileResponse(caminho_pdf, media_type='application/pdf', headers={
                 "Content-Disposition": f"attachment; filename={nome_arquivo}"
             })
 
-            try:
-                return response
-            finally:
+            @response.call_on_close
+            def remove_file():
                 try:
                     os.remove(caminho_pdf)
                 except Exception as e:
                     print(f"Erro ao excluir o arquivo {caminho_pdf}: {e}")
 
+            return response
         else:
             return {"retorno": "Não há agendamentos para esta data."}
     finally:
