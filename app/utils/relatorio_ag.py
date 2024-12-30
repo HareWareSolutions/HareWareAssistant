@@ -4,6 +4,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from datetime import datetime
 from io import BytesIO
+import pytz
 
 
 def gerar_relatorio_pdf(nome_empresa, dados_agendamentos):
@@ -35,7 +36,8 @@ def gerar_relatorio_pdf(nome_empresa, dados_agendamentos):
     style_normal.fontName = 'Helvetica'
 
     cabecalho_empresa = Paragraph(f"<font size=28><b>{nome_empresa}</b></font>", style_cabecalho)
-    data_atual = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    fuso_horario = pytz.timezone('America/Sao_Paulo')
+    data_atual = datetime.now(fuso_horario).strftime("%d/%m/%Y %H:%M:%S")
     cabecalho_data = Paragraph(f"<font size=14><i>Relatório gerado em: {data_atual}</i></font>", style_subcabecalho)
 
     elementos = [cabecalho_empresa, cabecalho_data]
