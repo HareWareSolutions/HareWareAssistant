@@ -44,7 +44,7 @@ def gerar_relatorio_pdf(nome_empresa, dados_agendamentos, data_relatorio):
     elementos = [cabecalho_empresa, nome_relatorio, cabecalho_data]
     elementos.append(Spacer(1, 10))
 
-    dados_tabela = [['ID Agendamento', 'Data', 'Hora', 'Telefone', 'ID Contato']]
+    dados_tabela = [['ID Agendamento', 'Data', 'Hora', 'Telefone', 'ID Contato', 'Nome']]
 
     for agendamento in dados_agendamentos:
         dados_tabela.append([
@@ -52,10 +52,11 @@ def gerar_relatorio_pdf(nome_empresa, dados_agendamentos, data_relatorio):
             agendamento.get('data', ''),
             agendamento.get('hora', ''),
             agendamento.get('telefone', ''),
-            agendamento.get('id_contato', '')
+            agendamento.get('id_contato', ''),
+            agendamento.get('nome', '')
         ])
 
-    tabela_dados = Table(dados_tabela, colWidths=[90, 100, 60, 100, 70])
+    tabela_dados = Table(dados_tabela, colWidths=[90, 100, 60, 100, 70, 120])
 
     estilo_tabela = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.Color(0.8, 0.8, 0.8)),
