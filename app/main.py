@@ -561,7 +561,7 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
 
             agendamentos_dia.sort(key=lambda x: x["hora"])
 
-            nome_arquivo = f"relatorio_agendamentos_{nome_empresa}_{datetime.now()}.pdf"
+            nome_arquivo = f"relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
             relatorio = gerar_relatorio_pdf(nome_empresa, agendamentos_dia)
 
             return StreamingResponse(relatorio, media_type='application/pdf', headers={"Content-Disposition": f"attachment; filename=relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"})
