@@ -518,7 +518,7 @@ async def logar(usuario: str, senha: str):
 
 
 @app.post("/gerar-relatorio-agendamento")
-async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
+async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str, background_tasks: BackgroundTasks):
 
     db = next(get_db(empresa))
     try:
@@ -573,7 +573,7 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
                 "Content-Disposition": f"attachment; filename={nome_arquivo}"
             })
 
-            BackgroundTasks.add_task(remover_arquivo, caminho_pdf)
+            background_tasks.add_task(remover_arquivo, caminho_pdf)
 
             return response
         else:
