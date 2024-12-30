@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime, date, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
@@ -10,7 +11,7 @@ from fastapi import FastAPI, Request, HTTPException
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
 from app.utils.rotinasHoras import verificar_horarios
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse
 
 logging.basicConfig(level=logging.INFO)
 
@@ -561,10 +562,25 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str):
 
             agendamentos_dia.sort(key=lambda x: x["hora"])
 
-            nome_arquivo = f"relatorio_agendamentos_{nome_empresa}.pdf"
+            nome_arquivo = f"relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
+            caminho_pdf = f"./relatorios/{nome_arquivo}"
             relatorio = gerar_relatorio_pdf(nome_empresa, agendamentos_dia)
 
-            return StreamingResponse(relatorio, media_type='application/pdf', headers={"Content-Disposition": f"attachment; filename=relatorio_agendamentos_{nome_empresa}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"})
+            with open(caminho_pdf, "wb") as f:
+                f.write(relatorio)
+
+            response = FileResponse(caminho_pdf, media_type='application/pdf', headers={
+                "Content-Disposition": f"attachment; filename={nome_arquivo}"
+            })
+
+            @response.call_on_close
+            def remove_file():
+                try:
+                    os.remove(caminho_pdf)
+                except Exception as e:
+                    print(f"Erro ao excluir o arquivo {caminho_pdf}: {e}")
+
+            return response
         else:
             return {"retorno": "Não há agendamentos para esta data."}
     finally:
