@@ -42,7 +42,7 @@ def gerar_relatorio_pdf(nome_empresa, dados_agendamentos, data_relatorio):
     cabecalho_data = Paragraph(f"<font size=14><i>Relatório gerado em: {data_atual}</i></font>", style_subcabecalho)
 
     elementos = [cabecalho_empresa, nome_relatorio, cabecalho_data]
-    elementos.append(Spacer(1, 40))
+    elementos.append(Spacer(1, 20))
 
     dados_tabela = [['ID Agendamento', 'Data', 'Hora', 'Telefone', 'ID Contato']]
 
