@@ -513,6 +513,8 @@ async def logar(usuario: str, senha: str):
 
     if usuario == "HareWareAdmin" and senha == "123456":
         return {"id": 1, "nome": "HareWare", "empresa": "hareware"}
+    elif usuario == "NatanTeste" and senha == "teste@natan510":
+        return {"id": 1, "nome": "HareWare", "empresa": "hareware"}
     else:
         return {"status": "Usuário ou senha incorretos"}
 
