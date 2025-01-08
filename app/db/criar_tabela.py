@@ -1,7 +1,7 @@
 from app.db.db import get_engine_and_session, Base
-from app.models import agendamento, contato, status, pedido
+from app.models import clientes, contrato
 
-env = "mmania"
+env = "hareware"
 
 engine, SessionLocal = get_engine_and_session(env)
 
