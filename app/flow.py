@@ -294,7 +294,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             id_pedido = registro_status.observacao
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'ERE', datetime.now(), id_pedido)
-            return {'ERE': ['Entrega', 'Retirada', 'Desistir do pedido'], 'mensagem': 'Você gostaria que seu pedido fosse entregue no endereço ou prefere retirar pessoalmente? Lembrando a entrega só é válida em Araras e está 15 reais.'}
+            return {'ERE': ['Entrega', 'Retirada', 'Desistir do pedido'], 'mensagem': 'Você gostaria que seu pedido fosse entregue no endereço ou prefere retirar pessoalmente? Lembrando a entrega só é válida em Araras e está 08 reais.'}
         elif opcao == 'Quero alterar':
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
