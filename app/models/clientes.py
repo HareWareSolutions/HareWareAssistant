@@ -49,3 +49,8 @@ def deletar_cliente(db: Session, cliente_id: int):
         db.commit()
         return True
     return False
+
+
+def buscar_cliente_cpfcnpj(db: Session, cpfcnpj: str):
+    return db.query(Cliente).filter(Cliente.cpfcnpj == cpfcnpj).first()
+

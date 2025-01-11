@@ -4,12 +4,14 @@ from datetime import datetime, date, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato
-from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, buscar_agendamentos_por_contato_id_formatado, buscar_agendamentos_por_contato_id, deletar_agendamento
+from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
+from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
 from pydantic import BaseModel
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
 from app.utils.rotinasHoras import verificar_horarios
+from app.utils.validador_documento import validar_documento
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
@@ -590,3 +592,26 @@ def remover_arquivo(caminho_pdf: str):
         print(f"Arquivo {caminho_pdf} removido com sucesso.")
     except Exception as e:
         print(f"Erro ao excluir o arquivo {caminho_pdf}: {e}")
+
+
+# PAINEL ADMINISTRATIVO HAREWARE
+
+@app.post("/cadastrar-cliente")
+async def cadastrar_cliente(cod_hw: str, nome: str, empresa: str, email: str, telefone: str, cpfcnpj: str, ativo: bool):
+    db = next(get_db(cod_hw))
+    try:
+        documento_valido = validar_documento(cpfcnpj)
+        if documento_valido:
+            documento_existente = buscar_cliente_cpfcnpj(db, cpfcnpj)
+            if documento_existente is not None:
+                sucesso = criar_cliente(db, nome, empresa, email, telefone, cpfcnpj, ativo)
+                if sucesso:
+                    return {"status": "success", "message": "Cliente cadastrado com sucesso."}
+                else:
+                    raise HTTPException(status_code=500, detail="Erro ao cadastrar o cliente.")
+            else:
+                return {"retorno": "Esse CNPJ já está cadastrado."}
+        else:
+            return {"retorno": "Por favor informe um documento válido."}
+    finally:
+        db.close()
