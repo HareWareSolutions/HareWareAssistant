@@ -603,14 +603,14 @@ async def cadastrar_cliente(cod_hw: str, nome: str, empresa: str, email: str, te
         documento_valido = validar_documento(cpfcnpj)
         if documento_valido:
             documento_existente = buscar_cliente_cpfcnpj(db, cpfcnpj)
-            if documento_existente is not None:
+            if documento_existente is None:
                 sucesso = criar_cliente(db, nome, empresa, email, telefone, cpfcnpj, ativo)
                 if sucesso:
                     return {"status": "success", "message": "Cliente cadastrado com sucesso."}
                 else:
                     raise HTTPException(status_code=500, detail="Erro ao cadastrar o cliente.")
             else:
-                return {"retorno": "Esse CNPJ já está cadastrado."}
+                return {"retorno": "Esse CPF ou CNPJ já está cadastrado."}
         else:
             return {"retorno": "Por favor informe um documento válido."}
     finally:
