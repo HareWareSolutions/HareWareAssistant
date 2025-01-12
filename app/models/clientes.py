@@ -60,3 +60,18 @@ def buscar_cliente_cpfcnpj(db: Session, cpfcnpj: str):
 def buscar_cliente_email(db: Session, email: str):
     return db.query(Cliente).filter(Cliente.email == email).first()
 
+
+def editar_clientes(db: Session, cliente_id: int, **kwargs):
+    cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
+    if not cliente:
+        return None
+
+    for key, value in kwargs.items():
+        if hasattr(cliente, key):
+            setattr(cliente, key, value)
+
+    db.commit()
+    db.refresh(cliente)
+    return cliente
+
+

@@ -5,7 +5,7 @@ from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
-from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email
+from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
 from pydantic import BaseModel
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
@@ -532,7 +532,6 @@ async def logar(usuario: str, senha: str):
         db.close()
 
 
-
 @app.post("/gerar-relatorio-agendamento")
 async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str, background_tasks: BackgroundTasks):
 
@@ -625,5 +624,74 @@ async def cadastrar_cliente(cod_hw: str, nome: str, empresa: str, email: str, te
                 return {"retorno": "Esse CPF ou CNPJ já está cadastrado."}
         else:
             return {"retorno": "Por favor informe um documento válido."}
+    finally:
+        db.close()
+
+
+@app.post("/visualizar-clientes")
+async def visualizar_clientes(cod_hw: str):
+    db = next(get_db(cod_hw))
+    try:
+        clientes = listar_clientes(db)
+
+        lista_clientes = []
+        for cliente in clientes:
+            if cliente.ativo == 0:
+                ativo = "Inativo"
+            else:
+                ativo = "Ativo"
+
+            dados_formatados = {
+                "id": cliente.id,
+                "nome": cliente.nome,
+                "email": cliente.email,
+                "telefone": cliente.telefone,
+                "cpfcnpj": cliente.cpfcnpj,
+                "ativo": ativo
+            }
+
+            lista_clientes.append(dados_formatados)
+
+        return {"retorno": lista_clientes}
+    finally:
+        db.close()
+
+
+@app.post("/alterar-cliente")
+async def alterar_cliente(cod_hw: str, cliente_id: int, nome: str = None, empresa: str = None, email: str = None,
+                          telefone: str = None, cpfcnpj: str = None, senha: str = None, ativo: bool = None):
+    db = next(get_db(cod_hw))
+    try:
+
+        cliente_existente = buscar_cliente(db, cliente_id)
+        if cliente_existente is None:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+
+        if cpfcnpj:
+            documento_valido = validar_documento(cpfcnpj)
+            if not documento_valido:
+                return {"retorno": "Por favor informe um documento válido."}
+
+            outro_cliente = buscar_cliente_cpfcnpj(db, cpfcnpj)
+            if outro_cliente and outro_cliente.id != cliente_id:
+                return {"retorno": "Esse CPF ou CNPJ já está cadastrado por outro cliente."}
+
+        campos_para_atualizar = {
+            "nome": nome,
+            "empresa": empresa,
+            "email": email,
+            "telefone": telefone,
+            "cpfcnpj": cpfcnpj,
+            "senha": senha,
+            "ativo": ativo,
+        }
+
+        campos_para_atualizar = {k: v for k, v in campos_para_atualizar.items() if v is not None}
+
+        cliente_atualizado = editar_clientes(db, cliente_id, **campos_para_atualizar)
+        if cliente_atualizado:
+            return {"status": "success", "message": "Cliente alterado com sucesso."}
+        else:
+            raise HTTPException(status_code=500, detail="Erro ao alterar o cliente.")
     finally:
         db.close()
