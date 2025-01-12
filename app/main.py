@@ -516,7 +516,7 @@ async def logar(usuario: str, senha: str):
     db = next(get_db('hwadmin'))
     try:
         usuario_dados = buscar_cliente_email(db, usuario)
-        print(usuario_dados)
+        print('\n\n\n\n\n\n\nDados do usuário: ', usuario_dados, "\n\n\n\n\n\n\n\n\n\n")
         if usuario_dados is not None:
             senha_usuario = usuario_dados.get("senha")
             if senha_usuario == senha:
