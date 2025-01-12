@@ -697,7 +697,7 @@ async def alterar_cliente(cod_hw: str, cliente_id: int, nome: str = None, empres
         db.close()
 
 
-@app.get("/buscar-cliente-cpfcnpj")
+@app.post("/buscar-cliente-cpfcnpj")
 async def buscar_cliente_por_cpfcnpj(cod_hw: str, cpfcnpj: str):
     db = next(get_db(cod_hw))
     try:
