@@ -512,21 +512,25 @@ async def pesquisarAgendaDia(empresa: str, data: str):
 
 @app.post("/logar")
 async def logar(usuario: str, senha: str):
-
     db = next(get_db('hwadmin'))
     try:
         usuario_dados = buscar_cliente_email(db, usuario)
-        print('\n\n\n\n\n\n\nDados do usuário: ', usuario_dados, "\n\n\n\n\n\n\n\n\n\n")
+
         if usuario_dados is not None:
-            senha_usuario = usuario_dados.get("senha")
+            senha_usuario = usuario_dados.senha
             if senha_usuario == senha:
-                return {"id": usuario_dados.get("id"), "nome": usuario_dados.get("nome"), "empresa": usuario_dados.get("empresa")}
+                return {
+                    "id": usuario_dados.id,
+                    "nome": usuario_dados.nome,
+                    "empresa": usuario_dados.empresa
+                }
             else:
                 return {"status": "Usuário ou senha incorretos"}
         else:
             return {"status": "Usuário ou senha incorretos"}
     finally:
         db.close()
+
 
 
 @app.post("/gerar-relatorio-agendamento")
