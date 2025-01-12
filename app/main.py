@@ -695,3 +695,20 @@ async def alterar_cliente(cod_hw: str, cliente_id: int, nome: str = None, empres
             raise HTTPException(status_code=500, detail="Erro ao alterar o cliente.")
     finally:
         db.close()
+
+
+@app.get("/buscar-cliente-cpfcnpj")
+async def buscar_cliente_por_cpfcnpj(cod_hw: str, cpfcnpj: str):
+    db = next(get_db(cod_hw))
+    try:
+        documento_valido = validar_documento(cpfcnpj)
+        if not documento_valido:
+            return {"retorno": "Por favor informe um documento válido."}
+
+        cliente = buscar_cliente_cpfcnpj(db, cpfcnpj)
+        if cliente:
+            return {"status": "success", "cliente": cliente}
+        else:
+            raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    finally:
+        db.close()
