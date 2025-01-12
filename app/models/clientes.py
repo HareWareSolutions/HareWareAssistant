@@ -12,16 +12,18 @@ class Cliente(Base):
     email = Column(String, nullable=False)
     telefone = Column(String, nullable=False)
     cpfcnpj = Column(String, nullable=False)
+    senha = Column(String, nullable=False)
     ativo = Column(Boolean, nullable=False)
 
 
-def criar_cliente(db: Session, nome: str, empresa: str, email: str, telefone: str, cpfcnpj: str, ativo: bool):
+def criar_cliente(db: Session, nome: str, empresa: str, email: str, telefone: str, cpfcnpj: str, senha: str, ativo: bool):
     novo_cliente = Cliente(
         nome=nome,
         empresa=empresa,
         email=email,
         telefone=telefone,
         cpfcnpj=cpfcnpj,
+        senha=senha,
         ativo=ativo
     )
     db.add(novo_cliente)
@@ -53,4 +55,8 @@ def deletar_cliente(db: Session, cliente_id: int):
 
 def buscar_cliente_cpfcnpj(db: Session, cpfcnpj: str):
     return db.query(Cliente).filter(Cliente.cpfcnpj == cpfcnpj).first()
+
+
+def buscar_cliente_email(db: Session, email: str):
+    return db.query(Cliente).filter(Cliente.email == email).first()
 

@@ -5,7 +5,7 @@ from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
-from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente
+from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
 from pydantic import BaseModel
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
@@ -513,12 +513,19 @@ async def pesquisarAgendaDia(empresa: str, data: str):
 @app.post("/logar")
 async def logar(usuario: str, senha: str):
 
-    if usuario == "HareWareAdmin" and senha == "123456":
-        return {"id": 1, "nome": "HareWare", "empresa": "hareware"}
-    elif usuario == "UserDemonstracao" and senha == "demonstracao@9834":
-        return {"id": 1, "nome": "HareWare", "empresa": "hareware"}
-    else:
-        return {"status": "Usuário ou senha incorretos"}
+    db = next(get_db('hwadmin'))
+    try:
+        usuario_dados = buscar_cliente_email(db, usuario)
+        if usuario_dados is not None:
+            senha_usuario = usuario_dados.get("senha")
+            if senha_usuario == senha:
+                return {"id": usuario_dados.get("id"), "nome": usuario_dados.get("nome"), "empresa": usuario_dados.get("empresa")}
+            else:
+                return {"status": "Usuário ou senha incorretos"}
+        else:
+            return {"status": "Usuário ou senha incorretos"}
+    finally:
+        db.close()
 
 
 @app.post("/gerar-relatorio-agendamento")
@@ -597,14 +604,14 @@ def remover_arquivo(caminho_pdf: str):
 # PAINEL ADMINISTRATIVO HAREWARE
 
 @app.post("/cadastrar-cliente")
-async def cadastrar_cliente(cod_hw: str, nome: str, empresa: str, email: str, telefone: str, cpfcnpj: str, ativo: bool):
+async def cadastrar_cliente(cod_hw: str, nome: str, empresa: str, email: str, telefone: str, cpfcnpj: str, senha: str, ativo: bool):
     db = next(get_db(cod_hw))
     try:
         documento_valido = validar_documento(cpfcnpj)
         if documento_valido:
             documento_existente = buscar_cliente_cpfcnpj(db, cpfcnpj)
             if documento_existente is None:
-                sucesso = criar_cliente(db, nome, empresa, email, telefone, cpfcnpj, ativo)
+                sucesso = criar_cliente(db, nome, empresa, email, telefone, cpfcnpj, senha, ativo)
                 if sucesso:
                     return {"status": "success", "message": "Cliente cadastrado com sucesso."}
                 else:

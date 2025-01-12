@@ -41,4 +41,3 @@ def validar_documento(documento: str) -> bool:
             return validar_cnpj(documento)
     return False
 
-
