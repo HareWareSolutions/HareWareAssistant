@@ -786,13 +786,17 @@ async def visualizar_contratos(cod_hw: str):
             else:
                 status_pagamento = "Não Pago"
 
+            cliente = buscar_cliente(db, contrato.id_cliente)
+
             dados_formatados = {
                 "id": contrato.id,
                 "tipo": contrato.tipo,
                 "pacote": contrato.pacote,
                 "tokens_utilizados": contrato.tokens_utilizados,
                 "status_pagamento": status_pagamento,
-                "data_ultimo_pagamento": contrato.data_ultimo_pagamento
+                "data_ultimo_pagamento": contrato.data_ultimo_pagamento,
+                "id_cliente": cliente.id,
+                "nome_cliente": cliente.nome_cliente
             }
 
             lista_contratos.append(dados_formatados)
