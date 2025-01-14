@@ -6,6 +6,7 @@ from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
+from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
 from pydantic import BaseModel
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
@@ -710,5 +711,92 @@ async def buscar_cliente_por_cpfcnpj(cod_hw: str, cpfcnpj: str):
             return {"status": "success", "cliente": cliente}
         else:
             raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    finally:
+        db.close()
+
+
+@app.post("/incluir-contrato")
+async def incluir_contrato(cod_hw: str, tipo: str, pagamento: bool, pacote: str, id_cliente: int):
+    db = next(get_db(cod_hw))
+    try:
+        cliente = buscar_cliente(db, id_cliente)
+        if cliente is not None:
+            sucesso = criar_contrato(db, tipo, pagamento, pacote, 0, None, id_cliente)
+            if sucesso:
+                cliente = alterar_cliente(db, id_cliente, ativo=True)
+                return {"status": "success", "message": "Contrato incluído com sucesso."}
+            else:
+                raise HTTPException(status_code=500, detail="Erro ao incluir contrato.")
+        else:
+            return {"retorno": "Por favor informe um cliente válido."}
+    finally:
+        db.close()
+
+
+@app.post("/alterar-contrato")
+async def alterar_contrato(cod_hw: str, id_contrato: int, tipo: str = None, pagamento: bool = None, pacote: int = None):
+    db = next(get_db(cod_hw))
+    try:
+        if pagamento:
+            data_pagamento = datetime.now()
+            data_formatada = data_pagamento.strftime("%d/%m/%Y")
+        else:
+            data_formatada = None
+
+        contrato = editar_contrato(
+            db,
+            id_contrato,
+            tipo,
+            pagamento,
+            pacote,
+            None,
+            data_formatada
+        )
+        if contrato:
+            return {"status": "success", "message": "Contrato alterado com sucesso."}
+        else:
+            raise HTTPException(status_code=404, detail="Contrato não encontrado.")
+    finally:
+        db.close()
+
+
+@app.post("/excluir-contrato")
+async def excluir_contrato(cod_hw: str, id_contrato: int):
+    db = next(get_db(cod_hw))
+    try:
+        sucesso = deletar_contrato(db, id_contrato)
+        if sucesso:
+            return {"status": "success", "message": "Contrato excluído com sucesso."}
+        else:
+            raise HTTPException(status_code=404, detail="Erro ao excluir contrato.")
+    finally:
+        db.close()
+
+
+@app.post("/visualizar-contratos")
+async def visualizar_contratos(cod_hw: str):
+    db = next(get_db(cod_hw))
+    try:
+        contratos = listar_contratos(db)
+        lista_contratos = []
+
+        for contrato in contratos:
+            if contrato.pagamento:
+                status_pagamento = "Pago"
+            else:
+                status_pagamento = "Não Pago"
+
+            dados_formatados = {
+                "id": contrato.id,
+                "tipo": contrato.tipo,
+                "pacote": contrato.pacote,
+                "tokens_utilizados": contrato.tokens_utilizados,
+                "status_pagamento": status_pagamento,
+                "data_ultimo_pagamento": contrato.data_ultimo_pagamento
+            }
+
+            lista_contratos.append(dados_formatados)
+
+        return {"retorno": lista_contratos}
     finally:
         db.close()
