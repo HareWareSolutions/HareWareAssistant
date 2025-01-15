@@ -807,7 +807,7 @@ async def visualizar_contratos(cod_hw: str):
 
 
 @app.post("/buscar-contrato")
-async def buscar_contrato(cod_hw: str, id_contrato: str):
+async def buscar_contrato(cod_hw: str, id_contrato: int):
     db = next(get_db(cod_hw))
     try:
         contrato = buscar_contrato_por_id(db, id_contrato)
