@@ -78,3 +78,7 @@ def deletar_contrato(db: Session, contrato_id: int):
         db.commit()
         return True
     return False
+
+
+def buscar_contrato_por_id(db: Session, contrato_id: int):
+    return db.query(Contrato).filter(Contrato.id == contrato_id).first()

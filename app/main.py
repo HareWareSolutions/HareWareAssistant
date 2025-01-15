@@ -6,7 +6,7 @@ from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
-from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos
+from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
 from pydantic import BaseModel
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
@@ -802,5 +802,18 @@ async def visualizar_contratos(cod_hw: str):
             lista_contratos.append(dados_formatados)
 
         return {"retorno": lista_contratos}
+    finally:
+        db.close()
+
+
+@app.post("/buscar-contrato")
+async def buscar_contrato(cod_hw: str, id_contrato: str):
+    db = next(get_db(cod_hw))
+    try:
+        contrato = buscar_contrato_por_id(db, id_contrato)
+        if contrato is not None:
+            return {"status": "success", "contrato": contrato}
+        else:
+            raise HTTPException(status_code=404, detail="Contrato não encontrado.")
     finally:
         db.close()
