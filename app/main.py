@@ -816,3 +816,25 @@ async def buscar_contrato(cod_hw: str, id_contrato: int):
             raise HTTPException(status_code=404, detail="Contrato não encontrado.")
     finally:
         db.close()
+
+
+@app.post("/logar-adm")
+async def logar(usuario: str, senha: str):
+    db = next(get_db('hwadmin'))
+    try:
+        usuario_dados = buscar_cliente_email(db, usuario)
+
+        if usuario_dados is not None:
+            senha_usuario = usuario_dados.senha
+            if senha_usuario == senha and (usuario_dados.empresa == 'hareware' or usuario_dados.empresa == 'hwadmin'):
+                return {
+                    "id": usuario_dados.id,
+                    "nome": usuario_dados.nome,
+                    "empresa": usuario_dados.empresa
+                }
+            else:
+                return {"status": "Usuário ou senha incorretos"}
+        else:
+            return {"status": "Usuário ou senha incorretos"}
+    finally:
+        db.close()
