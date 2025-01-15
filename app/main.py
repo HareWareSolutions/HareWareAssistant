@@ -738,10 +738,9 @@ async def alterar_contrato(cod_hw: str, id_contrato: int, tipo: str = None, paga
     db = next(get_db(cod_hw))
     try:
         if pagamento:
-            data_pagamento = datetime.now()
-            data_formatada = data_pagamento.strftime("%d/%m/%Y")
+            data_pagamento = datetime.now().date()
         else:
-            data_formatada = None
+            data_pagamento = None
 
         contrato = editar_contrato(
             db,
@@ -750,7 +749,7 @@ async def alterar_contrato(cod_hw: str, id_contrato: int, tipo: str = None, paga
             pagamento,
             pacote,
             None,
-            data_formatada
+            data_pagamento
         )
         if contrato:
             return {"status": "success", "message": "Contrato alterado com sucesso."}
