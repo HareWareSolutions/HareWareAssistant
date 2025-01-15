@@ -796,7 +796,7 @@ async def visualizar_contratos(cod_hw: str):
                 "status_pagamento": status_pagamento,
                 "data_ultimo_pagamento": contrato.data_ultimo_pagamento,
                 "id_cliente": cliente.id,
-                "nome_cliente": cliente.nome_cliente
+                "nome_cliente": cliente.nome
             }
 
             lista_contratos.append(dados_formatados)
