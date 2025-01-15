@@ -734,7 +734,7 @@ async def incluir_contrato(cod_hw: str, tipo: str, pagamento: bool, pacote: str,
 
 
 @app.post("/alterar-contrato")
-async def alterar_contrato(cod_hw: str, id_contrato: int, tipo: str = None, pagamento: bool = None, pacote: int = None):
+async def alterar_contrato(cod_hw: str, id_contrato: int, tipo: str = None, pagamento: bool = None, pacote: str = None):
     db = next(get_db(cod_hw))
     try:
         if pagamento:
