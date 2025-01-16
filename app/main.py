@@ -425,9 +425,8 @@ async def receive_message(request: Request):
 
                 return {"status": "success"}
 
-            print(resposta)
-            tokens_saida = encoding.encode(resposta)
-            print('passei pelo encoding')
+            tokens_saida = encoding.encode(resposta[0].text.value)
+
             num_tokens_saida = len(tokens_saida)
             total_tokens_acao = num_tokens + num_tokens_saida
 
@@ -436,8 +435,6 @@ async def receive_message(request: Request):
             total_tokens_contrato = contrato.tokens_utilizados
 
             atualizacao_tokens = total_tokens_contrato + total_tokens_acao
-            print('atualizacao tokens é ', type(atualizacao_tokens))
-            print(atualizacao_tokens)
 
             atualizacao_contrato = editar_contrato(
                 db,
