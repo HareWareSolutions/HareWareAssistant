@@ -1,5 +1,6 @@
 import logging
 import os
+import tiktoken
 from datetime import datetime, date, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
@@ -17,6 +18,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 logging.basicConfig(level=logging.INFO)
+
+encoding = tiktoken.get_encoding("cl100k_base")
 
 app = FastAPI()
 
@@ -281,6 +284,7 @@ async def receber_mensagem_foa(request: Request):
 
 @app.post("/webhook-zapi-sa")
 async def receive_message(request: Request):
+    db = next(get_db('hwadmin'))
     try:
         data = await request.json()
         logging.info(f"Dados recebidos: {data}")
@@ -289,6 +293,24 @@ async def receive_message(request: Request):
         if not numero_celular:
             logging.error("Número de telefone não encontrado.")
             return {"status": "error", "message": "Número de telefone não encontrado."}
+
+        destino = data['to']
+        if not destino:
+            logging.error("Número de destino não encontrado.")
+            return {"status": "error", "message": "Número de destino não encontrato."}
+
+        match destino:
+            case "5519999344528":
+                env = 'hareware'
+                id_contrato = 1
+            case "5519971501387":
+                env = 'malaman'
+                id_contrato = 5
+            case "5519984574859":
+                env = 'joice'
+                id_contrato = 2
+            case other:
+                return {"status": "error", "message": "Número de destino inválido."}
 
         if data.get("type") == "ReceivedCallback" and data.get("pollVote"):
 
@@ -307,7 +329,7 @@ async def receive_message(request: Request):
                 desculpa = 'Desculpe, acabamos de registrar um agendamento para esse horário. Poderia, por gentileza, escolher outro horário disponível?'
 
                 send_message_zapi(
-                    env='hareware',
+                    env=env,
                     number=numero_celular,
                     message=desculpa,
                     delay_typing=1
@@ -322,7 +344,7 @@ async def receive_message(request: Request):
 
             else:
                 send_message_zapi(
-                    env='hareware',
+                    env=env,
                     number=numero_celular,
                     message=resposta,
                     delay_typing=1
@@ -331,7 +353,7 @@ async def receive_message(request: Request):
                 return {"status": "success"}
 
             send_poll_zapi(
-                env='hareware',
+                env=env,
                 number=numero_celular,
                 question=pergunta,
                 options=opcoes
@@ -349,7 +371,7 @@ async def receive_message(request: Request):
             resposta = "Infelizmente no momento ainda não consigo analisar imagens..."
 
             send_message_zapi(
-                env='hareware',
+                env=env,
                 number=numero_celular,
                 message=resposta,
                 delay_typing=1
@@ -359,6 +381,9 @@ async def receive_message(request: Request):
         if prompt:
             logging.info(f"Mensagem de texto recebida: {prompt}")
 
+            tokens_entrada = encoding.encode(prompt)
+            num_tokens = len(tokens_entrada)
+
             resposta = fluxo_conversa(prompt, numero_celular)
 
             if 'CDT' in resposta:
@@ -366,7 +391,7 @@ async def receive_message(request: Request):
                 opcoes = [{'name': 'Sim'}, {'name': 'Não'}]
 
                 send_poll_zapi(
-                    env='hareware',
+                    env=env,
                     number=numero_celular,
                     question=pergunta,
                     options=opcoes
@@ -379,7 +404,7 @@ async def receive_message(request: Request):
                 opcoes = [{'name': opcao} for opcao in resposta['CAG']]
 
                 send_poll_zapi(
-                    env='hareware',
+                    env=env,
                     number=numero_celular,
                     question=pergunta,
                     options=opcoes
@@ -392,7 +417,7 @@ async def receive_message(request: Request):
                 opcoes = [{'name': 'Sim'}, {'name': 'Não'}]
 
                 send_poll_zapi(
-                    env='hareware',
+                    env=env,
                     number=numero_celular,
                     question=pergunta,
                     options=opcoes
@@ -400,8 +425,20 @@ async def receive_message(request: Request):
 
                 return {"status": "success"}
 
+            tokens_saida = encoding.encode(resposta)
+            num_tokens_saida = len(tokens_saida)
+            total_tokens_acao = num_tokens + num_tokens_saida
+
+            contrato = buscar_contrato_por_id(db, id_contrato)
+
+            total_tokens_contrato = contrato.tokens_utilizados
+
+            atualizacao_tokens = total_tokens_contrato + total_tokens_acao
+
+            atualizacao_contrato = editar_contrato(db, id_contrato, tokens_utilizados=atualizacao_tokens)
+
             send_message_zapi(
-                env='hareware',
+                env=env,
                 number=numero_celular,
                 message=resposta,
                 delay_typing=1
@@ -412,6 +449,8 @@ async def receive_message(request: Request):
     except Exception as e:
         logging.error(f"Erro ao processar a requisição: {str(e)}")
         return {"status": "error", "message": str(e)}
+    finally:
+        db.close()
 
 
 @app.post("/incluir-agendamento")
