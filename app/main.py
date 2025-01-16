@@ -434,6 +434,8 @@ async def receive_message(request: Request):
             total_tokens_contrato = contrato.tokens_utilizados
 
             atualizacao_tokens = total_tokens_contrato + total_tokens_acao
+            print('atualizacao tokens é ', type(atualizacao_tokens))
+            print(atualizacao_tokens)
 
             atualizacao_contrato = editar_contrato(
                 db,
