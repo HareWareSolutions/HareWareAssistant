@@ -425,7 +425,9 @@ async def receive_message(request: Request):
 
                 return {"status": "success"}
 
+            print(resposta)
             tokens_saida = encoding.encode(resposta)
+            print('passei pelo encoding')
             num_tokens_saida = len(tokens_saida)
             total_tokens_acao = num_tokens + num_tokens_saida
 
