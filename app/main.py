@@ -435,7 +435,15 @@ async def receive_message(request: Request):
 
             atualizacao_tokens = total_tokens_contrato + total_tokens_acao
 
-            atualizacao_contrato = editar_contrato(db, id_contrato, tokens_utilizados=atualizacao_tokens)
+            atualizacao_contrato = editar_contrato(
+                db,
+                id_contrato,
+                None,
+                None,
+                None,
+                atualizacao_tokens,
+                None
+            )
 
             send_message_zapi(
                 env=env,
