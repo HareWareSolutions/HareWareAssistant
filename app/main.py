@@ -294,7 +294,7 @@ async def receive_message(request: Request):
             logging.error("Número de telefone não encontrado.")
             return {"status": "error", "message": "Número de telefone não encontrado."}
 
-        destino = data.get("to")
+        destino = data.get("connectedPhone")
         if not destino:
             logging.error("Número de destino não encontrado.")
             return {"status": "error", "message": "Número de destino não encontrato."}
