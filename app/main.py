@@ -425,7 +425,11 @@ async def receive_message(request: Request):
 
                 return {"status": "success"}
 
-            tokens_saida = encoding.encode(resposta[0].text.value)
+            resposta_token = resposta
+            if isinstance(resposta_token, list):
+                resposta_token = resposta_token[0].text.value
+
+            tokens_saida = encoding.encode(resposta_token)
 
             num_tokens_saida = len(tokens_saida)
             total_tokens_acao = num_tokens + num_tokens_saida
