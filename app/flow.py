@@ -25,7 +25,7 @@ def fluxo_conversa(env, prompt, telefone):
         intencao = arc_predict(prompt)
 
         if intencao == 0 and not registro_status:
-            resposta = send_message_to_ai(prompt)
+            resposta = send_message_to_ai(env, prompt)
             return resposta
         else:
             if registro_status is None:
