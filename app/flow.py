@@ -100,7 +100,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
             novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data)
             agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
 
-            if env == 'malaman':
+            if env == 'hareware':
                 dia_semana = dia_da_semana(data_agendamento)
                 if dia_semana == 'sabado':
                     horarios_livres = verificar_horarios('malaman-sabado', agendamentos)
@@ -131,7 +131,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
             time.sleep(tempo)
             agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
 
-            if env == 'malaman':
+            if env == 'hareware':
                 dia_semana = dia_da_semana(data_agendamento)
                 if dia_semana == 'sabado':
                     horarios_disponiveis = verificar_horarios('malaman-sabado', agendamentos)
@@ -158,7 +158,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data_agendamento)
                 agendamentos = buscar_agendamentos_por_data(db, data)
 
-                if env == 'malaman':
+                if env == 'hareware':
                     dia_semana = dia_da_semana(data_agendamento)
                     if dia_semana == 'sabado':
                         horarios_livres = verificar_horarios('malaman-sabado', agendamentos)
