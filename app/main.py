@@ -319,7 +319,7 @@ async def receive_message(request: Request):
             opcao_votada = poll_data.get("options", [])
             opcao_votada = opcao_votada[0].get("name", "")
 
-            resposta = fluxo_conversa_poll(opcao_votada, numero_celular)
+            resposta = fluxo_conversa_poll(env, opcao_votada, numero_celular)
 
             if 'IHR' in resposta and isinstance(resposta['IHR'], list):
                 pergunta = 'Escolha um dos horários disponíveis:'
@@ -384,7 +384,7 @@ async def receive_message(request: Request):
             tokens_entrada = encoding.encode(prompt)
             num_tokens = len(tokens_entrada)
 
-            resposta = fluxo_conversa(prompt, numero_celular)
+            resposta = fluxo_conversa(env, prompt, numero_celular)
 
             if 'CDT' in resposta:
                 pergunta = f'Você deseja realizar um agendamento na data de {resposta["CDT"]}?'
@@ -482,7 +482,7 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
     try:
         data_agendamento = datetime.strptime(data, "%d/%m/%Y").date()
         agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
-        horarios_disponiveis = verificar_horarios(agendamentos)
+        horarios_disponiveis = verificar_horarios(empresa, agendamentos)
 
         hora_agendamento = datetime.strptime(hora, "%H:%M").time()
         hora_formatada = hora_agendamento.strftime("%H:%M")

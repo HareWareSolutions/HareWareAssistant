@@ -10,7 +10,11 @@ load_dotenv()
 #assistant_id_foundry = os.getenv('ASSISTANT_ID')
 foundry_endpoint = "https://hareware-openai.openai.azure.com/"
 foundry_key = "Tft6fly9yH8Yx6yyXz7vaM6g3iQIXBaQ8b69vFZ4l23ewuBc8W6tJQQJ99AKACYeBjFXJ3w3AAABACOGRcxn"
-assistant_id_foundry = "asst_z0XpoKoyLqtUmyEW6oNH0hlO"
+assistant_id_foundry = {
+    "hareware": "asst_z0XpoKoyLqtUmyEW6oNH0hlO",
+    "joice": "",
+    "malaman": "asst_J109oCFHPFndORVmgOsVvsVv"
+}
 
 
 client = AzureOpenAI(
@@ -20,12 +24,12 @@ client = AzureOpenAI(
 )
 
 
-def send_message_to_ai(message_content: str):
+def send_message_to_ai(code: str, message_content: str):
     thread = create_thread()
 
     send_message(thread.id, message_content)
 
-    run = start_run(thread.id, assistant_id_foundry)
+    run = start_run(thread.id, assistant_id_foundry[code])
 
     run_status = wait_for_run_to_complete(run, thread.id)
 

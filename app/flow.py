@@ -14,8 +14,8 @@ from app.ia.iia import iia_predict
 from app.ia.foundry import send_message_to_ai
 
 
-def fluxo_conversa(prompt, telefone):
-    db = next(get_db('hareware'))
+def fluxo_conversa(env, prompt, telefone):
+    db = next(get_db(env))
 
     registro_status = buscar_status(db, telefone)
 
@@ -79,8 +79,8 @@ def fluxo_conversa(prompt, telefone):
             return {'CNM': f'Seu nome é {prompt}?'}
 
 
-def fluxo_conversa_poll(opcao, telefone):
-    db = next(get_db('hareware'))
+def fluxo_conversa_poll(env, opcao, telefone):
+    db = next(get_db(env))
 
     registro_status = buscar_status(db, telefone)
 
@@ -93,7 +93,7 @@ def fluxo_conversa_poll(opcao, telefone):
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data)
             agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
-            horarios_livres = verificar_horarios(agendamentos)
+            horarios_livres = verificar_horarios(env, agendamentos)
 
             if not horarios_livres:
                 deletar_status(db, telefone)
@@ -116,7 +116,7 @@ def fluxo_conversa_poll(opcao, telefone):
             tempo = random.uniform(1, 3)
             time.sleep(tempo)
             agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
-            horarios_disponiveis = verificar_horarios(agendamentos)
+            horarios_disponiveis = verificar_horarios(env, agendamentos)
 
             if not horarios_disponiveis:
                 deletar_status(db, telefone)
@@ -135,7 +135,7 @@ def fluxo_conversa_poll(opcao, telefone):
                 deletar_status(db, telefone)
                 novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data_agendamento)
                 agendamentos = buscar_agendamentos_por_data(db, data)
-                horarios_livres = verificar_horarios(agendamentos)
+                horarios_livres = verificar_horarios(env, agendamentos)
 
                 if not horarios_livres:
                     deletar_status(db, telefone)
