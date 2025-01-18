@@ -102,8 +102,8 @@ def fluxo_conversa_poll(env, opcao, telefone):
 
             if env == 'hareware':
                 dia_semana = dia_da_semana(data_agendamento)
-                if dia_semana == 'sabado':
-                    horarios_livres = verificar_horarios('malaman-sabado', agendamentos)
+                if dia_semana == 'sábado':
+                    horarios_livres = verificar_horarios('malaman-sábado', agendamentos)
                 else:
                     horarios_livres = verificar_horarios(env, agendamentos)
             else:
@@ -133,8 +133,8 @@ def fluxo_conversa_poll(env, opcao, telefone):
 
             if env == 'hareware':
                 dia_semana = dia_da_semana(data_agendamento)
-                if dia_semana == 'sabado':
-                    horarios_disponiveis = verificar_horarios('malaman-sabado', agendamentos)
+                if dia_semana == 'sábado':
+                    horarios_disponiveis = verificar_horarios('malaman-sábado', agendamentos)
                 else:
                     horarios_disponiveis = verificar_horarios(env, agendamentos)
             else:
@@ -160,8 +160,8 @@ def fluxo_conversa_poll(env, opcao, telefone):
 
                 if env == 'hareware':
                     dia_semana = dia_da_semana(data_agendamento)
-                    if dia_semana == 'sabado':
-                        horarios_livres = verificar_horarios('malaman-sabado', agendamentos)
+                    if dia_semana == 'sábado':
+                        horarios_livres = verificar_horarios('malaman-sábado', agendamentos)
                     else:
                         horarios_livres = verificar_horarios(env, agendamentos)
                 else:
