@@ -7,6 +7,7 @@ from app.utils.validacoes import caracteres_invalidos, caracteres_numericos
 from app.models.status import buscar_status, gravar_status, deletar_status
 from app.utils.rotinasDatas import extrair_data, normalizar_data, transformar_data_e_hora
 from app.utils.rotinasHoras import verificar_horarios
+from app.utils.identificarDiaSemana import dia_da_semana
 from datetime import datetime
 from app.db.db import get_db
 from app.ia.arc import arc_predict
@@ -57,6 +58,11 @@ def fluxo_conversa(env, prompt, telefone):
 
                 if data is None:
                     return "Não entendi qual data você deseja agendar, poderia me informar novamente?"
+
+                dia_semana = dia_da_semana(data)
+
+                if env == 'malaman' or env == 'hareware' and dia_semana == 'domingo':
+                    return "Desculpa, infelizmente não trabalhamos aos domingos, poderia informar outra data?"
 
                 deletar_status(db, telefone)
                 novo_status = gravar_status(db, telefone, "CDT", datetime.now(), str(data))
