@@ -1,12 +1,19 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import pytz
 from datetime import datetime, timedelta
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from db.db import get_db
 from models.agendamento import buscar_agendamentos_por_data
 from models.contato import buscar_contato_id
 from utils.zapi import send_message_zapi
 
+
+def get_hora_brasil():
+    brasil_tz = pytz.timezone('America/Sao_Paulo')
+    return datetime.now(brasil_tz)
 
 
 def mensagem_env(env, nome, hora):
@@ -26,7 +33,7 @@ def mensagem_env(env, nome, hora):
 
 
 def is_round_hour():
-    current_time = datetime.now()
+    current_time = get_hora_brasil()
     return current_time.minute == 0 and current_time.second == 0
 
 
@@ -34,13 +41,13 @@ def notificar():
     envs = ['hareware']
 
     while True:
-        if is_round_hour():
+        if 1 == 1:
             for env in envs:
                 db = next(get_db(env))
                 try:
-                    hoje = datetime.now().date()
+                    hoje = get_hora_brasil().date()
                     agendamentos = buscar_agendamentos_por_data(db, hoje)
-                    hora_atual = datetime.now()
+                    hora_atual = get_hora_brasil()
 
                     for agendamento in agendamentos:
                         hora_agendada = datetime.strptime(agendamento, "%H:%M:%S")
