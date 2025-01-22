@@ -41,7 +41,7 @@ def notificar():
     envs = ['hareware']
 
     while True:
-        if 1 == 1:
+        if is_round_hour():
             for env in envs:
                 db = next(get_db(env))
                 try:
