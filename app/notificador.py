@@ -50,8 +50,13 @@ def notificar():
                     hora_atual = get_hora_brasil()
 
                     for agendamento in agendamentos:
-                        hora_agendada = datetime.strptime(agendamento, "%H:%M:%S")
-                        hora_agendada = get_hora_brasil().replace(hour=hora_agendada.hour, minute=hora_agendada.minute, second=hora_agendada.second, microsecond=0)
+                        hora_agendada = datetime.strptime(agendamento.hora, "%H:%M:%S")
+                        hora_agendada = hora_agendada.replace(
+                            year=hoje.year,
+                            month=hoje.month,
+                            day=hoje.day,
+                            tzinfo=pytz.timezone('America/Sao_Paulo').localize(datetime.now()).tzinfo
+                        )
 
                         if hora_agendada - timedelta(hours=1) <= hora_atual <= hora_agendada:
                             contato = buscar_contato_id(db, agendamento.contato_id)
