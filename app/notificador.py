@@ -1,12 +1,12 @@
 import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from datetime import datetime, timedelta
 from db.db import get_db
 from models.agendamento import buscar_agendamentos_por_data
 from models.contato import buscar_contato_id
 from utils.zapi import send_message_zapi
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 def mensagem_env(env, nome, hora):
