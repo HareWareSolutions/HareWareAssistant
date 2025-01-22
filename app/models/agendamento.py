@@ -38,6 +38,11 @@ def buscar_agendamentos_por_data(db: Session, data):
     return agendamentos
 
 
+def buscar_agendamentos_por_data_ntf(db: Session, data):
+    agendamentos = db.query(Agendamento).filter(Agendamento.data == data).all()  # Retorna objetos completos
+    return agendamentos
+
+
 def buscar_agendamentos_por_data_api(db: Session, data):
     data_formatada = datetime.strptime(data, "%d/%m/%Y").date()
 

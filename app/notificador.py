@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from db.db import get_db
-from models.agendamento import buscar_agendamentos_por_data
+from models.agendamento import buscar_agendamentos_por_data_ntf
 from models.contato import buscar_contato_id
 from utils.zapi import send_message_zapi
 
@@ -46,7 +46,7 @@ def notificar():
                 db = next(get_db(env))
                 try:
                     hoje = get_hora_brasil().date()
-                    agendamentos = buscar_agendamentos_por_data(db, hoje)
+                    agendamentos = buscar_agendamentos_por_data_ntf(db, hoje)
                     hora_atual = get_hora_brasil()
 
                     for agendamento in agendamentos:
