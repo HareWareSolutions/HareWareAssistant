@@ -50,11 +50,8 @@ def notificar():
                     hora_atual = get_hora_brasil()
 
                     for agendamento in agendamentos:
-                        hora_agendada = datetime.strptime(agendamento.hora, "%H:%M:%S")
+                        hora_agendada = datetime.combine(hoje, agendamento.hora)  # Combina data e hora
                         hora_agendada = hora_agendada.replace(
-                            year=hoje.year,
-                            month=hoje.month,
-                            day=hoje.day,
                             tzinfo=pytz.timezone('America/Sao_Paulo').localize(datetime.now()).tzinfo
                         )
 
