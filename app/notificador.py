@@ -41,7 +41,7 @@ def notificar():
     envs = ['hareware']
 
     while True:
-        if 1 == 1():
+        if 1 == 1:
             for env in envs:
                 db = next(get_db(env))
                 try:
