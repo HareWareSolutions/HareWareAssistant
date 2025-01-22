@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from app.db.db import get_db
-from app.models.agendamento import buscar_agendamentos_por_data
-from app.models.contato import buscar_contato_id
-from app.utils.zapi import send_message_zapi
+from db.db import get_db
+from models.agendamento import buscar_agendamentos_por_data
+from models.contato import buscar_contato_id
+from utils.zapi import send_message_zapi
 
 
 def mensagem_env(env, nome, hora):
