@@ -41,7 +41,7 @@ def notificar():
     envs = ['hareware']
 
     while True:
-        if 1 == 1:
+        if is_round_hour():
             for env in envs:
                 db = next(get_db(env))
                 try:
@@ -51,6 +51,7 @@ def notificar():
 
                     for agendamento in agendamentos:
                         hora_agendada = datetime.strptime(agendamento, "%H:%M:%S")
+                        hora_agendada = get_hora_brasil().replace(hour=hora_agendada.hour, minute=hora_agendada.minute, second=hora_agendada.second, microsecond=0)
 
                         if hora_agendada - timedelta(hours=1) <= hora_atual <= hora_agendada:
                             contato = buscar_contato_id(db, agendamento.contato_id)
