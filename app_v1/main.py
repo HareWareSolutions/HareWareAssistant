@@ -89,6 +89,6 @@ async def receive_message(request: Request):
     #auth_token = "xT3AcKpnGLC5VPk49fhTlCLwk1VkuU9Up"  # Substitua com seu token de autenticação
 
     # Chamando a função para enviar a mensagem
-    resultado = await enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token)
+    #resultado = await enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token)
 
     return {"status": "success", "message": "Mensagem recebida com sucesso! Este é um teste."}
