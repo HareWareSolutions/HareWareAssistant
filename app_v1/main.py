@@ -70,8 +70,10 @@ async def enviar_mensagem(api_url, connection_key, phone_number, message, delay_
 # Endpoint que recebe a mensagem e sempre retorna uma resposta com uma mensagem de teste
 @app.post("/webhook-zapi")
 async def receive_message(request: Request):
-    data = request.json()
-    print(data)
+    data = await request.json()
+
+    # Printando os dados recebidos na requisição
+    print("Dados recebidos:", data)
 
     """api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
     connection_key = "w-api_N3IE7GZOFN"  # Substitua com a chave de conexão real
