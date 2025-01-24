@@ -3,6 +3,7 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import time
+import hashlib
 
 # Configuração de log
 logging.basicConfig(level=logging.INFO)
@@ -19,10 +20,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Conjunto para armazenar os IDs das mensagens processadas
-# Usaremos um dicionário para armazenar o ID da mensagem com o timestamp da última vez que foi processada.
-processed_message_ids = {}
-
+# Conjunto para armazenar os hashes das mensagens processadas (chave: hash da mensagem)
+processed_hashes = {}
 
 # Função para enviar a mensagem via API
 async def enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token):
@@ -66,22 +65,26 @@ async def enviar_mensagem(api_url, connection_key, phone_number, message, delay_
 async def receive_message(request: Request):
     data = await request.json()
 
-    # Extraindo o ID da mensagem
+    # Extraindo o ID da mensagem e o conteúdo
     message_id = data['body']['key']['id']
+    remote_jid = data['body']['key']['remoteJid']
+    message_text = data['body']['message']['extendedTextMessage']['text']
 
-    # Verificando se a mensagem já foi processada com base no ID
+    # Gerando um hash único para a mensagem (com ID e conteúdo)
+    message_hash = hashlib.sha256(f"{message_id}-{remote_jid}-{message_text}".encode('utf-8')).hexdigest()
+
+    # Verificando duplicidade usando o hash
     current_time = time.time()  # Timestamp atual
-    if message_id in processed_message_ids:
-        last_processed_time = processed_message_ids[message_id]
+    if message_hash in processed_hashes:
+        last_processed_time = processed_hashes[message_hash]
         if current_time - last_processed_time < 5:  # Exemplo de janela de 5 segundos (ajustar conforme necessário)
             logging.info(f"Mensagem duplicada detectada (ID: {message_id}). Ignorando envio.")
             return {"status": "ignored", "message": "Mensagem duplicada detectada, não processada."}
 
-    # Armazenando o ID da mensagem com o timestamp atual
-    processed_message_ids[message_id] = current_time
+    # Armazenando o hash da mensagem com o timestamp atual
+    processed_hashes[message_hash] = current_time
 
     # Printando os dados recebidos na requisição
-    remote_jid = data['body']['key']['remoteJid']
     numero = remote_jid[0:13]  # Pegando o número
 
     api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
