@@ -68,7 +68,17 @@ async def receive_message(request: Request):
     # Extraindo o ID da mensagem e o conteúdo
     message_id = data['body']['key']['id']
     remote_jid = data['body']['key']['remoteJid']
-    message_text = data['body']['message']['extendedTextMessage']['text']
+
+    # Verificando o tipo de mensagem
+    message_text = None
+    if 'extendedTextMessage' in data['body']['message']:
+        message_text = data['body']['message']['extendedTextMessage']['text']
+    elif 'textMessage' in data['body']['message']:
+        message_text = data['body']['message']['textMessage']['text']
+    elif 'imageMessage' in data['body']['message']:
+        message_text = '[Imagem recebida]'  # Caso tenha uma imagem, podemos configurar uma resposta padrão
+    else:
+        message_text = '[Tipo de mensagem não suportado]'
 
     # Gerando um hash único para a mensagem (com ID e conteúdo)
     message_hash = hashlib.sha256(f"{message_id}-{remote_jid}-{message_text}".encode('utf-8')).hexdigest()
