@@ -92,4 +92,5 @@ def notificar():
             time.sleep(30)
 
 
-notificar()
+if __name__ == "__main__":
+    notificar()
