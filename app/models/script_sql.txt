@@ -1,0 +1,21 @@
+CREATE TABLE contato (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR NOT NULL,
+    numero_celular VARCHAR NOT NULL UNIQUE,
+    email VARCHAR
+);
+
+CREATE TABLE agendamento (
+    id SERIAL PRIMARY KEY,
+    data DATE NOT NULL,
+    hora TIME NOT NULL,
+    contato_id INTEGER NOT NULL REFERENCES contato(id)
+);
+
+CREATE TABLE status (
+    id SERIAL PRIMARY KEY,
+    numero_celular VARCHAR NOT NULL UNIQUE,
+    status VARCHAR NOT NULL,
+    hora VARCHAR NOT NULL,
+    observacao VARCHAR
+);
