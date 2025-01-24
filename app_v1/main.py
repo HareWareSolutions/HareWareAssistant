@@ -71,16 +71,6 @@ def enviar_mensagem(api_url, connection_key, phone_number, message, delay_messag
 # Endpoint que recebe a mensagem e sempre retorna uma resposta com uma mensagem de teste
 @app.post("/webhook-zapi")
 async def receive_message(request: Request):
-    """
-    Endpoint que recebe uma mensagem e sempre retorna uma resposta com uma mensagem de teste.
-    """
-    # Mensagem de teste a ser retornada
-    return {"status": "success", "message": "Mensagem recebida com sucesso! Este é um teste."}
-
-
-# Exemplo de como chamar a função de envio de mensagem
-if __name__ == "__main__":
-    # Parâmetros para a função de envio
     api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
     connection_key = "w-api_N3IE7GZOFN"  # Substitua com a chave de conexão real
     phone_number = "5519997581672"  # Substitua com o número de telefone real
@@ -91,10 +81,6 @@ if __name__ == "__main__":
     # Chamando a função para enviar a mensagem
     resultado = enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token)
 
-    # Exibindo o resultado
-    if resultado["status"] == "success":
-        print("Mensagem enviada com sucesso!")
-        print("Resposta da API:", resultado["message"])
-    else:
-        print(f"Erro ao enviar a mensagem. Código de status: {resultado['status_code']}")
-        print("Resposta de erro:", resultado["response"])
+    return {"status": "success", "message": "Mensagem recebida com sucesso! Este é um teste."}
+
+
