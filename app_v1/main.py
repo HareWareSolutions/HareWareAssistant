@@ -72,11 +72,12 @@ async def enviar_mensagem(api_url, connection_key, phone_number, message, delay_
 async def receive_message(request: Request):
     data = await request.json()
 
+    print(data)
     # Printando os dados recebidos na requisição
 
-    numero = data.get("remoteJid")
+    #numero = data.get("remoteJid")
 
-    print(numero)
+    #print(numero)
 
     #numero = numero
 
