@@ -22,4 +22,6 @@ class WebhookData(BaseModel):
 
 @app.post("/webhook-zapi")
 async def receive_message(request: Request):
-    print(request)
+    data = await request.json()
+    print(data)
+
