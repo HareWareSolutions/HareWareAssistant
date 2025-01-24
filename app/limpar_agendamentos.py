@@ -22,7 +22,7 @@ def calcular_espera_ate_meia_noite():
 
 
 def limpar_agendamentos():
-    envs = ['hareware']
+    envs = ['hareware', 'malaman']
 
     while True:
         espera_segundos = calcular_espera_ate_meia_noite()
