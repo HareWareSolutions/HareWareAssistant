@@ -43,3 +43,7 @@ def limpar_agendamentos():
                     print(f"Erro ao limpar agendamentos: {e}")
                 finally:
                     db.close()
+
+
+if __name__ == "__main__":
+    limpar_agendamentos()
