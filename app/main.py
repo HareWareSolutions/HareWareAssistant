@@ -1,8 +1,7 @@
 import logging
 import os
-import time
 import tiktoken
-from datetime import datetime, date, time
+from datetime import datetime, date, timedelta, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato
@@ -10,7 +9,6 @@ from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendame
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
 from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
-from pydantic import BaseModel
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
 from app.utils.rotinasHoras import verificar_horarios
@@ -35,11 +33,11 @@ app.add_middleware(
 
 ids_mensagens_processados = {}
 lock = Lock()
-TTL = 60
+TTL = timedelta(minutes=1)
 
 
 def limpar_ids():
-    hora_atual = time.time()
+    hora_atual = datetime.now()
     with lock:
         ids_para_deletar = [id_mensagem for id_mensagem, timestamp in ids_mensagens_processados.items() if hora_atual - timestamp > TTL]
         for id_mensagem in ids_para_deletar:
