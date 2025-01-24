@@ -1,6 +1,5 @@
 import logging
-import requests
-from pydantic import BaseModel
+import httpx
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,11 +19,8 @@ app.add_middleware(
 )
 
 
-
-
-
 # Função para enviar a mensagem via API
-def enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token):
+async def enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token):
     """
     Função para enviar uma mensagem via API e receber uma resposta com uma mensagem de teste.
 
@@ -39,7 +35,6 @@ def enviar_mensagem(api_url, connection_key, phone_number, message, delay_messag
     Retorno:
     - Resposta da API (em formato JSON ou mensagem de erro)
     """
-    # URL da API (construída com a chave de conexão)
     url = f"{api_url}/message/sendText?connectionKey={connection_key}"
 
     # Dados da mensagem
@@ -55,17 +50,21 @@ def enviar_mensagem(api_url, connection_key, phone_number, message, delay_messag
         "Authorization": f"Bearer {auth_token}"  # Usando o token de autenticação
     }
 
-    # Enviar a requisição POST
-    response = requests.post(url, json=data, headers=headers)
+    try:
+        # Usando httpx para fazer a requisição de forma assíncrona
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, json=data, headers=headers)
 
-    # Verificar a resposta da API
-    if response.status_code == 200:
-        # Supondo que a API retornará uma mensagem de teste no corpo da resposta
-        api_response = response.json()
-        # Exibindo a resposta com a mensagem de teste
-        return {"status": "success", "message": api_response.get("message", "Sem mensagem de teste")}
-    else:
-        return {"status": "error", "status_code": response.status_code, "response": response.text}
+        # Verificar a resposta da API
+        if response.status_code == 200:
+            api_response = response.json()
+            return {"status": "success", "message": api_response.get("message", "Sem mensagem de teste")}
+        else:
+            return {"status": "error", "status_code": response.status_code, "response": response.text}
+
+    except httpx.RequestError as e:
+        logging.error(f"Ocorreu um erro durante a requisição: {e}")
+        return {"status": "error", "message": str(e)}
 
 
 # Endpoint que recebe a mensagem e sempre retorna uma resposta com uma mensagem de teste
@@ -79,8 +78,6 @@ async def receive_message(request: Request):
     auth_token = "xT3AcKpnGLC5VPk49fhTlCLwk1VkuU9Up"  # Substitua com seu token de autenticação
 
     # Chamando a função para enviar a mensagem
-    resultado = enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token)
+    resultado = await enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token)
 
     return {"status": "success", "message": "Mensagem recebida com sucesso! Este é um teste."}
-
-
