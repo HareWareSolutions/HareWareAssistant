@@ -13,9 +13,11 @@ from utils.zapi import send_message_zapi
 
 notificacoes_enviadas = {}
 
+
 def get_hora_brasil():
     brasil_tz = pytz.timezone('America/Sao_Paulo')
     return datetime.now(brasil_tz)
+
 
 def mensagem_env(env, nome, hora):
     match env:
@@ -32,9 +34,11 @@ def mensagem_env(env, nome, hora):
                     f'Hoje você tem um compromisso marcado na barbearia do Malaman às {hora}.\n\n'
                     f'Contamos com a sua presença! até breve!')
 
+
 def is_round_hour():
     current_time = get_hora_brasil()
     return current_time.minute == 0 and current_time.second == 0
+
 
 def notificar():
     envs = ['hareware']
@@ -86,3 +90,6 @@ def notificar():
                     db.close()
         else:
             time.sleep(30)
+
+
+notificar()
