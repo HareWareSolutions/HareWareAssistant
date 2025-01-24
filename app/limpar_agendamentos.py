@@ -15,10 +15,19 @@ def get_hora_brasil():
     return datetime.now(brasil_tz)
 
 
+def calcular_espera_ate_meia_noite():
+    agora = get_hora_brasil()
+    proxima_meia_noite = datetime.combine(agora.date() + timedelta(days=1), datetime.min.time(), tzinfo=pytz.timezone('America/Sao_Paulo'))
+    return (proxima_meia_noite - agora).total_seconds()
+
+
 def limpar_agendamentos():
     envs = ['hareware']
 
     while True:
+        espera_segundos = calcular_espera_ate_meia_noite()
+        time.sleep(espera_segundos)
+
         agora = get_hora_brasil()
         if agora.strftime("%H:%M:%S") == '00:00:00':
             for env in envs:
@@ -34,5 +43,3 @@ def limpar_agendamentos():
                     print(f"Erro ao limpar agendamentos: {e}")
                 finally:
                     db.close()
-
-        time.sleep(60)
