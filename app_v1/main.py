@@ -75,11 +75,9 @@ async def receive_message(request: Request):
     print(data)
     # Printando os dados recebidos na requisição
 
-    #numero = data.get("remoteJid")
+    remote_jid = data['body']['key']['remoteJid']
 
-    #print(numero)
-
-    #numero = numero
+    print(remote_jid[0:11])
 
 
     #api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
