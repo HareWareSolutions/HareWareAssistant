@@ -216,7 +216,22 @@ def fluxo_conversa_poll(env, opcao, telefone):
             novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None)
             registro_contato = buscar_contato(db, telefone)
             deletar_status(db, telefone)
-            return f"Prazer em conhecê-lo {nome}, como posso te ajudar?"
+
+            if env == 'hareware':
+                mensagem_retorno = (f'Prazer em conhecê-lo {nome}, como posso te ajudar?\n\n'
+                                    f'Aqui você pode:\n\n'
+                                    f'- Sanar suas dúvidas sobre a HareWare\n\n'
+                                    f'- Agendar um horário com a frase de ativação: "Quero agendar um horário"\n\n'
+                                    f'- Solicitar o cancelamento de um agendamento com a frase de ativação: "Quero cancelar um agendamento"')
+            elif env == "malaman":
+                mensagem_retorno = (f'Blz mano, como posso te ajudar?\n\n'
+                                    f'Aqui você pode: \n\n'
+                                    f'- Agendar um horário na barbearia com a frase de ativação: "Quero marcar um horário"\n\n'
+                                    f'- Cancelar um horário marcado com a frase de ativação: "Quero cancelar um agendamento\n\n"'
+                                    f'- Sanar suas dúvidas sobre a Barbearia Malaman.')
+            elif env == "joice":
+                mensagem_retorno = 'Sistema fora'
+            return mensagem_retorno
         else:
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
