@@ -82,7 +82,7 @@ async def receive_message(request: Request):
     api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
     connection_key = "w-api_N3IE7GZOFN"  # Substitua com a chave de conexão real
     phone_number = numero  # Substitua com o número de telefone real
-    message = "oi, teste"  # A mensagem que você deseja enviar
+    message = "Bolinã de gorfe"  # A mensagem que você deseja enviar
     delay_message = 1000  # Atraso de 1000 milissegundos
     auth_token = "xT3AcKpnGLC5VPk49fhTlCLwk1VkuU9Up"  # Substitua com seu token de autenticação
 
