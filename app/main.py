@@ -59,7 +59,7 @@ async def receber_mensagem_foa(request: Request, background_tasks: BackgroundTas
             if id_mensagem in ids_mensagens_processados:
                 logging.info(f"Mensagem duplicada ignorada")
                 return {"status": "Mensagem duplicada ignorada."}
-            ids_mensagens_processados[id_mensagem] = time.time()
+            ids_mensagens_processados[id_mensagem] = datetime.now()
 
         background_tasks.add_task(limpar_ids)
 
@@ -319,7 +319,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             if id_mensagem in ids_mensagens_processados:
                 logging.info(f"Mensagem duplicada ignorada")
                 return {"status": "Mensagem duplicada ignorada."}
-            ids_mensagens_processados[id_mensagem] = time.time()
+            ids_mensagens_processados[id_mensagem] = datetime.now()
 
         background_tasks.add_task(limpar_ids)
 
