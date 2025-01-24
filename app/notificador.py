@@ -89,7 +89,7 @@ def notificar():
                 finally:
                     db.close()
         else:
-            time.sleep(30)
+            time.sleep(1)
 
 
 if __name__ == "__main__":
