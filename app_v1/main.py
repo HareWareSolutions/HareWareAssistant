@@ -2,7 +2,6 @@ import logging
 import httpx
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 # Configuração de log
 logging.basicConfig(level=logging.INFO)
@@ -18,12 +17,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
-
-
-# Definindo um modelo para validar o corpo da requisição
-class WebhookMessage(BaseModel):
-    phoneNumber: str
-    message: str
 
 
 # Função para enviar a mensagem via API
@@ -76,24 +69,18 @@ async def enviar_mensagem(api_url, connection_key, phone_number, message, delay_
 
 # Endpoint que recebe a mensagem e sempre retorna uma resposta com uma mensagem de teste
 @app.post("/webhook-zapi")
-async def receive_message(request: Request, payload: WebhookMessage):
-    # Extraindo o número do telefone e a mensagem do corpo da requisição
-    user_phone_number = payload.phoneNumber
-    user_message = payload.message
+async def receive_message(request: Request):
+    data = request.json()
+    print(data)
 
-    # Aqui você pode personalizar a mensagem que será enviada de volta
-    response_message = f"Oi! Recebemos sua mensagem: '{user_message}'. O número de telefone enviado foi: {user_phone_number}"
-
-    # Parâmetros da API de envio de mensagem
-    api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
+    """api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
     connection_key = "w-api_N3IE7GZOFN"  # Substitua com a chave de conexão real
     phone_number = "5519997581672"  # Substitua com o número de telefone real
+    message = "oi, teste"  # A mensagem que você deseja enviar
     delay_message = 1000  # Atraso de 1000 milissegundos
     auth_token = "xT3AcKpnGLC5VPk49fhTlCLwk1VkuU9Up"  # Substitua com seu token de autenticação
 
     # Chamando a função para enviar a mensagem
-    resultado = await enviar_mensagem(api_url, connection_key, phone_number, response_message, delay_message,
-                                      auth_token)
+    resultado = await enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token)"""
 
-    return {"status": "success",
-            "message": f"Mensagem recebida com sucesso! Número de telefone: {user_phone_number}. Este é um teste."}
+    return {"status": "success", "message": "Mensagem recebida com sucesso! Este é um teste."}
