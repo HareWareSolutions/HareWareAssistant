@@ -76,15 +76,17 @@ async def receive_message(request: Request):
 
     numero = data.get("remoteJid")
 
-    numero = numero[0:11]
+    print(numero)
+
+    #numero = numero
 
 
-    api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
-    connection_key = "w-api_N3IE7GZOFN"  # Substitua com a chave de conexão real
-    phone_number = numero  # Substitua com o número de telefone real
-    message = "oi, teste"  # A mensagem que você deseja enviar
-    delay_message = 1000  # Atraso de 1000 milissegundos
-    auth_token = "xT3AcKpnGLC5VPk49fhTlCLwk1VkuU9Up"  # Substitua com seu token de autenticação
+    #api_url = "https://host13.serverapi.dev"  # Substitua com o seu host real
+    #connection_key = "w-api_N3IE7GZOFN"  # Substitua com a chave de conexão real
+    #phone_number = numero  # Substitua com o número de telefone real
+    #message = "oi, teste"  # A mensagem que você deseja enviar
+    #delay_message = 1000  # Atraso de 1000 milissegundos
+    #auth_token = "xT3AcKpnGLC5VPk49fhTlCLwk1VkuU9Up"  # Substitua com seu token de autenticação
 
     # Chamando a função para enviar a mensagem
     resultado = await enviar_mensagem(api_url, connection_key, phone_number, message, delay_message, auth_token)
