@@ -20,9 +20,7 @@ app.add_middleware(
 )
 
 
-# Definição do modelo Pydantic
-class WebhookData(BaseModel):
-    message: str
+
 
 
 # Função para enviar a mensagem via API
@@ -72,12 +70,10 @@ def enviar_mensagem(api_url, connection_key, phone_number, message, delay_messag
 
 # Endpoint que recebe a mensagem e sempre retorna uma resposta com uma mensagem de teste
 @app.post("/webhook-zapi")
-async def receive_message(request: Request, data: WebhookData):
+async def receive_message(request: Request):
     """
     Endpoint que recebe uma mensagem e sempre retorna uma resposta com uma mensagem de teste.
     """
-    logging.info(f"Mensagem recebida: {data.message}")
-
     # Mensagem de teste a ser retornada
     return {"status": "success", "message": "Mensagem recebida com sucesso! Este é um teste."}
 
