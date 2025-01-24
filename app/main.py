@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 import tiktoken
 from datetime import datetime, date, time
 from app.db.db import get_db
@@ -16,6 +17,7 @@ from app.utils.rotinasHoras import verificar_horarios
 from app.utils.validador_documento import validar_documento
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from threading import Lock
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,16 +33,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+ids_mensagens_processados = {}
+lock = Lock()
+TTL = 60
 
-class WebhookData(BaseModel):
-    message: str
+
+def limpar_ids():
+    hora_atual = time.time()
+    with lock:
+        ids_para_deletar = [id_mensagem for id_mensagem, timestamp in ids_mensagens_processados.items() if hora_atual - timestamp > TTL]
+        for id_mensagem in ids_para_deletar:
+            del ids_mensagens_processados[id_mensagem]
 
 
 @app.post("/webhook-zapi-foa")
-async def receber_mensagem_foa(request: Request):
+async def receber_mensagem_foa(request: Request, background_tasks: BackgroundTasks):
     try:
         data = await request.json()
         logging.info(f"Dados recebidos: {data}")
+
+        id_mensagem = data.get("messageId")
+        if not id_mensagem:
+            logging.error("ID da mensagem não encontrado.")
+            return {"error": "ID da mensagem não encontrado."}
+
+        with lock:
+            if id_mensagem in ids_mensagens_processados:
+                logging.info(f"Mensagem duplicada ignorada")
+                return {"status": "Mensagem duplicada ignorada."}
+            ids_mensagens_processados[id_mensagem] = time.time()
+
+        background_tasks.add_task(limpar_ids)
 
         numero_celular = data.get("phone")
         if not numero_celular:
@@ -283,14 +306,25 @@ async def receber_mensagem_foa(request: Request):
 
 
 @app.post("/webhook-zapi-sa")
-async def receive_message(request: Request):
+async def receive_message(request: Request, background_tasks: BackgroundTasks):
     db = next(get_db('hwadmin'))
     try:
         data = await request.json()
         logging.info(f"Dados recebidos: {data}")
 
         id_mensagem = data.get("messageId")
-        print("\n\n\n\nid da mensagem: ", id_mensagem)
+        if not id_mensagem:
+            logging.error("ID da mensagem não encontrado.")
+            return {"error": "ID da mensagem não encontrado."}
+
+        with lock:
+            if id_mensagem in ids_mensagens_processados:
+                logging.info(f"Mensagem duplicada ignorada")
+                return {"status": "Mensagem duplicada ignorada."}
+            ids_mensagens_processados[id_mensagem] = time.time()
+
+        background_tasks.add_task(limpar_ids)
+
         numero_celular = data.get("phone")
         if not numero_celular:
             logging.error("Número de telefone não encontrado.")
