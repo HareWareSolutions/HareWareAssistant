@@ -289,7 +289,7 @@ async def receive_message(request: Request):
         data = await request.json()
         logging.info(f"Dados recebidos: {data}")
 
-        id_mensagem = data.get("id")
+        id_mensagem = data.get("messageId")
         print("\n\n\n\nid da mensagem: ", id_mensagem)
         numero_celular = data.get("phone")
         if not numero_celular:
