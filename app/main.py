@@ -323,6 +323,11 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
 
         background_tasks.add_task(limpar_ids)
 
+        grupo = data.get("isGroup")
+        if grupo:
+            logging.info("Mensagem de grupo ignorada.")
+            return {"status": "Mensagem de grupo ignorada"}
+
         numero_celular = data.get("phone")
         if not numero_celular:
             logging.error("Número de telefone não encontrado.")
