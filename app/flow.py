@@ -231,7 +231,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 mensagem_retorno = (f'Blz mano, como posso te ajudar?\n\n'
                                     f'Aqui você pode: \n\n'
                                     f'- Agendar um horário na barbearia com a frase de ativação: "Quero marcar um horário"\n\n'
-                                    f'- Cancelar um horário marcado com a frase de ativação: "Quero cancelar um agendamento\n\n"'
+                                    f'- Cancelar um horário marcado com a frase de ativação: "Quero cancelar um agendamento"\n\n'
                                     f'- Sanar suas dúvidas sobre a Barbearia Malaman.')
             elif env == "joice":
                 mensagem_retorno = 'Sistema fora'
