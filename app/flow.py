@@ -56,10 +56,12 @@ def fluxo_conversa(env, prompt, telefone):
             if registro_status.status == 'IDT': #IDT = Informando Data
                 data = extrair_data(prompt)
 
+                print(data)
                 if data is None:
                     return "Não entendi qual data você deseja agendar, poderia me informar novamente?"
 
                 dia_semana = dia_da_semana(data)
+                print(dia_semana)
 
                 if env == 'malaman' or env == 'hareware' and dia_semana == 'domingo':
                     return "Desculpa, infelizmente não trabalhamos aos domingos, poderia informar outra data?"
