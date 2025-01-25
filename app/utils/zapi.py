@@ -19,6 +19,10 @@ def get_credentials(env):
         client_token_zapi = "F4d0341838a8d4eddad0be7bda51ce724S"
         zapi_instance = "3DA117F2FB115098C9701A5D138A61BB"
         token_zapi = "E20500BA1D9262121B984AC7"
+    elif env == 'malaman':
+        client_token_zapi = "F4d0341838a8d4eddad0be7bda51ce724S"
+        zapi_instance = "3DBBCB685FBD10930FDDEEBFCAD96732"
+        token_zapi = "B152191B0734E9872587B74E"
 
     return client_token_zapi, zapi_instance, token_zapi
 
