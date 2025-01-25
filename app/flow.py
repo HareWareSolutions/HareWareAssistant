@@ -73,8 +73,12 @@ def fluxo_conversa(env, prompt, telefone):
         if registro_status is None:
             novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
 
-            return ("Olá, Seja bem-vindo a central de atendimento da HareWare!\n\n"
-                    "Percebi que você não está cadastrado na minha lista de contatos, poderia me dizer o seu nome?")
+            if env == 'hareware':
+                return ("Olá, Seja bem-vindo a central de atendimento HareWare!\n\n"
+                        "Percebi que você não está cadastrado na minha lista de contatos, poderia me dizer o seu nome?")
+            elif env == 'malaman':
+                return ("Olá, Seja bem-vindo a central de atendimento da HareWare!\n\n"
+                        "Percebi que você não está cadastrado na minha lista de contatos, poderia me dizer o seu nome?")
 
         if registro_status.status == 'CNC': #CNC = Cadastro de Nome de Contato
             if caracteres_numericos(prompt) or caracteres_invalidos(prompt):
