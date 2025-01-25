@@ -6,7 +6,7 @@ DATABASE_URL_HAREWARE = "postgresql+pg8000://postgres:HareWare%402025@localhost/
 DATABASE_URL_MMANIA = "postgresql+pg8000://postgres:HareWare%402025@localhost/mmaniadeboloAssistant"
 DATABASE_URL_HWADMIN = "postgresql+pg8000://postgres:HareWare%402025@localhost/HareWare"
 DATABASE_URL_JOICE = "postgresql+pg8000://postgres:HareWare%402025@localhost/joiceAssistant"
-DATABASE_URL_MALAMAN = "postgresql+pg8000://postgres:HareWare%402025@localhost/malamanAssistant"
+DATABASE_URL_MALAMAN = "postgresql+pg8000://postgres:HareWare%402025@localhost/MalamanAssistant"
 
 
 def get_database_url(env: str = "hareware"):
