@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta
+import pytz
+
+fuso_brasil = pytz.timezone("America/Sao_Paulo")
 
 
 def normalizar_data(data):
@@ -18,11 +21,13 @@ def extrair_data(frase):
         "vinte e oito": 28, "vinte e nove": 29, "trinta": 30, "trinta e um": 31
     }
     dias_semana = {
-        "segunda": 0, "terça": 1, "quarta": 2, "quinta": 3, "sexta": 4, "sábado": 5, "domingo": 6
+        "segunda": 0, "terça": 1, "quarta": 2, "quinta": 3, "sexta": 4, "sábado": 5, "domingo": 6,
+        "segunda-feira": 0, "terça-feira": 1, "quarta-feira": 2, "quinta-feira": 3, "sexta-feira": 4
     }
 
     palavras = frase.lower().split()
-    dia, mes, ano = None, datetime.now().month, datetime.now().year
+    agora = datetime.now(fuso_brasil)
+    dia, mes, ano = None, agora.month, agora.year
 
     for i, palavra in enumerate(palavras):
         if palavra.isdigit() and 1 <= int(palavra) <= 31:
@@ -41,29 +46,27 @@ def extrair_data(frase):
                 ano = int(partes[2])
 
     if dia:
-        return datetime(ano, mes, dia).date()
+        return datetime(ano, mes, dia, tzinfo=fuso_brasil).date()
 
-    hoje = datetime.now()
     if "hoje" in palavras:
-        return hoje.date()
+        return agora.date()
     elif "amanhã" in palavras:
-        return (hoje + timedelta(days=1)).date()
+        return (agora + timedelta(days=1)).date()
 
     for dia_semana, indice in dias_semana.items():
         if dia_semana in palavras:
-            dia_atual = hoje.weekday()
+            dia_atual = agora.weekday()
             delta = (indice - dia_atual) % 7
             if delta == 0:
                 delta = 7
-            return (hoje + timedelta(days=delta)).date()
+            return (agora + timedelta(days=delta)).date()
 
     return None
 
 
 def transformar_data_e_hora(data_hora_str: str):
     data_hora = datetime.strptime(data_hora_str, "%d/%m/%Y %H:%M")
+    data_hora = fuso_brasil.localize(data_hora)
     data = data_hora.date()
     hora = data_hora.time()
     return data, hora
-
-
