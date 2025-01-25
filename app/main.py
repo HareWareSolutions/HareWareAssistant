@@ -696,8 +696,8 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str, back
 
 
 @app.post("/visualizar-contatos")
-async def visualizar_contatos(cod_hw: str):
-    db = next(get_db(cod_hw))
+async def visualizar_contatos(empresa: str):
+    db = next(get_db(empresa))
     try:
         contatos = listar_contatos(db)
 
@@ -719,8 +719,8 @@ async def visualizar_contatos(cod_hw: str):
 
 
 @app.post("/cadastrar-contato")
-async def cadastrar_contato(cod_hw: str, nome: str, numero_celular: str, email: str = None):
-    db = next(get_db(cod_hw))
+async def cadastrar_contato(empresa: str, nome: str, numero_celular: str, email: str = None):
+    db = next(get_db(empresa))
     try:
         sucesso = criar_contato(db, nome, numero_celular, email)
         if sucesso:
@@ -732,8 +732,8 @@ async def cadastrar_contato(cod_hw: str, nome: str, numero_celular: str, email: 
 
 
 @app.post("/excluir-contato")
-async def excluir_contato(cod_hw: str, id: int):
-    db = next(get_db(cod_hw))
+async def excluir_contato(empresa: str, id: int):
+    db = next(get_db(empresa))
     try:
         sucesso = deletar_contato(db, id)
         if sucesso:
