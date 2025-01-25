@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time
 from sqlalchemy.orm import Session, relationship
 from app.db.db import Base
 from datetime import datetime
+import pytz
 
 
 class Agendamento(Base):
@@ -65,9 +66,22 @@ def buscar_agendamentos_por_data_api(db: Session, data):
 
 
 def buscar_agendamentos_por_contato_id(db: Session, contato_id: int):
-    agendamentos = db.query(Agendamento).filter(Agendamento.contato_id == contato_id).all()
+    fuso_brasileiro = pytz.timezone('America/Sao_Paulo')
+    agora = datetime.now(fuso_brasileiro)
+
+    agendamentos = (
+        db.query(Agendamento)
+        .filter(
+            Agendamento.contato_id == contato_id,
+            (Agendamento.data > agora.date()) |
+            ((Agendamento.data == agora.date()) & (Agendamento.hora > agora.time()))
+        )
+        .all()
+    )
+
     if not agendamentos:
         return None
+
     return [
         {
             "id": agendamento.id,
