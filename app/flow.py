@@ -77,8 +77,8 @@ def fluxo_conversa(env, prompt, telefone):
                 return ("Olá, Seja bem-vindo a central de atendimento HareWare!\n\n"
                         "Percebi que você não está cadastrado na minha lista de contatos, poderia me dizer o seu nome?")
             elif env == 'malaman':
-                return ("Olá, Seja bem-vindo a central de atendimento da HareWare!\n\n"
-                        "Percebi que você não está cadastrado na minha lista de contatos, poderia me dizer o seu nome?")
+                return ("E aí, parça! Seja bem-vindo à Barbearia do Malaman!\n\n"
+                        "Não achei você na minha lista de contatos, qual é o seu nome, mano?")
 
         if registro_status.status == 'CNC': #CNC = Cadastro de Nome de Contato
             if caracteres_numericos(prompt) or caracteres_invalidos(prompt):
