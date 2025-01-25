@@ -63,7 +63,7 @@ def fluxo_conversa(env, prompt, telefone):
                 dia_semana = dia_da_semana(data)
                 print(dia_semana)
 
-                if env == 'malaman' or env == 'hareware' and dia_semana == 'domingo':
+                if (env == 'malaman' or env == 'hareware') and dia_semana == 'domingo':
                     return "Desculpa, infelizmente não trabalhamos aos domingos, poderia informar outra data?"
 
                 deletar_status(db, telefone)
