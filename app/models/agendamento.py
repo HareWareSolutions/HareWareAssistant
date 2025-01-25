@@ -66,6 +66,20 @@ def buscar_agendamentos_por_data_api(db: Session, data):
 
 
 def buscar_agendamentos_por_contato_id(db: Session, contato_id: int):
+    agendamentos = db.query(Agendamento).filter(Agendamento.contato_id == contato_id).all()
+    if not agendamentos:
+        return None
+    return [
+        {
+            "id": agendamento.id,
+            "data": agendamento.data.strftime("%Y-%m-%d"),
+            "hora": agendamento.hora.strftime("%H:%M:%S")
+        }
+        for agendamento in agendamentos
+    ]
+
+
+def buscar_agendamentos_por_contato_id_formatado(db: Session, contato_id: int):
     fuso_brasileiro = pytz.timezone('America/Sao_Paulo')
     agora = datetime.now(fuso_brasileiro)
 
@@ -82,20 +96,6 @@ def buscar_agendamentos_por_contato_id(db: Session, contato_id: int):
     if not agendamentos:
         return None
 
-    return [
-        {
-            "id": agendamento.id,
-            "data": agendamento.data.strftime("%Y-%m-%d"),
-            "hora": agendamento.hora.strftime("%H:%M:%S")
-        }
-        for agendamento in agendamentos
-    ]
-
-
-def buscar_agendamentos_por_contato_id_formatado(db: Session, contato_id: int):
-    agendamentos = db.query(Agendamento).filter(Agendamento.contato_id == contato_id).all()
-    if not agendamentos:
-        return None
     return [
         f"{agendamento.data.strftime('%d/%m/%Y')} {agendamento.hora.strftime('%H:%M')}"
         for agendamento in agendamentos
