@@ -33,3 +33,15 @@ def buscar_contato(db: Session, numero_celular: str):
 def buscar_contato_id(db: Session, id: int):
     return db.query(Contato).filter(Contato.id == id).first()
 
+
+def deletar_contato(db: Session, id: int):
+    contato = db.query(Contato).filter(Contato.id == id).first()
+
+    if contato:
+        db.delete(contato)
+        db.commit()
+        return True
+    else:
+        return False
+
+

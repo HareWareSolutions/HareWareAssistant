@@ -4,7 +4,7 @@ import tiktoken
 from datetime import datetime, date, timedelta, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
-from app.models.contato import buscar_contato_id, criar_contato
+from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
 from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
@@ -691,6 +691,55 @@ async def relatorio_agendamento(empresa: str, nome_empresa: str, data: str, back
             return response
         else:
             return {"retorno": "Não há agendamentos para esta data."}
+    finally:
+        db.close()
+
+
+@app.post("/visualizar-contatos")
+async def visualizar_contatos(cod_hw: str):
+    db = next(get_db(cod_hw))
+    try:
+        contatos = listar_contatos(db)
+
+        lista_contatos = []
+        for contato in contatos:
+            dados_contato = {
+                "id": contato.id,
+                "nome": contato.nome,
+                "numero_celular": contato.numero_celular,
+                "email": contato.email
+            }
+
+            lista_contatos.append(dados_contato)
+
+        return {"retorno": lista_contatos}
+
+    finally:
+        db.close()
+
+
+@app.post("/cadastrar-contato")
+async def cadastrar_contato(cod_hw: str, nome: str, numero_celular: str, email: str = None):
+    db = next(get_db(cod_hw))
+    try:
+        sucesso = criar_contato(db, nome, numero_celular, email)
+        if sucesso:
+            return {"status": "sucess", "message": "Contato cadastrado com sucesso."}
+        else:
+            raise HTTPException(status_code=500, detail="Erro ao cadastrar o contato.")
+    finally:
+        db.close()
+
+
+@app.post("/excluir-contato")
+async def excluir_contato(cod_hw: str, id: int):
+    db = next(get_db(cod_hw))
+    try:
+        sucesso = deletar_contato(db, id)
+        if sucesso:
+            return {"status": "sucess", "message": "Contato excluido com sucesso."}
+        else:
+            raise HTTPException(status_code=500, detail="Erro ao excluir contato.")
     finally:
         db.close()
 
