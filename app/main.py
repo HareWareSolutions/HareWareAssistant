@@ -352,14 +352,15 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             case other:
                 return {"status": "error", "message": "Número de destino inválido."}
 
-        print(numero_celular, type(numero_celular))
-        telefone_celular = str(numero_celular)
+        db2 = next(get_db(env))
+        try:
+            contato = buscar_contato(db, numero_celular)
 
-        contato = buscar_contato(db, telefone_celular)
-
-        if contato.pausa == True:
-            logging.info(f"Mensagem de contato em pausa.")
-            return {"status": "Mensagem de contato em pausa."}
+            if contato.pausa == True:
+                logging.info(f"Mensagem de contato em pausa.")
+                return {"status": "Mensagem de contato em pausa."}
+        finally:
+            db2.close()
 
         if env == "malaman":
             lista_parentes = ["5519997859405", "5519971523661", "5519995471732"]
