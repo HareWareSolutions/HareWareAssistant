@@ -644,6 +644,27 @@ async def pesquisa_contato(empresa: str, id_contato: int):
         db.close()
 
 
+@app.post("/dados-contato")
+async def procurar_dados_contato(empresa: str, id_contato: int):
+    db = next(get_db(empresa))
+    try:
+        contato = buscar_contato_id(db, id_contato)
+        if contato:
+            dados_contato = {
+                "id": contato.id,
+                "nome": contato.nome,
+                "telefone": contato.numero_celular,
+                "email": contato.email,
+                "pausa": contato.pausa
+                }
+
+            return {"retorno": dados_contato}
+        else:
+            return {"retorno": "Nenhum Contato foi encontrado."}
+    finally:
+        db.close()
+
+
 @app.post("/logar")
 async def logar(usuario: str, senha: str):
     db = next(get_db('hwadmin'))
