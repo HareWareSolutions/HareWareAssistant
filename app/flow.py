@@ -13,6 +13,7 @@ from app.db.db import get_db
 from app.ia.arc import arc_predict
 from app.ia.iia import iia_predict
 from app.ia.foundry import send_message_to_ai
+import pytz
 
 
 def fluxo_conversa(env, prompt, telefone):
@@ -54,14 +55,24 @@ def fluxo_conversa(env, prompt, telefone):
                 return "Certo, poderia me informar uma data?"
 
             if registro_status.status == 'IDT': #IDT = Informando Data
+                fuso_brasileiro = pytz.timezone('America/Sao_Paulo')
+                data_atual = datetime.now(fuso_brasileiro)
+
                 data = extrair_data(prompt)
 
-                print(data)
+                data_extraida = fuso_brasileiro.localize(data)
+
+                if data_extraida.date() < data_atual.date():
+                    deletar_status(db, telefone)
+                    novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None)
+                    return "A data informada é anterior à data de hoje. Por favor escolha outra data..."
+
                 if data is None:
+                    deletar_status(db, telefone)
+                    novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None)
                     return "Não entendi qual data você deseja agendar, poderia me informar novamente?"
 
                 dia_semana = dia_da_semana(data)
-                print(dia_semana)
 
                 if (env == 'malaman' or env == 'hareware') and dia_semana == 'domingo':
                     return "Desculpa, infelizmente não trabalhamos aos domingos, poderia informar outra data?"

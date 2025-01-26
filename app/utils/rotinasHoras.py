@@ -1,11 +1,17 @@
-def verificar_horarios(env, agendamentos):
+from datetime import datetime
+import pytz
 
+
+def verificar_horarios(env, agendamentos):
     horarios_disponiveis = {
         'hareware': [{"08:00": 1}, {"09:00": 1}, {"10:00": 1}, {"11:00": 1}, {"13:00": 1}, {"14:00": 1}, {"15:00": 1}, {"16:00": 1}, {"17:00": 1}, {"18:00": 1}],
         'joice': [{"06:30": 1}, {"09:00": 1}, {"11:30": 1}, {"14:00": 1}, {"16:30": 1}, {"19:00": 1}],
         'malaman': [{"08:00": 1}, {"09:00": 1}, {"10:00": 1}, {"11:00": 1}, {"12:00": 1}, {"13:00": 1}, {"14:00": 1}, {"15:00": 1}, {"16:00": 1}, {"17:00": 1}, {"18:00": 1}],
         'malaman-sabado': [{"07:00": 1}, {"08:00": 1}, {"09:00": 1}, {"10:00": 1}, {"11:00": 1}, {"12:00": 1}, {"13:00": 1}, {"14:00": 1}]
     }
+
+    tz = pytz.timezone('America/Sao_Paulo')
+    horario_atual = datetime.now(tz).strftime('%H:%M')
 
     for agendamento in agendamentos:
         horario = agendamento[:5]
@@ -17,7 +23,7 @@ def verificar_horarios(env, agendamentos):
     horarios_livres = []
     for horario_disponivel in horarios_disponiveis[env]:
         for hora, disponibilidade in horario_disponivel.items():
-            if disponibilidade == 1:
+            if disponibilidade == 1 and hora > horario_atual:
                 horarios_livres.append(hora)
 
     return horarios_livres
