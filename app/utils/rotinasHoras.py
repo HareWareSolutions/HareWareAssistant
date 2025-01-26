@@ -21,7 +21,8 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     if data_agendamento == data_atual_dt:
         for horario_disponivel in horarios_disponiveis[env]:
             hora = list(horario_disponivel.keys())[0]
-            if hora > horario_atual_str:
+            hora_dt = datetime.strptime(hora, '%H:%M')
+            if hora_dt > horario_atual:
                 horarios_disponiveis_finais.append(horario_disponivel)
 
     elif data_agendamento > data_atual_dt:
