@@ -14,18 +14,16 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     horario_atual = datetime.now(tz)
     horario_atual_str = horario_atual.strftime('%H:%M')
     data_atual = horario_atual.strftime('%d/%m/%Y')
-    data_atual_dt = datetime.strptime(data_atual, '%d/%m/%Y')
 
     horarios_disponiveis_finais = []
 
-    if data_agendamento == data_atual_dt:
+    if data_agendamento == data_atual:
         for horario_disponivel in horarios_disponiveis[env]:
             hora = list(horario_disponivel.keys())[0]
-            hora_dt = datetime.strptime(hora, '%H:%M').replace(year=horario_atual.year, month=horario_atual.month, day=horario_atual.day)
-            if hora_dt > horario_atual:
+            if hora > horario_atual_str:
                 horarios_disponiveis_finais.append(horario_disponivel)
 
-    elif data_agendamento > data_atual_dt:
+    elif data_agendamento > data_atual:
         horarios_disponiveis_finais = horarios_disponiveis[env]
 
     for agendamento in agendamentos:
