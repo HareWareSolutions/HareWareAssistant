@@ -352,12 +352,6 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             case other:
                 return {"status": "error", "message": "Número de destino inválido."}
 
-        if env == "malaman":
-            lista_parentes = ["5519997859405", "5519971523661", "5519995471732"]
-            if numero_celular in lista_parentes:
-                logging.info(f"Mensagem de parentes ignorada")
-                return {"status": "Mensagem de parentes ignorada."}
-
         if data.get("type") == "ReceivedCallback" and data.get("pollVote"):
 
             poll_data = data["pollVote"]
