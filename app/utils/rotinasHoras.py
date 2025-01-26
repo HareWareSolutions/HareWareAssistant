@@ -31,7 +31,7 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     horarios_livres = []
     for horario_disponivel in horarios_disponiveis[env]:
         for hora, disponibilidade in horario_disponivel.items():
-            if disponibilidade == 1:
+            if disponibilidade == 1 and (data_agendamento > data_atual or hora > horario_atual_str):
                 horarios_livres.append(hora)
 
     return horarios_livres
