@@ -4,7 +4,7 @@ import tiktoken
 from datetime import datetime, date, timedelta, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
-from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato
+from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
 from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
@@ -351,6 +351,12 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
                 id_contrato = 2
             case other:
                 return {"status": "error", "message": "Número de destino inválido."}
+
+        contato = buscar_contato(db, numero_celular)
+
+        if contato.pausa == True:
+            logging.info(f"Mensagem de contato em pausa.")
+            return {"status": "Mensagem de contato em pausa."}
 
         if env == "malaman":
             lista_parentes = ["5519997859405", "5519971523661", "5519995471732"]
