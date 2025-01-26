@@ -414,6 +414,8 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             if captions:
                 logging.info(f"Captions da imagem: {captions}")
             resposta = "Infelizmente no momento ainda não consigo analisar imagens..."
+            logging.info("Mensagens de imagem.")
+            return {"Retorno": "Ignorado, mensagem de imagem."}
 
             send_message_zapi(
                 env=env,
