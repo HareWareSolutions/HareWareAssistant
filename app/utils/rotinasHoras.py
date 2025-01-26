@@ -20,8 +20,6 @@ def verificar_horarios(env, agendamentos, data_agendamento):
             hora = list(horario_disponivel.keys())[0]
             if hora <= horario_atual_str:
                 horario_disponivel[hora] = 0
-    elif data_agendamento > data_atual:
-        pass
 
     for agendamento in agendamentos:
         horario_agendado = agendamento[:5]
