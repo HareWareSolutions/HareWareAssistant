@@ -54,16 +54,16 @@ def fluxo_conversa(env, prompt, telefone):
                 novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None)
                 return "Certo, poderia me informar uma data?"
 
-            if registro_status.status == 'IDT': #IDT = Informando Data
+            if registro_status.status == 'IDT':  # IDT = Informando Data
                 fuso_brasileiro = pytz.timezone('America/Sao_Paulo')
                 data_atual = datetime.now(fuso_brasileiro)
 
                 data = extrair_data(prompt)
 
-                if isinstance(data, datetime.date):
-                    data_extraida = datetime.combine(data, datetime.min.time())
-                else:
-                    data_extraida = data
+                if data is None:
+                    return "Data não encontrada ou inválida"
+
+                data_extraida = datetime.combine(data, datetime.min.time(), fuso_brasileiro)
 
                 if data_extraida.date() < data_atual.date():
                     deletar_status(db, telefone)
