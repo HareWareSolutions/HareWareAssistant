@@ -60,7 +60,10 @@ def fluxo_conversa(env, prompt, telefone):
 
                 data = extrair_data(prompt)
 
-                data_extraida = fuso_brasileiro.localize(data)
+                if isinstance(data, datetime.date):
+                    data_extraida = datetime.combine(data, datetime.min.time())
+                else:
+                    data_extraida = data
 
                 if data_extraida.date() < data_atual.date():
                     deletar_status(db, telefone)
