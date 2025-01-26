@@ -52,6 +52,8 @@ def extrair_data(frase):
         return agora.date()
     elif "amanhã" in palavras:
         return (agora + timedelta(days=1)).date()
+    elif "amanha" in palavras:
+        return (agora + timedelta(days=1)).date()
 
     for dia_semana, indice in dias_semana.items():
         if dia_semana in palavras:
