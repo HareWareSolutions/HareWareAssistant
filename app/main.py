@@ -514,6 +514,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
 
 @app.post("/incluir-agendamento")
 async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
+    print(empresa, data, hora, contato)
     try:
         data_convertida = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
     except ValueError:
