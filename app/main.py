@@ -533,7 +533,9 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
         hora_formatada = hora_agendamento.strftime("%H:%M")
 
         if hora_formatada in horarios_disponiveis:
+            print('cheguei aqui no gravar agendamento')
             sucesso = gravar_agendamento(db, data_convertida, hora, contato)
+            print(sucesso)
             if sucesso:
                 return {"status": "success", "message": "Agendamento incluído com sucesso."}
             else:
@@ -542,7 +544,6 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
             raise HTTPException(status_code=500, detail="Já há um agendamento para esse horário nesta data.")
     finally:
         db.close()
-
 
 
 @app.post("/cancelar-agendamento")
