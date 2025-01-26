@@ -16,6 +16,7 @@ from app.utils.validador_documento import validar_documento
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from threading import Lock
+from app.utils.rotinasDatas import normalizar_data
 
 logging.basicConfig(level=logging.INFO)
 
@@ -518,6 +519,8 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
     except ValueError:
         raise HTTPException(status_code=400, detail="Formato de 'data' inválido. Use 'DD/MM/YYYY'.")
 
+    data_normalizada = normalizar_data(data_convertida)
+
     try:
         datetime.strptime(hora, "%H:%M")
     except ValueError:
@@ -528,7 +531,7 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
         data_agendamento = datetime.strptime(data, "%d/%m/%Y").date()
         agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
         print('vou verificar os horarios disponiveis')
-        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data_convertida)
+        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data_normalizada)
         print(horarios_disponiveis)
 
         hora_agendamento = datetime.strptime(hora, "%H:%M").time()
