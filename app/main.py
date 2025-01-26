@@ -515,7 +515,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
 @app.post("/incluir-agendamento")
 async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
     try:
-        data_convertida = datetime.strptime(data, "%d/%m/%Y").strftime("%d/%m/%Y")
+        data_convertida = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
     except ValueError:
         raise HTTPException(status_code=400, detail="Formato de 'data' inválido. Use 'DD/MM/YYYY'.")
 
@@ -528,13 +528,18 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
     try:
         data_agendamento = datetime.strptime(data, "%d/%m/%Y").date()
         agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
-        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data_convertida)
+        print('vou verificar os horarios disponiveis')
+        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data)
+        print(horarios_disponiveis)
 
         hora_agendamento = datetime.strptime(hora, "%H:%M").time()
         hora_formatada = hora_agendamento.strftime("%H:%M")
+        print(hora_formatada, type(hora_formatada))
 
         if hora_formatada in horarios_disponiveis:
+            print('cheguei aqui no gravar agendamento')
             sucesso = gravar_agendamento(db, data_convertida, hora, contato)
+            print(sucesso)
             if sucesso:
                 return {"status": "success", "message": "Agendamento incluído com sucesso."}
             else:
