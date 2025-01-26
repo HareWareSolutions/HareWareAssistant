@@ -114,7 +114,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
     registro_status = buscar_status(db, telefone)
 
     registro_contato = buscar_contato(db, telefone)
-
+    print(registro_contato.pausa)
     if registro_contato.pausa == True:
         return {"PAUSA": "Contato em pausa de conversa."}
 
