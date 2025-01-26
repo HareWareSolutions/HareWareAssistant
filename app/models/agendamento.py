@@ -40,7 +40,7 @@ def buscar_agendamentos_por_data(db: Session, data):
 
 
 def buscar_agendamentos_por_data_ntf(db: Session, data):
-    agendamentos = db.query(Agendamento).filter(Agendamento.data == data).all()  # Retorna objetos completos
+    agendamentos = db.query(Agendamento).filter(Agendamento.data == data).all()
     return agendamentos
 
 

@@ -609,6 +609,21 @@ async def pesquisarAgendaDia(empresa: str, data: str):
         db.close()
 
 
+@app.post("/horarios-disponiveis")
+async def horarios_disponiveis(empresa: str, data: str):
+    db = next(get_db(empresa))
+    try:
+        data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
+        agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
+        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data_agendamento)
+        if horarios_disponiveis:
+            return {"retorno": horarios_disponiveis}
+        else:
+            return {"retorno": None}
+    finally:
+        db.close()
+
+
 @app.post("/logar")
 async def logar(usuario: str, senha: str):
     db = next(get_db('hwadmin'))
