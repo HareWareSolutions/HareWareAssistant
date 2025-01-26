@@ -15,23 +15,28 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     horario_atual_str = horario_atual.strftime('%H:%M')
     data_atual = horario_atual.strftime('%Y-%m-%d')
 
+    horarios_disponiveis_convertidos = [
+        {datetime.strptime(hora, '%H:%M'): disponibilidade for hora, disponibilidade in horario.items()}
+        for horario in horarios_disponiveis[env]
+    ]
+
     if data_agendamento == data_atual:
-        horarios_disponiveis[env] = [
-            horario for horario in horarios_disponiveis[env] if list(horario.keys())[0] > horario_atual_str
+        horarios_disponiveis_convertidos = [
+            horario for horario in horarios_disponiveis_convertidos if list(horario.keys())[0] > horario_atual
         ]
     elif data_agendamento > data_atual:
         pass
 
     for agendamento in agendamentos:
-        horario = agendamento[:5]
-        for horario_disponivel in horarios_disponiveis[env]:
-            if horario in horario_disponivel:
-                horario_disponivel[horario] = 0
+        horario_agendado = datetime.strptime(agendamento[:5], '%H:%M')
+        for horario_disponivel in horarios_disponiveis_convertidos:
+            if horario_agendado in horario_disponivel:
+                horario_disponivel[horario_agendado] = 0
 
     horarios_livres = []
-    for horario_disponivel in horarios_disponiveis[env]:
+    for horario_disponivel in horarios_disponiveis_convertidos:
         for hora, disponibilidade in horario_disponivel.items():
-            if disponibilidade == 1 and (data_agendamento > data_atual or hora > horario_atual_str):
-                horarios_livres.append(hora)
+            if disponibilidade == 1 and (data_agendamento > data_atual or hora > horario_atual):
+                horarios_livres.append(hora.strftime('%H:%M'))
 
     return horarios_livres
