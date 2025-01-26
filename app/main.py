@@ -352,16 +352,6 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             case other:
                 return {"status": "error", "message": "Número de destino inválido."}
 
-        db2 = next(get_db(env))
-        try:
-            contato = buscar_contato(db, numero_celular)
-
-            if contato.pausa == True:
-                logging.info(f"Mensagem de contato em pausa.")
-                return {"status": "Mensagem de contato em pausa."}
-        finally:
-            db2.close()
-
         if env == "malaman":
             lista_parentes = ["5519997859405", "5519971523661", "5519995471732"]
             if numero_celular in lista_parentes:
@@ -381,6 +371,11 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
                 pergunta = 'Escolha um dos horários disponíveis:'
                 opcoes = [{'name': opcao} for opcao in resposta['IHR']]
                 opcoes.append({'name': 'Nenhum desses horários é compatível comigo.'})
+
+            elif 'PAUSA' in resposta:
+                logging.info(f"Mensagem de contato em pausa.")
+                return {"status": "Mensagem de contato em pausa."}
+
             elif 'IHR2' in resposta and isinstance(resposta['IHR2'], list):
                 desculpa = 'Desculpe, acabamos de registrar um agendamento para esse horário. Poderia, por gentileza, escolher outro horário disponível?'
 
@@ -454,6 +449,10 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
                 )
 
                 return {"status": "success"}
+
+            elif 'PAUSA' in resposta:
+                logging.info(f"Mensagem de contato em pausa.")
+                return {"status": "Mensagem de contato em pausa."}
 
             elif 'CAG' in resposta and isinstance(resposta['CAG'], list):
                 pergunta = 'Escolha um dos agendamentos para cancelar:'

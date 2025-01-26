@@ -115,6 +115,9 @@ def fluxo_conversa_poll(env, opcao, telefone):
 
     registro_contato = buscar_contato(db, telefone)
 
+    if registro_contato.pausa == True:
+        return {"PAUSA": "Contato em pausa de conversa."}
+
     if registro_status.status == "CDT": #CDT: Confirmação de data
         if opcao == "Sim":
             data = registro_status.observacao
