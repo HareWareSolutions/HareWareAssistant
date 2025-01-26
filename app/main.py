@@ -614,11 +614,10 @@ async def horarios_disponiveis(empresa: str, data: str):
     db = next(get_db(empresa))
     try:
         if "/" in data:
-            data = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
+            data_agendamento = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
 
-        data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
         agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
-        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data_agendamento)
+        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data)
         if horarios_disponiveis:
             return {"retorno": horarios_disponiveis}
         else:
