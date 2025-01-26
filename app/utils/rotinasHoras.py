@@ -13,15 +13,15 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     tz = pytz.timezone('America/Sao_Paulo')
     horario_atual = datetime.now(tz)
     horario_atual_str = horario_atual.strftime('%H:%M')
-    data_atual = horario_atual.strftime('%Y-%m-%d')
-    data_atual_dt = datetime.strptime(data_atual, '%Y-%m-%d')
+    data_atual = horario_atual.strftime('%d/%m/%Y')
+    data_atual_dt = datetime.strptime(data_atual, '%d/%m/%Y')
 
     horarios_disponiveis_finais = []
 
     if data_agendamento == data_atual_dt:
         for horario_disponivel in horarios_disponiveis[env]:
             hora = list(horario_disponivel.keys())[0]
-            hora_dt = datetime.strptime(hora, '%H:%M')
+            hora_dt = datetime.strptime(hora, '%H:%M').replace(year=horario_atual.year, month=horario_atual.month, day=horario_atual.day)
             if hora_dt > horario_atual:
                 horarios_disponiveis_finais.append(horario_disponivel)
 
