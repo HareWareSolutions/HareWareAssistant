@@ -14,26 +14,23 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     horario_atual = datetime.now(tz)
     horario_atual_str = horario_atual.strftime('%H:%M')
     data_atual = horario_atual.strftime('%Y-%m-%d')
+    data_atual_dt = datetime.strptime(data_atual, '%Y-%m-%d')
 
-    print(data_agendamento, type(data_agendamento))
-    print(data_atual, type(data_atual))
-    if data_agendamento == data_atual:
-        print('entrei na data atual')
+    horarios_disponiveis_finais = []
+
+    if data_agendamento == data_atual_dt:
         for horario_disponivel in horarios_disponiveis[env]:
             hora = list(horario_disponivel.keys())[0]
-            if hora <= horario_atual_str:
-                horario_disponivel[hora] = 0
+            if hora > horario_atual_str:
+                horarios_disponiveis_finais.append(horario_disponivel)
+
+    elif data_agendamento > data_atual_dt:
+        horarios_disponiveis_finais = horarios_disponiveis[env]
 
     for agendamento in agendamentos:
         horario_agendado = agendamento[:5]
-        for horario_disponivel in horarios_disponiveis[env]:
-            if horario_agendado in horario_disponivel:
-                horario_disponivel[horario_agendado] = 0
+        horarios_disponiveis_finais = [horario for horario in horarios_disponiveis_finais if list(horario.keys())[0] != horario_agendado]
 
-    horarios_livres = []
-    for horario_disponivel in horarios_disponiveis[env]:
-        for hora, disponibilidade in horario_disponivel.items():
-            if disponibilidade == 1:
-                horarios_livres.append(hora)
+    horarios_livres = [list(horario.keys())[0] for horario in horarios_disponiveis_finais if list(horario.values())[0] == 1]
 
     return horarios_livres
