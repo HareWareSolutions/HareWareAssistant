@@ -122,16 +122,17 @@ def fluxo_conversa_poll(env, opcao, telefone):
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data)
             agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
+            data_normalizada = normalizar_data(data_agendamento)
 
             if env == 'malaman':
                 dia_semana = dia_da_semana(data_agendamento)
                 print(dia_semana)
                 if dia_semana == 'sÃ¡bado':
-                    horarios_livres = verificar_horarios('malaman-sabado', agendamentos, data_agendamento)
+                    horarios_livres = verificar_horarios('malaman-sabado', agendamentos, data_normalizada)
                 else:
-                    horarios_livres = verificar_horarios(env, agendamentos, data_agendamento)
+                    horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
             else:
-                horarios_livres = verificar_horarios(env, agendamentos, data_agendamento)
+                horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
 
             if not horarios_livres:
                 deletar_status(db, telefone)
@@ -147,6 +148,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
     elif registro_status.status == "IHR": #IHR: Informar hora
         if opcao != 'Nenhum desses horários é compatível comigo.':
             data_agendamento = datetime.strptime(registro_status.observacao, "%Y-%m-%d").date()
+            data_normalizada = normalizar_data(data_agendamento)
             hora_agendamento = datetime.strptime(opcao, "%H:%M").time()
 
             data_normalizada = normalizar_data(data_agendamento)
@@ -159,11 +161,11 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 dia_semana = dia_da_semana(data_agendamento)
                 print(dia_semana)
                 if dia_semana == 'sÃ¡bado':
-                    horarios_disponiveis = verificar_horarios('malaman-sabado', agendamentos, data_agendamento)
+                    horarios_disponiveis = verificar_horarios('malaman-sabado', agendamentos, data_normalizada)
                 else:
-                    horarios_disponiveis = verificar_horarios(env, agendamentos, data_agendamento)
+                    horarios_disponiveis = verificar_horarios(env, agendamentos, data_normalizada)
             else:
-                horarios_disponiveis = verificar_horarios(env, agendamentos, data_agendamento)
+                horarios_disponiveis = verificar_horarios(env, agendamentos, data_normalizada)
 
             if not horarios_disponiveis:
                 deletar_status(db, telefone)
@@ -187,11 +189,11 @@ def fluxo_conversa_poll(env, opcao, telefone):
                     dia_semana = dia_da_semana(data_agendamento)
                     print(dia_semana)
                     if dia_semana == 'sÃ¡bado':
-                        horarios_livres = verificar_horarios('malaman-sabado', agendamentos, data_agendamento)
+                        horarios_livres = verificar_horarios('malaman-sabado', agendamentos, data_normalizada)
                     else:
-                        horarios_livres = verificar_horarios(env, agendamentos, data_agendamento)
+                        horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
                 else:
-                    horarios_livres = verificar_horarios(env, agendamentos, data_agendamento)
+                    horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
 
                 if not horarios_livres:
                     deletar_status(db, telefone)
