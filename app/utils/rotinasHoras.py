@@ -16,13 +16,14 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     data_atual = horario_atual.strftime('%Y-%m-%d')
 
     if data_agendamento == data_atual:
-        horario_atual_str = horario_atual.strftime('%H:%M')
+        horarios_disponiveis[env] = [
+            horario for horario in horarios_disponiveis[env] if list(horario.keys())[0] > horario_atual_str
+        ]
     elif data_agendamento > data_atual:
-        horario_atual_str = '00:00'
+        pass
 
     for agendamento in agendamentos:
         horario = agendamento[:5]
-
         for horario_disponivel in horarios_disponiveis[env]:
             if horario in horario_disponivel:
                 horario_disponivel[horario] = 0
@@ -30,7 +31,7 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     horarios_livres = []
     for horario_disponivel in horarios_disponiveis[env]:
         for hora, disponibilidade in horario_disponivel.items():
-            if disponibilidade == 1 and (data_agendamento > data_atual or hora > horario_atual_str):
+            if disponibilidade == 1:
                 horarios_livres.append(hora)
 
     return horarios_livres
