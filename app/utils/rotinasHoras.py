@@ -15,6 +15,8 @@ def verificar_horarios(env, agendamentos, data_agendamento):
     horario_atual_str = horario_atual.strftime('%H:%M')
     data_atual = horario_atual.strftime('%Y-%m-%d')
 
+    print(data_agendamento, type(data_agendamento))
+    print(data_atual, type(data_atual))
     if data_agendamento == data_atual:
         print('entrei na data atual')
         for horario_disponivel in horarios_disponiveis[env]:
