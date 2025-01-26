@@ -527,7 +527,9 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
     try:
         data_agendamento = datetime.strptime(data, "%d/%m/%Y").date()
         agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
+        print('vou verificar os horarios disponiveis')
         horarios_disponiveis = verificar_horarios(empresa, agendamentos)
+        print(horarios_disponiveis)
 
         hora_agendamento = datetime.strptime(hora, "%H:%M").time()
         hora_formatada = hora_agendamento.strftime("%H:%M")
