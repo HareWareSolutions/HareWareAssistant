@@ -631,7 +631,7 @@ async def horarios_disponiveis(empresa: str, data: str):
 
 
 @app.post("/contato-pesquisa")
-async def pesquisa_contato(empresa: str, id_contato: str):
+async def pesquisa_contato(empresa: str, id_contato: int):
     db = next(get_db(empresa))
     try:
         contato = buscar_contato_id(db, id_contato)
@@ -642,6 +642,7 @@ async def pesquisa_contato(empresa: str, id_contato: str):
             return {"retorno": "Nenhum Contato foi encontrado."}
     finally:
         db.close()
+
 
 @app.post("/logar")
 async def logar(usuario: str, senha: str):
