@@ -238,7 +238,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
     elif registro_status.status == 'CNM': #Confirmação de nome
         if opcao == 'Sim':
             nome = registro_status.observacao
-            novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None)
+            novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None, pausa=False)
             registro_contato = buscar_contato(db, telefone)
             deletar_status(db, telefone)
 
@@ -327,7 +327,7 @@ def fluxo_conversa_poll_foa(opcao, telefone):
     if registro_status.status == 'CNM': #CNM: Confirmação de Nome
         if opcao == "Sim":
             nome = registro_status.observacao
-            novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None)
+            novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None, pausa=False)
             registro_contato = buscar_contato(db, telefone)
             deletar_status(db, telefone)
             novo_status = gravar_status(db, telefone, 'EAC', datetime.now(), None)

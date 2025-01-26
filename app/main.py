@@ -4,7 +4,7 @@ import tiktoken
 from datetime import datetime, date, timedelta, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
-from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato
+from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
 from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
@@ -758,7 +758,7 @@ async def visualizar_contatos(empresa: str):
 async def cadastrar_contato(empresa: str, nome: str, numero_celular: str, email: str = None):
     db = next(get_db(empresa))
     try:
-        sucesso = criar_contato(db, nome, numero_celular, email)
+        sucesso = criar_contato(db, nome, numero_celular, email, False)
         if sucesso:
             return {"status": "sucess", "message": "Contato cadastrado com sucesso."}
         else:
@@ -776,6 +776,19 @@ async def excluir_contato(empresa: str, id: int):
             return {"status": "sucess", "message": "Contato excluido com sucesso."}
         else:
             raise HTTPException(status_code=500, detail="Erro ao excluir contato.")
+    finally:
+        db.close()
+
+
+@app.post("/editar-contato")
+async def editar_contato_endpoint(empresa: str, id: int, nome: str = None, numero_celular: str = None, email: str = None, pausa: bool = None):
+    db = next(get_db(empresa))
+    try:
+        contato_atualizado = editar_contato(db, id, nome, numero_celular, email, pausa)
+        if contato_atualizado:
+            return {"message": "Contato atualizado com sucesso", "contato": contato_atualizado}
+        else:
+            raise HTTPException(status_code=404, detail="Contato não encontrado")
     finally:
         db.close()
 

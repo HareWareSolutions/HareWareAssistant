@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.orm import relationship, Session
 from app.db.db import Base
 
@@ -10,12 +10,13 @@ class Contato(Base):
     nome = Column(String, nullable=False)
     numero_celular = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=True)
+    pausa = Column(Boolean, default=False)
 
     agendamento = relationship("Agendamento", back_populates="contato")
 
 
-def criar_contato(db: Session, nome: str, numero_celular: str, email: str = None):
-    novo_contato = Contato(nome=nome, numero_celular=numero_celular, email=email)
+def criar_contato(db: Session, nome: str, numero_celular: str, email: str = None, pausa: bool = False):
+    novo_contato = Contato(nome=nome, numero_celular=numero_celular, email=email, pausa=pausa)
     db.add(novo_contato)
     db.commit()
     db.refresh(novo_contato)
@@ -45,3 +46,21 @@ def deletar_contato(db: Session, id: int):
         return False
 
 
+def editar_contato(db: Session, id: int, nome: str = None, numero_celular: str = None, email: str = None, pausa: bool = None):
+    contato = db.query(Contato).filter(Contato.id == id).first()
+
+    if contato:
+        if nome:
+            contato.nome = nome
+        if numero_celular:
+            contato.numero_celular = numero_celular
+        if email:
+            contato.email = email
+        if pausa is not None:
+            contato.pausa = pausa
+
+        db.commit()
+        db.refresh(contato)
+        return contato
+    else:
+        return None
