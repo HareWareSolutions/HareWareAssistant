@@ -80,6 +80,9 @@ def fluxo_conversa(env, prompt, telefone):
                 if (env == 'malaman' or env == 'hareware') and dia_semana == 'domingo':
                     return "Desculpa, infelizmente não trabalhamos aos domingos, poderia informar outra data?"
 
+                if env == 'malaman' and dia_semana == 'sexta':
+                    return "Peço desculpas, mas na sexta-feira não tenho horários disponíveis. Poderia escolher outro dia?"
+
                 deletar_status(db, telefone)
                 novo_status = gravar_status(db, telefone, "CDT", datetime.now(), str(data))
                 data_normalizada = normalizar_data(data)
