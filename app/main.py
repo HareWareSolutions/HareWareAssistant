@@ -352,7 +352,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             case other:
                 return {"status": "error", "message": "Número de destino inválido."}
 
-        contato = buscar_contato(db, numero_celular)
+        contato = buscar_contato(db, str(numero_celular))
 
         if contato.pausa == True:
             logging.info(f"Mensagem de contato em pausa.")
