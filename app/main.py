@@ -614,16 +614,21 @@ async def horarios_disponiveis(empresa: str, data: str):
     db = next(get_db(empresa))
     try:
         if "/" in data:
-            data_agendamento = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
+            data_agendamento = datetime.strptime(data, "%d/%m/%Y").date()
+        else:
+            return {"erro": "Formato de data inválido. Use 'DD/MM/YYYY'."}
 
         agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
-        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data)
+        data_formatada = data_agendamento.strftime("%d/%m/%Y")
+        horarios_disponiveis = verificar_horarios(empresa, agendamentos, data_formatada)
+
         if horarios_disponiveis:
             return {"retorno": horarios_disponiveis}
         else:
             return {"retorno": None}
     finally:
         db.close()
+
 
 
 @app.post("/logar")
