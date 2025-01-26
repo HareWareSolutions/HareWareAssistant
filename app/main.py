@@ -544,6 +544,7 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
         db.close()
 
 
+
 @app.post("/cancelar-agendamento")
 async def cancelarAgendamento(empresa: str, id_agendamento: int):
     db = next(get_db(empresa))
