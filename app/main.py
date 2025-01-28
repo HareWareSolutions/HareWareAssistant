@@ -30,6 +30,7 @@ app.add_middleware(
         "http://hareinteract.com.br",
         "https://hareinteract.com.br",
         "http://www.hareinteract.com.br",
+        "https://www.hareinteract.com.br",
         "https://api.z-api.io",
         "https://hareware.com.br"
     ],
