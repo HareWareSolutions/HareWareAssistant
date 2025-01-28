@@ -29,6 +29,7 @@ app.add_middleware(
     allow_origins=[
         "http://hareinteract.com.br",
         "https://hareinteract.com.br",
+        "http://www.hareinteract.com.br",
         "https://api.z-api.io",
         "https://hareware.com.br"
     ],
