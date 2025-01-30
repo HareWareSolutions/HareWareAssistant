@@ -16,7 +16,7 @@ from app.utils.validador_documento import validar_documento
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from threading import Lock
-from app.utils.rotinasDatas import normalizar_data
+import emoji
 
 logging.basicConfig(level=logging.INFO)
 
@@ -323,6 +323,9 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             logging.error("ID da mensagem não encontrado.")
             return {"error": "ID da mensagem não encontrado."}
 
+        nome_contato = data.get("chatName")
+        nome_contato = emoji.replace_emoji(nome_contato, replace='')
+
         with lock:
             if id_mensagem in ids_mensagens_processados:
                 logging.info(f"Mensagem duplicada ignorada")
@@ -438,7 +441,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             tokens_entrada = encoding.encode(prompt)
             num_tokens = len(tokens_entrada)
 
-            resposta = fluxo_conversa(env, prompt, numero_celular)
+            resposta = fluxo_conversa(env, prompt, numero_celular, nome_contato)
 
             if 'CDT' in resposta:
                 pergunta = f'Você deseja realizar um agendamento na data de {resposta["CDT"]}?'

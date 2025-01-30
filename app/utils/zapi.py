@@ -108,6 +108,33 @@ def send_document_zapi(env, number, document_url, file_name):
         print(f"Erro ao enviar o documento: {e}")
 
 
+def send_button_message_zapi(env, number, message, title, footer, buttons):
+    client_token_zapi, zapi_instance, token_zapi = get_credentials(env)
+
+    url = f"https://api.z-api.io/instances/{zapi_instance}/token/{token_zapi}/send-button-actions"
+    headers = {
+        'Content-Type': 'application/json',
+        'Client-Token': client_token_zapi
+    }
+    payload = {
+        "phone": number,
+        "message": message,
+        "title": title,
+        "footer": footer,
+        "buttonActions": buttons
+    }
+
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        if response.status_code == 200:
+            print("Mensagem com botões enviada com sucesso!")
+        else:
+            print(f"Falha ao enviar a mensagem com botões. Código de status: {response.status_code}")
+            print(f"Resposta da API: {response.text}")
+    except Exception as e:
+        print(f"Erro ao enviar a mensagem com botões: {e}")
+
+
 def remove_word(sentence):
     sentence_without_source = re.sub(r'【\d+:\d+†\([^\)]+\)】', '', sentence)
     sentence_without_source = re.sub(r'【\d+:\d+†[^\]]+】', '', sentence_without_source)

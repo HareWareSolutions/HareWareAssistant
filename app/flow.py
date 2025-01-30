@@ -1,5 +1,6 @@
 import time
 import random
+import emoji
 from app.models.contato import buscar_contato, criar_contato
 from app.models.pedido import buscar_pedido_id, criar_pedido, excluir_pedido, alterar_pedido
 from app.models.agendamento import buscar_agendamentos_por_data, gravar_agendamento, buscar_agendamentos_por_contato_id_formatado, buscar_agendamentos_por_contato_id, deletar_agendamento
@@ -16,15 +17,18 @@ from app.ia.foundry import send_message_to_ai
 import pytz
 
 
-def fluxo_conversa(env, prompt, telefone):
+def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
     db = next(get_db(env))
 
     registro_status = buscar_status(db, telefone)
 
     registro_contato = buscar_contato(db, telefone)
 
-    if registro_contato is not None:
+    if registro_contato is None:
+        novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None, pausa=False)
+        registro_contato = buscar_contato(db, telefone)
 
+    if registro_contato is not None:
         if registro_contato.pausa == True:
             return {"PAUSA": "Contato em pausa de conversa."}
 
