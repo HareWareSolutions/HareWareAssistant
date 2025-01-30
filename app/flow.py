@@ -145,6 +145,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
 
             if not horarios_livres:
+                print(horarios_livres)
                 deletar_status(db, telefone)
                 novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None)
                 data_normalizada = normalizar_data(data_agendamento)
