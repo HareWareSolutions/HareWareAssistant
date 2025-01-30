@@ -25,10 +25,12 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
     registro_contato = buscar_contato(db, telefone)
 
     if registro_contato is None:
+        print('entrei aqui')
         novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None, pausa=False)
         registro_contato = buscar_contato(db, telefone)
 
     if registro_contato is not None:
+        print('entrei no is not none')
         if registro_contato.pausa == True:
             return {"PAUSA": "Contato em pausa de conversa."}
 
