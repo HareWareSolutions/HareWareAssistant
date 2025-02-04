@@ -54,14 +54,39 @@ def start_run(thread_id, assistant_id):
     )
 
 
-def wait_for_run_to_complete(run, thread_id):
-    while run.status in ['queued', 'in_progress', 'cancelling']:
+def wait_for_run_to_complete(run, thread_id, max_retries=3):
+    retries = 0
+
+    while isinstance(run, object) and hasattr(run, 'status') and run.status in ['queued', 'in_progress', 'cancelling']:
         time.sleep(1)
         run = client.beta.threads.runs.retrieve(
             thread_id=thread_id,
             run_id=run.id
         )
-    return run
+
+    if not isinstance(run, object) or not hasattr(run, 'status'):
+        return "Hmmm... não entendi direito o que aconteceu. Pode tentar de novo?"
+
+    if run.status == 'completed':
+        return run
+    elif run.status == 'requires_action':
+        return run
+    elif run.status == 'failed':
+        if retries < max_retries:
+            retries += 1
+            print(f"Run falhou, tentando novamente... ({retries}/{max_retries})")
+            time.sleep(2 ** retries)
+            run = start_run(thread_id, run.assistant_id)
+            if not isinstance(run, object) or not hasattr(run, 'status'):
+                return "Não consegui processar isso direito... pode tentar mais uma vez?"
+            return wait_for_run_to_complete(run, thread_id, max_retries)
+        else:
+            return "Hmmm... tentei algumas vezes, mas não deu certo. Quer tentar mais tarde?"
+    elif run.status == 'incomplete':
+        return "Acho que não terminei isso direito... pode tentar de novo?"
+    else:
+        return f"Status inesperado: {run.status}"
+
 
 
 def get_assistant_reply(run_status, thread_id):
