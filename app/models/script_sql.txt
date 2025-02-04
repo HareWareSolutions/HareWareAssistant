@@ -17,6 +17,6 @@ CREATE TABLE status (
     id SERIAL PRIMARY KEY,
     numero_celular VARCHAR NOT NULL UNIQUE,
     status VARCHAR NOT NULL,
-    hora TIME NOT NULL,
+    hora VARCHAR NOT NULL,
     observacao VARCHAR
 );
