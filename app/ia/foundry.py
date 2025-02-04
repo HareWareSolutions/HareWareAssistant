@@ -54,36 +54,14 @@ def start_run(thread_id, assistant_id):
     )
 
 
-def wait_for_run_to_complete(run, thread_id, max_retries=3):
-    retries = 0
-
+def wait_for_run_to_complete(run, thread_id):
     while run.status in ['queued', 'in_progress', 'cancelling']:
         time.sleep(1)
         run = client.beta.threads.runs.retrieve(
             thread_id=thread_id,
             run_id=run.id
         )
-
-    if run.status == 'completed':
-        return run
-    elif run.status == 'requires_action':
-        return run
-    elif run.status == 'failed':
-        if retries < max_retries:
-            retries += 1
-            print(f"Run falhou, tentando novamente... ({retries}/{max_retries})")
-            time.sleep(2 ** retries)
-            return wait_for_run_to_complete(
-                start_run(thread_id, run.assistant_id),
-                thread_id,
-                max_retries
-            )
-        else:
-            return "Hmmm... algo deu errado e eu não consegui entender direito. Quer tentar de novo?"
-    elif run.status == 'incomplete':
-        return "Acho que não consegui terminar isso direito... pode tentar mais uma vez?"
-    else:
-        return f"Status inesperado: {run.status}"
+    return run
 
 
 def get_assistant_reply(run_status, thread_id):
