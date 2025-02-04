@@ -353,9 +353,6 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             case "5519999344528":
                 env = 'hareware'
                 id_contrato = 1
-            case "5519971501387":
-                env = 'malaman'
-                id_contrato = 5
             case "5519984574859":
                 env = 'joice'
                 id_contrato = 2

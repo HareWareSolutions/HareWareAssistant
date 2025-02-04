@@ -12,9 +12,8 @@ foundry_endpoint = "https://hareware-openai.openai.azure.com/"
 foundry_key = "Tft6fly9yH8Yx6yyXz7vaM6g3iQIXBaQ8b69vFZ4l23ewuBc8W6tJQQJ99AKACYeBjFXJ3w3AAABACOGRcxn"
 assistant_id_foundry = {
     "hareware": "asst_z0XpoKoyLqtUmyEW6oNH0hlO",
-    "joice": "",
-    "malaman": "asst_J109oCFHPFndORVmgOsVvsVv"
-}
+    "joice": "asst_5kkGpWuNMpAYUTqRCuyTwkpL"
+    }
 
 
 client = AzureOpenAI(

@@ -106,6 +106,9 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
             elif env == 'malaman':
                 return ("E aí, parça! Seja bem-vindo à Barbearia do Malaman!\n\n"
                         "Não achei você na minha lista de contatos, qual é o seu nome, mano?")
+            elif env == 'joice':
+                return ("Olá, Seja bem-vinda (o) ao WhatsApp oficial da Joice Carolina Cílios!\n\n"
+                        "Percebi que você não está cadastrada (o) na minha lista de contatos, poderia me dizer o seu nome?")
 
         if registro_status.status == 'CNC': #CNC = Cadastro de Nome de Contato
             if caracteres_numericos(prompt) or caracteres_invalidos(prompt):
@@ -254,7 +257,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
             deletar_status(db, telefone)
 
             if env == 'hareware':
-                mensagem_retorno = (f'Prazer em conhecê-lo {nome}, como posso te ajudar?\n\n'
+                mensagem_retorno = (f'Prazer em conhecê-lo (a) {nome}, como posso te ajudar?\n\n'
                                     f'Aqui você pode:\n\n'
                                     f'- Sanar suas dúvidas sobre a HareWare\n\n'
                                     f'- Agendar um horário com a frase de ativação: "Quero agendar um horário"\n\n'
@@ -266,7 +269,11 @@ def fluxo_conversa_poll(env, opcao, telefone):
                                     f'- Cancelar um horário marcado com a frase de ativação: "Quero cancelar um agendamento"\n\n'
                                     f'- Sanar suas dúvidas sobre a Barbearia Malaman.')
             elif env == "joice":
-                mensagem_retorno = 'Sistema fora'
+                mensagem_retorno = (f'Prazer em conhecê-la (o) {nome}, como posso te ajudar?\n\n'
+                                    f'Aqui você pode:\n\n'
+                                    f'- Sanar suas dúvidas sobre o meu Curso e sobre o meu salão.\n\n'
+                                    f'- Agendar um horário no meu salão com a frase de ativação: "Quero agendar um horário"\n\n'
+                                    f'- Solicitar o cancelamento de um agendamento com a frase de ativação: "Quero cancelar um agendamento"')
             return mensagem_retorno
         else:
             deletar_status(db, telefone)
