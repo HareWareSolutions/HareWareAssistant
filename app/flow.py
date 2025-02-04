@@ -60,7 +60,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
                         return {"CAG": agendamentos}
                 print("cheguei antes de gravar um novo status")
                 print(db, telefone)
-                novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None)
+                novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None)
                 print("Passei da gravação do status")
                 return "Certo, poderia me informar uma data?\n\n Escreva no formato DD/MM/YYYY"
 
