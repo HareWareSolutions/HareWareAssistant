@@ -25,7 +25,7 @@ def mensagem_env(env, nome, hora):
             return (f'Olá, {nome},\n\n'
                     f'Hoje você tem um compromisso marcado com a HareWare às {hora}.\n\n'
                     f'Contamos com a sua presença! até breve!')
-        case 'joice':
+        case 'sjoicer':
             return (f'Olá, {nome},\n\n'
                     f'Hoje você tem um compromisso marcado no Salão da Joice às {hora}. \n\n'
                     f'Contamos com a sua presença! até breve!')
@@ -41,7 +41,7 @@ def is_round_hour():
 
 
 def notificar():
-    envs = ['hareware', 'malaman']
+    envs = ['hareware', 'sjoicer']
 
     while True:
         if is_round_hour():
