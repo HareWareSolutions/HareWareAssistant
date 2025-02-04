@@ -16,7 +16,7 @@ def get_database_url(env: str = "hareware"):
         return DATABASE_URL_MMANIA
     elif env == "hwadmin":
         return DATABASE_URL_HWADMIN
-    elif env == "joice":
+    elif env == "sjoicer":
         return DATABASE_URL_JOICE
     elif env == "malaman":
         return DATABASE_URL_MALAMAN

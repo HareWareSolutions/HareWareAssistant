@@ -354,7 +354,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
                 env = 'hareware'
                 id_contrato = 1
             case "5519984574859":
-                env = 'joice'
+                env = 'sjoicer'
                 id_contrato = 2
             case other:
                 return {"status": "error", "message": "Número de destino inválido."}
