@@ -12,7 +12,7 @@ class Contato(Base):
     email = Column(String, nullable=True)
     pausa = Column(Boolean, default=False)
 
-    agendamento = relationship("Agendamento", back_populates="contato")
+    agendamentos = relationship("Agendamento", back_populates="contato", cascade="all, delete-orphan")
 
 
 def criar_contato(db: Session, nome: str, numero_celular: str, email: str = None, pausa: bool = False):
@@ -42,8 +42,7 @@ def deletar_contato(db: Session, id: int):
         db.delete(contato)
         db.commit()
         return True
-    else:
-        return False
+    return False
 
 
 def editar_contato(db: Session, id: int, nome: str = None, numero_celular: str = None, email: str = None, pausa: bool = None):

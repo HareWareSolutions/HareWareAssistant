@@ -11,9 +11,9 @@ class Agendamento(Base):
     id = Column(Integer, primary_key=True, index=True)
     data = Column(Date, nullable=False)
     hora = Column(Time, nullable=False)
-    contato_id = Column(Integer, ForeignKey('contato.id'), nullable=False)
+    contato_id = Column(Integer, ForeignKey('contato.id', ondelete="CASCADE"), nullable=False)
 
-    contato = relationship("Contato", back_populates="agendamento")
+    contato = relationship("Contato", back_populates="agendamentos")
 
 
 def gravar_agendamento(db: Session, data, hora, contato_id: int):
