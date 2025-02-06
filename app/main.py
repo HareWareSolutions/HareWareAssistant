@@ -4,7 +4,7 @@ import tiktoken
 from datetime import datetime, date, timedelta, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
-from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato
+from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato_id
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
 from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
@@ -353,9 +353,9 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             case "5519999344528":
                 env = 'hareware'
                 id_contrato = 1
-            case "5519984574859":
-                env = 'sjoicer'
-                id_contrato = 2
+            case "5519996075939":
+                env = "emyconsultorio"
+                id_contrato = 6
             case other:
                 return {"status": "error", "message": "Número de destino inválido."}
 
@@ -548,6 +548,32 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
         if hora_formatada in horarios_disponiveis:
             sucesso = gravar_agendamento(db, data_convertida, hora, contato)
             if sucesso:
+                dados_contato = buscar_contato_id(db, contato)
+
+                if empresa == 'hareware':
+                    nome_empresa = 'HareWare Soluções Tecnológicas'
+                    telefone_cliente = '5519997581672'
+                elif empresa == 'emyconsultorio':
+                    nome_empresa = 'Consultório Eminy Bezerra'
+                    telefone_cliente = '5513991701738'
+
+                mensagem = (f'Olá, {dados_contato.nome},\n'
+                            f'Você tem um compromisso com {nome_empresa} no dia {data} às {hora}.\n\n'
+                            f'Até! :)')
+
+                send_message_zapi(
+                    env=empresa,
+                    number=dados_contato.numero_celular,
+                    message=mensagem
+                )
+
+                notificacao_cliente = f'{dados_contato.nome} agendou um horário no dia {data} às {hora}.'
+
+                send_message_zapi(
+                    env=empresa,
+                    number=telefone_cliente,
+                    message=notificacao_cliente
+                )
                 return {"status": "success", "message": "Agendamento incluído com sucesso."}
             else:
                 raise HTTPException(status_code=500, detail="Erro ao gravar o agendamento.")

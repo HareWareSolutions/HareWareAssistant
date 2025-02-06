@@ -14,6 +14,7 @@ from app.db.db import get_db
 from app.ia.arc import arc_predict
 from app.ia.iia import iia_predict
 from app.ia.foundry import send_message_to_ai
+from app.utils.zapi import send_message_zapi
 import pytz
 
 
@@ -86,11 +87,8 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
 
                 dia_semana = dia_da_semana(data)
 
-                if (env == 'malaman' or env == 'hareware') and dia_semana == 'domingo':
-                    return "Desculpa, infelizmente não trabalhamos aos domingos, poderia informar outra data?"
-
-                if env == 'malaman' and dia_semana == 'sexta':
-                    return "Peço desculpas, mas na sexta-feira não tenho horários disponíveis. Poderia escolher outro dia?"
+                if (env == 'emyconsultorio' or env == 'hareware') and (dia_semana == 'domingo' or dia_semana == 'sÃ¡bado'):
+                    return "Desculpa, infelizmente não trabalhamos aos finais de semana, poderia informar outra data?"
 
                 deletar_status(db, telefone)
                 novo_status = gravar_status(db, telefone, "CDT", datetime.now(), str(data))
@@ -192,6 +190,20 @@ def fluxo_conversa_poll(env, opcao, telefone):
             if hora_formatada in horarios_disponiveis:
                 agendamento = gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id)
                 deletar_status(db, telefone)
+
+                if env == 'hareware':
+                    numero_cliente = '5519997581672'
+                elif env == 'emyconsultorio':
+                    numero_cliente = '5513991701738'
+
+                notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}.'
+
+                send_message_zapi(
+                    env=env,
+                    number=numero_cliente,
+                    message=notificacao_cliente
+                )
+
                 return f"Agendamento realizado para o dia {data_normalizada} às {opcao}."
             else:
                 data = registro_status.observacao
@@ -200,15 +212,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data_agendamento)
                 agendamentos = buscar_agendamentos_por_data(db, data)
 
-                if env == 'malaman':
-                    dia_semana = dia_da_semana(data_agendamento)
-                    print(dia_semana)
-                    if dia_semana == 'sÃ¡bado':
-                        horarios_livres = verificar_horarios('malaman-sabado', agendamentos, data_normalizada)
-                    else:
-                        horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
-                else:
-                    horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
+                horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
 
                 if not horarios_livres:
                     deletar_status(db, telefone)
