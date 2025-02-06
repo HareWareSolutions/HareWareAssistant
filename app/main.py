@@ -552,10 +552,10 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
 
                 if empresa == 'hareware':
                     nome_empresa = 'HareWare Soluções Tecnológicas'
-                    telefone_cliente = '5519997581672'
+                    telefone_cliente = ['5519997581672', '5519988246777', '5519995869852']
                 elif empresa == 'emyconsultorio':
                     nome_empresa = 'Consultório Eminy Bezerra'
-                    telefone_cliente = '5513991701738'
+                    telefone_cliente = ['5513991701738']
 
                 mensagem = (f'Olá, {dados_contato.nome},\n'
                             f'Você tem um compromisso com {nome_empresa} no dia {data} às {hora}.\n\n'
@@ -569,11 +569,13 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
 
                 notificacao_cliente = f'{dados_contato.nome} agendou um horário no dia {data} às {hora}.'
 
-                send_message_zapi(
-                    env=empresa,
-                    number=telefone_cliente,
-                    message=notificacao_cliente
-                )
+                for numero_cliente in telefone_cliente:
+                    send_message_zapi(
+                        env=empresa,
+                        number=numero_cliente,
+                        message=notificacao_cliente
+                    )
+
                 return {"status": "success", "message": "Agendamento incluído com sucesso."}
             else:
                 raise HTTPException(status_code=500, detail="Erro ao gravar o agendamento.")

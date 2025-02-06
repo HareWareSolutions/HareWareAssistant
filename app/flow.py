@@ -192,17 +192,19 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 deletar_status(db, telefone)
 
                 if env == 'hareware':
-                    numero_cliente = '5519997581672'
+                    numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
                 elif env == 'emyconsultorio':
-                    numero_cliente = '5513991701738'
+                    numero_cliente = ['5513991701738']
 
                 notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}.'
 
-                send_message_zapi(
-                    env=env,
-                    number=numero_cliente,
-                    message=notificacao_cliente
-                )
+                for n_cliente in numero_cliente:
+
+                    send_message_zapi(
+                        env=env,
+                        number=n_cliente,
+                        message=notificacao_cliente
+                    )
 
                 return f"Agendamento realizado para o dia {data_normalizada} às {opcao}."
             else:

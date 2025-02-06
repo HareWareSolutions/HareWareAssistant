@@ -37,7 +37,7 @@ def is_round_hour():
 
 
 def notificar():
-    envs = ['hareware', 'emyconsultorio']
+    envs = ['hareware']
 
     while True:
         if is_round_hour():
