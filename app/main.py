@@ -614,10 +614,9 @@ async def pesquisarAgendaDia(empresa: str, data: str):
                 confirmacao = agendamento.get("confirmacao")
 
                 if confirmacao:
-                    print("Entrei no sim")
                     confirmacao == "Sim"
+                    print(confirmacao)
                 else:
-                    print("ENtrei no não")
                     confirmacao == "Não"
 
                 if isinstance(data_obj, datetime):
@@ -637,6 +636,7 @@ async def pesquisarAgendaDia(empresa: str, data: str):
 
                 contato = buscar_contato_id(db, id_contato)
 
+                print(confirmacao)
                 reserva = {
                     "id_agendamento": id_agendamento,
                     "data": data_formatada,
