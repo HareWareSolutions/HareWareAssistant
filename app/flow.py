@@ -298,7 +298,9 @@ def fluxo_conversa_poll(env, opcao, telefone):
             novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None)
             return "Certo, escolha a melhor data para você!\n\n Escreva no formato DD/MM/YYYY"
         else:
+            print(registro_status.observacao)
             sucesso = deletar_agendamento(db, int(registro_status.observacao))
+            print(sucesso)
             return f'O seu agendamento foi cancelado, precisando de mais alguma coisa é só chamar!'
     else:
         deletar_status(db, telefone)
