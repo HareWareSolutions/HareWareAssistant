@@ -122,6 +122,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
     db = next(get_db(env))
 
     registro_status = buscar_status(db, telefone)
+    print(registro_status)
 
     registro_contato = buscar_contato(db, telefone)
     if registro_contato.pausa == True:
