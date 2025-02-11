@@ -635,6 +635,8 @@ async def pesquisarAgendaDia(empresa: str, data: str):
 
                 contato = buscar_contato_id(db, id_contato)
 
+                print(confirmacao)
+
                 reserva = {
                     "id_agendamento": id_agendamento,
                     "data": data_formatada,
