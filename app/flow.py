@@ -282,14 +282,13 @@ def fluxo_conversa_poll(env, opcao, telefone):
                                     f'- Agendar um horário no meu salão com a frase de ativação: "Quero agendar um horário"\n\n'
                                     f'- Solicitar o cancelamento de um agendamento com a frase de ativação: "Quero cancelar um agendamento"')
             return mensagem_retorno
-        elif registro_status.status == 'CPA':
+        elif registro_status.status == 'CPA': # Confirmação de presença
             deletar_status(db, telefone)
             if opcao == 'Sim':
                 agendamento_confirmado = alterar_confirmacao_agendamento(db, int(registro_status.observacao), True)
                 return f'Obrigado pela confirmação!'
             else:
                 novo_status = gravar_status(db, telefone, 'RAG', datetime.now(), registro_status.observacao)
-                print('enviei o retorno')
                 return {"RAG": [{'name': 'Sim'}, {'name': 'Não'}]}
 
         elif registro_status.status == 'RAG':

@@ -367,6 +367,8 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             opcao_votada = opcao_votada[0].get("name", "")
 
             resposta = fluxo_conversa_poll(env, opcao_votada, numero_celular)
+            print(resposta)
+            print('coletei a resposta')
 
             if 'IHR' in resposta and isinstance(resposta['IHR'], list):
                 pergunta = 'Escolha um dos horários disponíveis:'
