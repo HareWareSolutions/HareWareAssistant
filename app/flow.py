@@ -255,7 +255,16 @@ def fluxo_conversa_poll(env, opcao, telefone):
             if agendamento.get('data') == str(data_cancelamento) and agendamento.get('hora') == str(hora_cancelamento):
                 id_agendamento = agendamento['id']
                 deletar_agendamento(db, id_agendamento)
-                return f'Agendamento cancelado com sucesso, posso te ajudar em mais alguma coisa?'
+                novo_status = gravar_status(db, telefone, 'RA2', datetime.now(), None)
+                return {'RA2': 'Agendamento cancelado com sucesso, Gostaria de remarcar?'}
+
+    elif registro_status.status == 'RA2': # Remarcar agendamento 2
+        deletar_status(db, telefone)
+        if opcao == 'Sim':
+            novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None)
+            return "Certo, escolha a melhor data para você!\n\n Escreva no formato DD/MM/YYYY"
+        else:
+            return 'Tudo bem... precisando de mais alguma coisa é só chamar!'
 
     elif registro_status.status == 'CNM': #Confirmação de nome
         if opcao == 'Sim':

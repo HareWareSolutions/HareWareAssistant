@@ -367,8 +367,6 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             opcao_votada = opcao_votada[0].get("name", "")
 
             resposta = fluxo_conversa_poll(env, opcao_votada, numero_celular)
-            print(resposta)
-            print('coletei a resposta')
 
             if 'IHR' in resposta and isinstance(resposta['IHR'], list):
                 pergunta = 'Escolha um dos horários disponíveis:'
@@ -398,10 +396,14 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
 
             elif 'RAG' in resposta:
                 if env == 'hareware':
-                    pergunta = 'Você deseja reagendar a reunião?'
+                    pergunta = 'Você deseja remarcar a reunião?'
                 elif env == 'emyconsultorio':
-                    pergunta = 'Você deseja reagendar a reunião?'
+                    pergunta = 'Você deseja remarcar a consulta?'
 
+                opcoes = [{'name': 'Sim'}, {'name': 'Não'}]
+
+            elif 'RA2' in resposta:
+                pergunta = resposta['RA2']
                 opcoes = [{'name': 'Sim'}, {'name': 'Não'}]
 
             else:
