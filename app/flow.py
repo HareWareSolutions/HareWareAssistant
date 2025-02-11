@@ -289,6 +289,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 return f'Obrigado pela confirmação!'
             else:
                 novo_status = gravar_status(db, telefone, 'RAG', datetime.now(), registro_status.observacao)
+                print('enviei o retorno')
                 return {"RAG": [{'name': 'Sim'}, {'name': 'Não'}]}
 
         elif registro_status.status == 'RAG':
