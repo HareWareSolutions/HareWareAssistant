@@ -476,9 +476,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
                 elif env == 'emyconsultorio':
                     pergunta = 'Você deseja reagendar a reunião?'
 
-                print(opcoes, type(opcoes))
-
-                opcoes = [{'name': opcao} for opcao in resposta['RAG']]
+                opcoes = resposta['RAG']
 
                 send_poll_zapi(
                     env=env,
