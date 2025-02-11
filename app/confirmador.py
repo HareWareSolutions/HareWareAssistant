@@ -9,8 +9,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from db.db import get_db
 from models.agendamento import buscar_agendamentos_por_data_ntf
 from models.contato import buscar_contato_id
-from models.status import deletar_status, buscar_status, gravar_status
-from utils.zapi import send_message_zapi, send_poll_zapi
+from models.status import deletar_status, gravar_status
+from utils.zapi import send_poll_zapi
+from utils.rotinasDatas import normalizar_data
 
 notificacoes_enviadas = {}
 
@@ -55,13 +56,15 @@ def notificar():
                         tzinfo=pytz.timezone('America/Sao_Paulo').localize(datetime.now()).tzinfo
                     )
 
-                    if hora_atual <= hora_agendada <= limite and agendamento.id not in notificacoes_enviadas:
+                    if hora_atual <= hora_agendada <= limite and agendamento.id not in notificacoes_enviadas and agendamento.confirmacao != True:
                         contato = buscar_contato_id(db, agendamento.contato_id)
+
+                        data_normalizada = normalizar_data(agendamento.data)
 
                         dados = {
                             'id': agendamento.id,
                             'hora': agendamento.hora,
-                            'data': agendamento.data,
+                            'data': data_normalizada,
                             'nome_cliente': contato.nome,
                             'celular': contato.numero_celular
                         }
