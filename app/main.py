@@ -614,10 +614,9 @@ async def pesquisarAgendaDia(empresa: str, data: str):
                 confirmacao = agendamento.get("confirmacao")
 
                 if confirmacao:
-                    confirmacao == "Sim"
-                    print(confirmacao)
+                    confirmacao = "Sim"
                 else:
-                    confirmacao == "Não"
+                    confirmacao = "Não"
 
                 if isinstance(data_obj, datetime):
                     data_formatada = data_obj.strftime("%d/%m/%Y")
