@@ -470,6 +470,21 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
 
                 return {"status": "success"}
 
+            elif 'RAG' in resposta and isistance(resposta['RAG'], list):
+                if env == 'hareware':
+                    pergunta = 'Você deseja reagendar a reunião?'
+                elif env == 'emyconsultorio':
+                    pergunta = 'Você deseja reagendar a reunião?'
+
+                opcoes = [{'name': opcao} for opcao in resposta['RAG']]
+
+                send_poll_zapi(
+                    env=env,
+                    number=numero_celular,
+                    question=pergunta,
+                    options=opcoes
+                )
+
             elif 'CNM' in resposta:
                 pergunta = resposta['CNM']
                 opcoes = [{'name': 'Sim'}, {'name': 'Não'}]

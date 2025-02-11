@@ -122,3 +122,14 @@ def deletar_agendamento_por_data_hora(db: Session, data: str, hora: str):
     db.commit()
 
     return {"message": "Agendamento cancelado com sucesso."}
+
+
+def alterar_confirmacao_agendamento(db: Session, agendamento_id: int, confirmacao: bool):
+    agendamento = db.query(Agendamento).filter(Agendamento.id == agendamento_id).first()
+    if not agendamento:
+        raise ValueError("Agendamento não encontrado.")
+    agendamento.confirmacao = confirmacao
+    db.commit()
+    db.refresh(agendamento)
+    return agendamento
+
