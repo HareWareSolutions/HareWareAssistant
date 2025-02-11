@@ -10,7 +10,8 @@ CREATE TABLE agendamento (
     id SERIAL PRIMARY KEY,
     data DATE NOT NULL,
     hora TIME NOT NULL,
-    contato_id INTEGER NOT NULL REFERENCES contato(id)
+    contato_id INTEGER NOT NULL REFERENCES contato(id),
+    confirmacao BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE status (

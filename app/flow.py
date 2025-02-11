@@ -188,7 +188,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
             hora_formatada = hora_agendamento.strftime('%H:%M')
 
             if hora_formatada in horarios_disponiveis:
-                agendamento = gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id)
+                agendamento = gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id, False)
                 deletar_status(db, telefone)
 
                 if env == 'hareware':

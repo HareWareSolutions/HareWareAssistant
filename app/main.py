@@ -546,7 +546,7 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
         hora_formatada = hora_agendamento.strftime("%H:%M")
 
         if hora_formatada in horarios_disponiveis:
-            sucesso = gravar_agendamento(db, data_convertida, hora, contato)
+            sucesso = gravar_agendamento(db, data_convertida, hora, contato, False)
             if sucesso:
                 dados_contato = buscar_contato_id(db, contato)
 
@@ -611,6 +611,12 @@ async def pesquisarAgendaDia(empresa: str, data: str):
                 data_obj = agendamento.get("data")
                 hora_obj = agendamento.get("hora")
                 id_contato = agendamento.get("id_contato")
+                confirmacao = agendamento.get("confirmacao")
+
+                if confirmacao:
+                    confirmacao == "Sim"
+                else:
+                    confirmacao == "Não"
 
                 if isinstance(data_obj, datetime):
                     data_formatada = data_obj.strftime("%d/%m/%Y")
@@ -635,7 +641,8 @@ async def pesquisarAgendaDia(empresa: str, data: str):
                     "hora": hora_formatada,
                     "id_contato": id_contato,
                     "telefone": contato.numero_celular,
-                    "nome": contato.nome
+                    "nome": contato.nome,
+                    "confirmacao": confirmacao
                 }
 
                 agendamentos_dia.append(reserva)

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Boolean
 from sqlalchemy.orm import Session, relationship
 from app.db.db import Base
 from datetime import datetime
@@ -12,12 +12,13 @@ class Agendamento(Base):
     data = Column(Date, nullable=False)
     hora = Column(Time, nullable=False)
     contato_id = Column(Integer, ForeignKey('contato.id', ondelete="CASCADE"), nullable=False)
+    confirmacao = Column(Boolean, default=False)
 
     contato = relationship("Contato", back_populates="agendamentos")
 
 
-def gravar_agendamento(db: Session, data, hora, contato_id: int):
-    novo_agendamento = Agendamento(data=data, hora=hora, contato_id=contato_id)
+def gravar_agendamento(db: Session, data, hora, contato_id: int, confirmacao: bool = False):
+    novo_agendamento = Agendamento(data=data, hora=hora, contato_id=contato_id, confirmacao=confirmacao)
     db.add(novo_agendamento)
     db.commit()
     db.refresh(novo_agendamento)
@@ -51,7 +52,8 @@ def buscar_agendamentos_por_data_api(db: Session, data):
         Agendamento.id,
         Agendamento.data,
         Agendamento.hora,
-        Agendamento.contato_id
+        Agendamento.contato_id,
+        Agendamento.confirmacao
     ).filter(Agendamento.data == data_formatada).all()
 
     return [
@@ -59,7 +61,8 @@ def buscar_agendamentos_por_data_api(db: Session, data):
             "id_agendamento": agendamento.id,
             "data": agendamento.data,
             "hora": agendamento.hora,
-            "id_contato": agendamento.contato_id
+            "id_contato": agendamento.contato_id,
+            "confirmacao": agendamento.confirmacao
         }
         for agendamento in agendamentos
     ]
@@ -73,7 +76,8 @@ def buscar_agendamentos_por_contato_id(db: Session, contato_id: int):
         {
             "id": agendamento.id,
             "data": agendamento.data.strftime("%Y-%m-%d"),
-            "hora": agendamento.hora.strftime("%H:%M:%S")
+            "hora": agendamento.hora.strftime("%H:%M:%S"),
+            "confirmacao": agendamento.confirmacao
         }
         for agendamento in agendamentos
     ]
@@ -100,3 +104,21 @@ def buscar_agendamentos_por_contato_id_formatado(db: Session, contato_id: int):
         f"{agendamento.data.strftime('%d/%m/%Y')} {agendamento.hora.strftime('%H:%M')}"
         for agendamento in agendamentos
     ]
+
+
+def deletar_agendamento_por_data_hora(db: Session, data: str, hora: str):
+    data_formatada = datetime.strptime(data, "%d/%m/%Y").date()
+    hora_formatada = datetime.strptime(hora, "%H:%M").time()
+
+    agendamento = db.query(Agendamento).filter(
+        Agendamento.data == data_formatada,
+        Agendamento.hora == hora_formatada
+    ).first()
+
+    if not agendamento:
+        raise ValueError("Nenhum agendamento encontrado para a data e hora especificadas.")
+
+    db.delete(agendamento)
+    db.commit()
+
+    return {"message": "Agendamento cancelado com sucesso."}
