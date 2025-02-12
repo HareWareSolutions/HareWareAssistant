@@ -1,13 +1,8 @@
-import os
 import time
-from dotenv import load_dotenv
 from openai import AzureOpenAI
 
-load_dotenv()
 
-#foundry_endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
-#foundry_key = os.getenv('AZURE_API_KEY')
-#assistant_id_foundry = os.getenv('ASSISTANT_ID')
+
 foundry_endpoint = "https://hareware-openai.openai.azure.com/"
 foundry_key = "Tft6fly9yH8Yx6yyXz7vaM6g3iQIXBaQ8b69vFZ4l23ewuBc8W6tJQQJ99AKACYeBjFXJ3w3AAABACOGRcxn"
 assistant_id_foundry = {

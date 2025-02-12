@@ -1,6 +1,6 @@
 import time
 import random
-import emoji
+from app.ia.gptOpenAi import ask_to_openai
 from app.models.contato import buscar_contato, criar_contato
 from app.models.pedido import buscar_pedido_id, criar_pedido, excluir_pedido, alterar_pedido
 from app.models.agendamento import buscar_agendamentos_por_data, gravar_agendamento, buscar_agendamentos_por_contato_id_formatado, buscar_agendamentos_por_contato_id, deletar_agendamento, alterar_confirmacao_agendamento
@@ -36,7 +36,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
         intencao = arc_predict(prompt)
 
         if intencao == 0 and not registro_status:
-            resposta = send_message_to_ai(env, prompt)
+            resposta = ask_to_openai(env, prompt)
             return resposta
         else:
             if registro_status is None:
