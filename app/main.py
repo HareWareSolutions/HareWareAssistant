@@ -628,7 +628,7 @@ async def cancelarAgendamento(empresa: str, id_agendamento: int):
                     message=notificacao_cliente
                 )
 
-            notificacao_paciente = f'{nome_empresa} cancelou o agendamento do dia {data_normalizada} às {dados_agendamento.hora}.'
+            notificacao_paciente = f'{nome_empresa} cancelou o agendamento do dia {data_normalizada} às {dados_agendamento.get('hora')}.'
 
             send_message_zapi(
                 env=empresa,
