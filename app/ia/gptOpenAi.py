@@ -1,4 +1,6 @@
 from openai import OpenAI
+import requests
+
 
 client = OpenAI(api_key="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")
 
@@ -9,26 +11,34 @@ assistant_id_openai = {
 
 
 def ask_to_openai(code, pergunta):
-    thread = client.beta.threads.create()
+    try:
+        thread = client.beta.threads.create()
 
-    client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=pergunta
-    )
+        client.beta.threads.messages.create(
+            thread_id=thread.id,
+            role="user",
+            content=pergunta
+        )
 
-    run = client.beta.threads.runs.create_and_poll(
-        thread_id=thread.id,
-        assistant_id=assistant_id_openai[code]
-    )
+        run = client.beta.threads.runs.create_and_poll(
+            thread_id=thread.id,
+            assistant_id=assistant_id_openai[code]
+        )
 
-    if run.status == 'completed':
-        messages = client.beta.threads.messages.list(thread_id=thread.id)
-        return messages.data[0].content[0].text.value
-    elif run.status == 'failed':
-        return "Desculpa, mas meu sistema cognitivo falhou, poderia escrever novamente a sua mensagem?"
-    elif run.status == 'incomplete':
-        return "Desculpa, não consegui compreender o que você disse, poderia dizer novamente porém de outra forma?"
-    else:
-        return f"Erro: {run.status}"
-
+        if run.status == 'completed':
+            messages = client.beta.threads.messages.list(thread_id=thread.id)
+            return messages.data[0].content[0].text.value
+        elif run.status == 'failed':
+            return "Desculpa, mas meu sistema cognitivo falhou, poderia escrever novamente a sua mensagem?"
+        elif run.status == 'incomplete':
+            return "Desculpa, não consegui compreender o que você disse, poderia dizer novamente porém de outra forma?"
+        else:
+            return f"Erro: {run.status}"
+    except requests.exceptions.Timeout:
+        return "Erro de conexão: O tempo de espera pela resposta da API excedeu o limite."
+    except requests.exceptions.RequestException as e:
+        return f"Erro de requisição: {str(e)}"
+    except KeyError:
+        return "Erro: O código do assistente fornecido é inválido."
+    except Exception as e:
+        return f"Erro inesperado: {str(e)}"
