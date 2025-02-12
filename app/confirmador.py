@@ -34,7 +34,7 @@ def mensagem_env(env, nome, hora, data):
 
 
 def notificar():
-    envs = ['hareware']
+    envs = ['hareware', 'emyconsultorio']
 
     while True:
         agora = get_hora_brasil()
