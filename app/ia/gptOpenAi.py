@@ -4,7 +4,7 @@ client = OpenAI(api_key="sk-proj-y6Cbpte-YmtTySWRbWtWo27EQnq51r2Vp-iiaz6H70De0oa
 
 assistant_id_openai = {
     "hareware": "asst_pb8dfn9OtyXz4c0s9pZMOXSQ",
-    "emyconsultorio": ""
+    "emyconsultorio": "asst_XnR71BKSAU4dceGOranD7qJb"
     }
 
 
