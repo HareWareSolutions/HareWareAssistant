@@ -262,7 +262,9 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 elif env == 'emyconsultorio':
                     numero_cliente = ['5513991701738']
 
-                notificacao_cliente = f'{registro_contato.nome} cancelou um horário para o dia {data_cancelamento} às {hora_cancelamento}.'
+                data_cancelamento_normalizada = normalizar_data(data_cancelamento)
+
+                notificacao_cliente = f'{registro_contato.nome} cancelou um horário para o dia {data_cancelamento_normalizada} às {hora_cancelamento}.'
 
                 for n_cliente in numero_cliente:
 
