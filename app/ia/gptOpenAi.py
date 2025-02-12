@@ -25,6 +25,10 @@ def ask_to_openai(code, pergunta):
     if run.status == 'completed':
         messages = client.beta.threads.messages.list(thread_id=thread.id)
         return messages.data[0].content[0].text.value
+    elif run.status == 'failed':
+        return "Desculpa, mas meu sistema cognitivo falhou, poderia escrever novamente a sua mensagem?"
+    elif run.status == 'incomplete':
+        return "Desculpa, não consegui compreender o que você disse, poderia dizer novamente porém de outra forma?"
     else:
         return f"Erro: {run.status}"
 
