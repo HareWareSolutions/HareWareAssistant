@@ -564,10 +564,10 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
                 dados_contato = buscar_contato_id(db, contato)
 
                 if empresa == 'hareware':
-                    nome_empresa = 'HareWare Soluções Tecnológicas'
+                    nome_empresa = 'a HareWare Soluções Tecnológicas'
                     telefone_cliente = ['5519997581672', '5519988246777', '5519995869852']
                 elif empresa == 'emyconsultorio':
-                    nome_empresa = 'Consultório Eminy Bezerra'
+                    nome_empresa = 'a Clínica Eminy Bezerra'
                     telefone_cliente = ['5513991701738']
 
                 mensagem = (f'Olá, {dados_contato.nome},\n'
@@ -614,7 +614,7 @@ async def cancelarAgendamento(empresa: str, id_agendamento: int):
                 nome_empresa = 'A HareWare Soluções Tecnológicas'
                 numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
             elif empresa == 'emyconsultorio':
-                nome_empresa = 'O Consultório Eminy Bezerra'
+                nome_empresa = 'A Clínica Eminy Bezerra'
                 numero_cliente = ['5513991701738']
 
             data_normalizada = normalizar_data(dados_agendamento.get('data'))
