@@ -5,12 +5,13 @@ from datetime import datetime, date, timedelta, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato_id
-from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento
+from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento, buscar_agendamento_por_id
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
 from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
+from app.utils.rotinasDatas import normalizar_data
 from app.utils.rotinasHoras import verificar_horarios
 from app.utils.validador_documento import validar_documento
 from fastapi.middleware.cors import CORSMiddleware
@@ -601,8 +602,40 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
 async def cancelarAgendamento(empresa: str, id_agendamento: int):
     db = next(get_db(empresa))
     try:
+        dados_agendamento = buscar_agendamento_por_id(db, id_agendamento)
+
+        dados_contato_agendamento = buscar_contato_id(db, dados_agendamento.get("id_contato"))
+
         sucesso = deletar_agendamento(db, id_agendamento)
+
         if sucesso:
+
+            if empresa == 'hareware':
+                nome_empresa = 'A HareWare Soluções Tecnológicas'
+                numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
+            elif empresa == 'emyconsultorio':
+                nome_empresa = 'O Consultório Eminy Bezerra'
+                numero_cliente = ['5513991701738']
+
+            data_normalizada = normalizar_data(dados_agendamento.data)
+
+            notificacao_cliente = f'{dados_contato_agendamento.nome} cancelou o horário do dia {data_normalizada} às {dados_agendamento.hora}.'
+
+            for n_cliente in numero_cliente:
+                send_message_zapi(
+                    env=empresa,
+                    number=n_cliente,
+                    message=notificacao_cliente
+                )
+
+            notificacao_paciente = f'{nome_empresa} cancelou o agendamento do dia {data_normalizada} às {dados_agendamento.hora}.'
+
+            send_message_zapi(
+                env=empresa,
+                number=dados_contato_agendamento.numero_celular,
+                message=notificacao_paciente
+            )
+
             return {"status": "success", "message": "Agendamento cancelado com sucesso."}
         else:
             raise HTTPException(status_code=500, detail="Erro ao deletar o agendamento.")

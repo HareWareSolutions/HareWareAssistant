@@ -256,6 +256,22 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 id_agendamento = agendamento['id']
                 deletar_agendamento(db, id_agendamento)
                 novo_status = gravar_status(db, telefone, 'RA2', datetime.now(), None)
+
+                if env == 'hareware':
+                    numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
+                elif env == 'emyconsultorio':
+                    numero_cliente = ['5513991701738']
+
+                notificacao_cliente = f'{registro_contato.nome} cancelou um horário para o dia {data_cancelamento} às {hora_cancelamento}.'
+
+                for n_cliente in numero_cliente:
+
+                    send_message_zapi(
+                        env=env,
+                        number=n_cliente,
+                        message=notificacao_cliente
+                    )
+
                 return {'RA2': 'Agendamento cancelado com sucesso, Gostaria de remarcar?'}
 
     elif registro_status.status == 'RA2': # Remarcar agendamento 2

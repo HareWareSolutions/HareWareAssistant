@@ -133,3 +133,18 @@ def alterar_confirmacao_agendamento(db: Session, agendamento_id: int, confirmaca
     db.refresh(agendamento)
     return agendamento
 
+
+def buscar_agendamento_por_id(db: Session, agendamento_id: int):
+    agendamento = db.query(Agendamento).filter(Agendamento.id == agendamento_id).first()
+
+    if not agendamento:
+        raise ValueError("Agendamento não encontrado.")
+
+    return {
+        "id_agendamento": agendamento.id,
+        "data": agendamento.data.strftime("%Y-%m-%d"),
+        "hora": agendamento.hora.strftime("%H:%M:%S"),
+        "id_contato": agendamento.contato_id,
+        "confirmacao": agendamento.confirmacao
+    }
+
