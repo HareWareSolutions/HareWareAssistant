@@ -617,7 +617,8 @@ async def cancelarAgendamento(empresa: str, id_agendamento: int):
                 nome_empresa = 'O Consultório Eminy Bezerra'
                 numero_cliente = ['5513991701738']
 
-            data_normalizada = normalizar_data(dados_agendamento.data)
+            print(dados_agendamento.data, type(dados_agendamento.data))
+            data_normalizada = 'teste'
 
             notificacao_cliente = f'{dados_contato_agendamento.nome} cancelou o horário do dia {data_normalizada} às {dados_agendamento.hora}.'
 
