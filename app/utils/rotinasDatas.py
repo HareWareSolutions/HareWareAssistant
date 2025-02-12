@@ -5,7 +5,14 @@ fuso_brasil = pytz.timezone("America/Sao_Paulo")
 
 
 def normalizar_data(data):
-    return data.strftime("%d/%m/%Y") if data else None
+    if data:
+        if isinstance(data, str):
+            try:
+                data = datetime.strptime(data, "%Y-%m-%d")
+            except ValueError:
+                return None
+        return data.strftime("%d/%m/%Y")
+    return None
 
 
 def extrair_data(frase):
