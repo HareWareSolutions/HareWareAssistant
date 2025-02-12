@@ -28,7 +28,3 @@ def ask_to_openai(code, pergunta):
     else:
         return f"Erro: {run.status}"
 
-
-if __name__ == "__main__":
-    resposta = ask_to_openai('hareware', "Onde está o endereço da empresa?")
-    print(resposta)
