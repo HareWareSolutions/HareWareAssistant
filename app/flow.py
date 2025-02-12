@@ -62,7 +62,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
 
                 novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None)
 
-                return "Certo, poderia me informar uma data?\n\n Escreva no formato DD/MM/YYYY"
+                return "Certo, poderia me informar uma data?\n\n Escreva no formato Dia/Mês/Ano"
 
             if registro_status.status == 'IDT':  # IDT = Informando Data
                 fuso_brasileiro = pytz.timezone('America/Sao_Paulo')
