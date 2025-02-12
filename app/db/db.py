@@ -5,8 +5,8 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 DATABASE_URL_HAREWARE = "postgresql+pg8000://postgres:HareWare%402025@localhost/HareWareAssistant"
 DATABASE_URL_MMANIA = "postgresql+pg8000://postgres:HareWare%402025@localhost/mmaniadeboloAssistant"
 DATABASE_URL_HWADMIN = "postgresql+pg8000://postgres:HareWare%402025@localhost/HareWare"
-DATABASE_URL_JOICE = "postgresql+pg8000://postgres:HareWare%402025@localhost/joiceAssistant"
 DATABASE_URL_MALAMAN = "postgresql+pg8000://postgres:HareWare%402025@localhost/MalamanAssistant"
+DATABASE_URL_EMINY = "postgresql+pg8000://postgres:HareWare%402025@localhost/EminyAssistant"
 
 
 def get_database_url(env: str = "hareware"):
@@ -16,10 +16,8 @@ def get_database_url(env: str = "hareware"):
         return DATABASE_URL_MMANIA
     elif env == "hwadmin":
         return DATABASE_URL_HWADMIN
-    elif env == "sjoicer":
-        return DATABASE_URL_JOICE
-    elif env == "malaman":
-        return DATABASE_URL_MALAMAN
+    elif env == "emyconsultorio":
+        return DATABASE_URL_EMINY
     else:
         raise ValueError(f"Ambiente {env} não reconhecido!")
 
