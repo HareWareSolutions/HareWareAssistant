@@ -2,7 +2,7 @@ from openai import OpenAI
 import requests
 
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="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")
 
 assistant_id_openai = {
     "hareware": "asst_pb8dfn9OtyXz4c0s9pZMOXSQ",
