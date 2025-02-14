@@ -9,7 +9,7 @@ assistant_id_openai = {
     ],
     "emyconsultorio": [
         "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",
-        "asst_I7AwY6tfrzdqIPQ2xsImgKk3"
+        "asst_H5Bhwe8cXpeCLfINj3ilZury"
     ]
 }
 
