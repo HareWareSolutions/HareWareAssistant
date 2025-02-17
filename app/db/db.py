@@ -2,11 +2,11 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL_HAREWARE = "postgresql+pg8000://hareware:HareWare402025@localhost/HareWareAssistant"
-DATABASE_URL_MMANIA = "postgresql+pg8000://hareware:HareWare402025@localhost/mmaniadeboloAssistant"
-DATABASE_URL_HWADMIN = "postgresql+pg8000://hareware:HareWare402025@localhost/HareWare"
-DATABASE_URL_MALAMAN = "postgresql+pg8000://hareware:HareWare402025@localhost/MalamanAssistant"
-DATABASE_URL_EMINY = "postgresql+pg8000://hareware:HareWare402025@localhost/EminyAssistant"
+DATABASE_URL_HAREWARE = "postgresql+pg8000://hareware:HareWare402025@localhost/hareWareassistant"
+DATABASE_URL_MMANIA = "postgresql+pg8000://hareware:HareWare402025@localhost/mmaniadeboloassistant"
+DATABASE_URL_HWADMIN = "postgresql+pg8000://hareware:HareWare402025@localhost/hareware"
+DATABASE_URL_MALAMAN = "postgresql+pg8000://hareware:HareWare402025@localhost/malamanassistant"
+DATABASE_URL_EMINY = "postgresql+pg8000://hareware:HareWare402025@localhost/eminyassistant"
 
 
 def get_database_url(env: str = "hareware"):
