@@ -15,11 +15,9 @@ from utils.rotinasDatas import normalizar_data
 
 notificacoes_enviadas = {}
 
-
 def get_hora_brasil():
     brasil_tz = pytz.timezone('America/Sao_Paulo')
     return datetime.now(brasil_tz)
-
 
 def mensagem_env(env, nome, hora, data):
     match env:
@@ -32,14 +30,13 @@ def mensagem_env(env, nome, hora, data):
                     f'Você tem uma consulta agendada com a Dra. Eminy Bezerra no dia {data} às {hora}. \n\n'
                     f'Você confirma a sua presença?')
 
-
 def notificar():
     envs = ['hareware', 'emyconsultorio']
 
     while True:
         agora = get_hora_brasil()
         for agendamento_id, hora_notificada in list(notificacoes_enviadas.items()):
-            if agora - hora_notificada > timedelta(hours=1):
+            if agora - hora_notificada > timedelta(days=1):
                 notificacoes_enviadas.pop(agendamento_id)
 
         for env in envs:
@@ -91,7 +88,6 @@ def notificar():
                 db.close()
 
         time.sleep(3600)
-
 
 if __name__ == "__main__":
     notificar()
