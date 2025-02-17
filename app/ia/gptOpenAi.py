@@ -4,11 +4,11 @@ import requests
 
 assistant_id_openai = {
     "hareware": [
-        "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",
+        "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",
         "asst_pb8dfn9OtyXz4c0s9pZMOXSQ"
     ],
     "emyconsultorio": [
-        "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",
+        "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",
         "asst_H5Bhwe8cXpeCLfINj3ilZury"
     ]
 }
