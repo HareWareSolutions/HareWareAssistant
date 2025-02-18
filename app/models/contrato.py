@@ -13,6 +13,8 @@ class Contrato(Base):
     tokens_utilizados = Column(Integer, nullable=False, default=0)
     data_ultimo_pagamento = Column(Date, nullable=True)
     id_cliente = Column(Integer, ForeignKey("cliente.id"), nullable=False)
+    assistant_id = Column(String, nullable=True)
+    api_key_ia = Column(String, nullable=True)
 
     cliente = relationship("Cliente")
 
@@ -25,6 +27,8 @@ def criar_contrato(
     tokens_utilizados: int,
     data_ultimo_pagamento,
     id_cliente: int,
+    assistant_id: str = None,
+    api_key_ia: str = None,
 ):
     novo_contrato = Contrato(
         tipo=tipo,
@@ -33,6 +37,8 @@ def criar_contrato(
         tokens_utilizados=tokens_utilizados,
         data_ultimo_pagamento=data_ultimo_pagamento,
         id_cliente=id_cliente,
+        assistant_id=assistant_id,
+        api_key_ia=api_key_ia,
     )
     db.add(novo_contrato)
     db.commit()
@@ -48,6 +54,8 @@ def editar_contrato(
     pacote: str = None,
     tokens_utilizados: int = None,
     data_ultimo_pagamento=None,
+    assistant_id: str = None,
+    api_key_ia: str = None,
 ):
     contrato = db.query(Contrato).filter(Contrato.id == contrato_id).first()
     if contrato:
@@ -61,6 +69,10 @@ def editar_contrato(
             contrato.tokens_utilizados = tokens_utilizados
         if data_ultimo_pagamento is not None:
             contrato.data_ultimo_pagamento = data_ultimo_pagamento
+        if assistant_id is not None:
+            contrato.assistant_id = assistant_id
+        if api_key_ia is not None:
+            contrato.api_key_ia = api_key_ia
         db.commit()
         db.refresh(contrato)
         return contrato
@@ -82,3 +94,8 @@ def deletar_contrato(db: Session, contrato_id: int):
 
 def buscar_contrato_por_id(db: Session, contrato_id: int):
     return db.query(Contrato).filter(Contrato.id == contrato_id).first()
+
+
+def buscar_contrato_por_id_cliente(db: Session, id_cliente: int):
+    return db.query(Contrato).filter(Contrato.id_cliente == id_cliente).all()
+

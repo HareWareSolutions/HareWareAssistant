@@ -451,7 +451,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             tokens_entrada = encoding.encode(prompt)
             num_tokens = len(tokens_entrada)
 
-            resposta = fluxo_conversa(env, prompt, numero_celular, nome_contato)
+            resposta = fluxo_conversa(env, prompt, numero_celular, nome_contato, id_contrato)
 
             if 'CDT' in resposta:
                 pergunta = f'Você deseja realizar um agendamento na data de {resposta["CDT"]}?'
@@ -1024,26 +1024,19 @@ async def buscar_cliente_por_cpfcnpj(cod_hw: str, cpfcnpj: str):
         db.close()
 
 
-@app.post("/incluir-contrato")
-async def incluir_contrato(cod_hw: str, tipo: str, pagamento: bool, pacote: str, id_cliente: int):
-    db = next(get_db(cod_hw))
-    try:
-        cliente = buscar_cliente(db, id_cliente)
-        if cliente is not None:
-            sucesso = criar_contrato(db, tipo, pagamento, pacote, 0, None, id_cliente)
-            if sucesso:
-                cliente = alterar_cliente(db, id_cliente, ativo=True)
-                return {"status": "success", "message": "Contrato incluído com sucesso."}
-            else:
-                raise HTTPException(status_code=500, detail="Erro ao incluir contrato.")
-        else:
-            return {"retorno": "Por favor informe um cliente válido."}
-    finally:
-        db.close()
-
+from datetime import datetime
+from fastapi import HTTPException
 
 @app.post("/alterar-contrato")
-async def alterar_contrato(cod_hw: str, id_contrato: int, tipo: str = None, pagamento: bool = None, pacote: str = None):
+async def alterar_contrato(
+    cod_hw: str,
+    id_contrato: int,
+    tipo: str = None,
+    pagamento: bool = None,
+    pacote: str = None,
+    assistant_id: str = None,
+    api_key_ia: str = None
+):
     db = next(get_db(cod_hw))
     try:
         if pagamento:
@@ -1057,8 +1050,9 @@ async def alterar_contrato(cod_hw: str, id_contrato: int, tipo: str = None, paga
             tipo,
             pagamento,
             pacote,
-            None,
-            data_pagamento
+            data_ultimo_pagamento=data_pagamento,
+            assistant_id=assistant_id,
+            api_key_ia=api_key_ia
         )
         if contrato:
             return {"status": "success", "message": "Contrato alterado com sucesso."}
@@ -1104,7 +1098,9 @@ async def visualizar_contratos(cod_hw: str):
                 "status_pagamento": status_pagamento,
                 "data_ultimo_pagamento": contrato.data_ultimo_pagamento,
                 "id_cliente": cliente.id,
-                "nome_cliente": cliente.nome
+                "nome_cliente": cliente.nome,
+                "assistant_id": contrato.assistant_id,
+                "api_key_ia": contrato.api_key_ia
             }
 
             lista_contratos.append(dados_formatados)
@@ -1120,7 +1116,17 @@ async def buscar_contrato(cod_hw: str, id_contrato: int):
     try:
         contrato = buscar_contrato_por_id(db, id_contrato)
         if contrato is not None:
-            return {"status": "success", "contrato": contrato}
+            return {"status": "success", "contrato": {
+                "id": contrato.id,
+                "tipo": contrato.tipo,
+                "pacote": contrato.pacote,
+                "tokens_utilizados": contrato.tokens_utilizados,
+                "status_pagamento": "Pago" if contrato.pagamento else "Não Pago",
+                "data_ultimo_pagamento": contrato.data_ultimo_pagamento,
+                "id_cliente": contrato.id_cliente,
+                "assistant_id": contrato.assistant_id,
+                "api_key_ia": contrato.api_key_ia
+            }}
         else:
             raise HTTPException(status_code=404, detail="Contrato não encontrado.")
     finally:

@@ -18,7 +18,7 @@ from app.utils.zapi import send_message_zapi
 import pytz
 
 
-def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
+def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato: int = None):
     db = next(get_db(env))
 
     registro_status = buscar_status(db, telefone)
@@ -36,7 +36,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None):
         intencao = arc_predict(prompt)
 
         if intencao == 0 and not registro_status:
-            resposta = ask_to_openai(env, prompt)
+            resposta = ask_to_openai(id_contrato, prompt)
             return resposta
         else:
             if registro_status is None:
