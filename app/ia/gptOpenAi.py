@@ -1,25 +1,23 @@
 from openai import OpenAI
 import requests
+from app.db.db import get_db
+from app.models.clientes import buscar_cliente_nome
+from app.models.contrato import buscar_contrato_por_id
 
 
-assistant_id_openai = {
-    "hareware": [
-        "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",
-        "asst_pb8dfn9OtyXz4c0s9pZMOXSQ"
-    ],
-    "emyconsultorio": [
-        "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",
-        "asst_H5Bhwe8cXpeCLfINj3ilZury"
-    ]
-}
-
-
-def ask_to_openai(code, pergunta):
+def get_credentials(code):
+    db = next(get_db(code))
     try:
-        if code not in assistant_id_openai:
-            return "Erro: Código do assistente inválido."
+        contrato = buscar_contrato_por_id(db, code)
 
-        api_key, assistant_id = assistant_id_openai[code]
+        return contrato.api_key_ia, contrato.assistant_id
+    finally:
+        db.close()
+
+
+def ask_to_openai(id_contrato, pergunta):
+    try:
+        api_key, assistant_id = get_credentials(id_contrato)
 
         client = OpenAI(api_key=api_key)
 
