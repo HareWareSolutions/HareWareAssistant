@@ -6,7 +6,7 @@ from app.models.contrato import buscar_contrato_por_id
 
 
 def get_credentials(code):
-    db = next(get_db(code))
+    db = next(get_db('hwadmin'))
     try:
         contrato = buscar_contrato_por_id(db, code)
 
