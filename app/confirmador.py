@@ -28,6 +28,7 @@ def mensagem_env(env, nome, hora, data):
         case 'emyconsultorio':
             return (f'Olá, {nome},\n\n'
                     f'Você tem uma consulta agendada com a Dra. Eminy Bezerra no dia {data} às {hora}. \n\n'
+                    f'A clínica está localizada em Araras-SP, na rua Marechal Deodoro, 704 - Centro, CEP 13600-110.\n\n'
                     f'Você confirma a sua presença?')
 
 def notificar():
