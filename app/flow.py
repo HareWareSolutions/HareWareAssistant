@@ -87,7 +87,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
 
                 dia_semana = dia_da_semana(data)
 
-                if (env == 'emyconsultorio' or env == 'hareware') and (dia_semana == 'domingo' or dia_semana == 'sÃ¡bado'):
+                if (env == 'emyconsultorio' or env == 'hareware') and (dia_semana == 'domingo' or dia_semana == 'sÃ¡bado' or dia_semana == 'sábado' or dia_semana == 'sabado'):
                     return "Desculpa, infelizmente não trabalhamos aos finais de semana, poderia informar outra data?"
 
                 deletar_status(db, telefone)
