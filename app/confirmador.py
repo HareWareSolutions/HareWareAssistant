@@ -46,7 +46,7 @@ def notificar():
                 hoje = agora.date()
                 agendamentos = buscar_agendamentos_por_data_ntf(db, hoje)
                 hora_atual = agora
-                limite = hora_atual + timedelta(hours=12)
+                limite = hora_atual + timedelta(hours=3)
 
                 for agendamento in agendamentos:
                     hora_agendada = datetime.combine(hoje, agendamento.hora)

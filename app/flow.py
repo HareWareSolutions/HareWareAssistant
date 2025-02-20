@@ -207,7 +207,13 @@ def fluxo_conversa_poll(env, opcao, telefone):
                         message=notificacao_cliente
                     )
 
-                return f"Agendamento realizado para o dia {data_normalizada} às {opcao}."
+                if env == 'emyconsultorio':
+                    mensagem_agendamento = (f'Estou feliz por você ter dado este passo importante para seu autocuidado 😍🙏🏻\n\n'
+                                            f'Agendamento realizado para o dia {data_normalizada} às {opcao}.')
+                elif env == 'hareware':
+                    mensagem_agendamento = f'Agendamento realizado para o dia {data_normalizada} às {opcao}.'
+
+                return mensagem_agendamento
             else:
                 data = registro_status.observacao
                 data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
@@ -280,7 +286,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
         deletar_status(db, telefone)
         if opcao == 'Sim':
             novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None)
-            return "Certo, escolha a melhor data para você!\n\n Escreva no formato DD/MM/YYYY"
+            return "Certo, escolha a melhor data para você!\n\n Escreva no formato Dia/Mês"
         else:
             return 'Tudo bem... precisando de mais alguma coisa é só chamar!'
 
