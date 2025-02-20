@@ -3,6 +3,7 @@ import os
 import tiktoken
 from datetime import datetime, date, timedelta, time
 from app.db.db import get_db
+import subprocess
 from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato_id
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento, buscar_agendamento_por_id
@@ -18,6 +19,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from threading import Lock
 import emoji
+
+subprocess.Popen(['python', 'confirmador.py'])
+subprocess.Popen(['python', 'notificador.py'])
 
 logging.basicConfig(level=logging.INFO)
 
