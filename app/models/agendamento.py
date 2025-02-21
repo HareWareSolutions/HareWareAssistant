@@ -13,12 +13,13 @@ class Agendamento(Base):
     hora = Column(Time, nullable=False)
     contato_id = Column(Integer, ForeignKey('contato.id', ondelete="CASCADE"), nullable=False)
     confirmacao = Column(Boolean, default=False)
+    observacao = Column(String, nullable=True)
 
     contato = relationship("Contato", back_populates="agendamentos")
 
 
-def gravar_agendamento(db: Session, data, hora, contato_id: int, confirmacao: bool = False):
-    novo_agendamento = Agendamento(data=data, hora=hora, contato_id=contato_id, confirmacao=confirmacao)
+def gravar_agendamento(db: Session, data, hora, contato_id: int, confirmacao: bool = False, observacao: str = None):
+    novo_agendamento = Agendamento(data=data, hora=hora, contato_id=contato_id, confirmacao=confirmacao, observacao=observacao)
     db.add(novo_agendamento)
     db.commit()
     db.refresh(novo_agendamento)

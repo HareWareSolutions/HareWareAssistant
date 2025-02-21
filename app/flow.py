@@ -43,7 +43,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
                 intencao_cancelamento = iia_predict(prompt)
 
                 if intencao_cancelamento == 1:
-                    novo_status = gravar_status(db, telefone, "CAG", datetime.now(), None)
+                    novo_status = gravar_status(db, telefone, "CAG", datetime.now(), None, None)
                     agendamentos = buscar_agendamentos_por_contato_id_formatado(db, registro_contato.id)
                     if agendamentos is None:
                         deletar_status(db, telefone)
@@ -60,11 +60,28 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
                         agendamentos.append('Desistir de cancelar agendamento.')
                         return {"CAG": agendamentos}
 
-                novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None)
+                if env == 'emyconsultorio':
+                    novo_status = gravar_status((db, telefone, "EPC", datetime.now().time()), None, None)
 
+                    return {"EPC", ["Profilaxia Dental (Limpeza)", "Clareamento a Laser (Em consultório)", "Restauração em Resina", "Extração de Dente", "Raspagem Gengival", "Atendimento Infantil", "Assessoria em Aleitamento Materno", "Outro"]}
+                else:
+                    novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None, None)
+
+                    return "Certo, poderia me informar uma data?\n\n Escreva no formato Dia/Mês"
+
+            if registro_status.status == 'OPC': # OPC: Outro procedimento
+                procedimento = prompt
+                deletar_status(db, telefone)
+                novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None, procedimento)
                 return "Certo, poderia me informar uma data?\n\n Escreva no formato Dia/Mês"
 
             if registro_status.status == 'IDT':  # IDT = Informando Data
+
+                if registro_status.observacao2 is not None:
+                    escolha_procedimento = registro_status.observacao2
+                else:
+                    escolha_procedimento = None
+
                 fuso_brasileiro = pytz.timezone('America/Sao_Paulo')
                 data_atual = datetime.now(fuso_brasileiro)
 
@@ -77,12 +94,12 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
 
                 if data_extraida.date() < data_atual.date():
                     deletar_status(db, telefone)
-                    novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None)
+                    novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None, escolha_procedimento)
                     return "A data informada é anterior à data de hoje. Por favor escolha outra data..."
 
                 if data is None:
                     deletar_status(db, telefone)
-                    novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None)
+                    novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None, escolha_procedimento)
                     return "Não entendi qual data você deseja agendar, poderia me informar novamente?"
 
                 dia_semana = dia_da_semana(data)
@@ -91,13 +108,13 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
                     return "Desculpa, infelizmente não trabalhamos aos finais de semana, poderia informar outra data?"
 
                 deletar_status(db, telefone)
-                novo_status = gravar_status(db, telefone, "CDT", datetime.now(), str(data))
+                novo_status = gravar_status(db, telefone, "CDT", datetime.now(), str(data), escolha_procedimento)
                 data_normalizada = normalizar_data(data)
 
                 return {'CDT': data_normalizada}
     else:
         if registro_status is None:
-            novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None, None)
 
             if env == 'hareware':
                 return ("Olá, Seja bem-vindo a central de atendimento HareWare!\n\n"
@@ -114,7 +131,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
                 return "Por favor, insira um nome válido."
 
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'CNM', datetime.now(), prompt)
+            novo_status = gravar_status(db, telefone, 'CNM', datetime.now(), prompt, None)
             return {'CNM': f'Seu nome é {prompt}?'}
 
 
@@ -129,37 +146,49 @@ def fluxo_conversa_poll(env, opcao, telefone):
         return {"PAUSA": "Contato em pausa de conversa."}
 
     if registro_status.status == "CDT": #CDT: Confirmação de data
+
+        if registro_status.observacao2 is not None:
+            escolha_procedimento = registro_status.observacao2
+        else:
+            escolha_procedimento = None
+
         if opcao == "Sim":
             data = registro_status.observacao
             data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data)
+            novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data, escolha_procedimento)
             agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
             data_normalizada = normalizar_data(data_agendamento)
 
-            if env == 'malaman':
-                dia_semana = dia_da_semana(data_agendamento)
-                print(dia_semana)
-                if dia_semana == 'sÃ¡bado':
-                    horarios_livres = verificar_horarios('malaman-sabado', agendamentos, data_normalizada)
-                else:
-                    horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
-            else:
-                horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
+            horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
 
             if not horarios_livres:
-                print(horarios_livres)
                 deletar_status(db, telefone)
-                novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None)
+                novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None, escolha_procedimento)
                 data_normalizada = normalizar_data(data_agendamento)
                 return f'Infelizmente, todos os meus horários para o dia {data_normalizada} já estão preenchidos.\n\nPoderia informar outra data?'
             return {"IHR": horarios_livres}
         else:
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'CDA', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'CDA', datetime.now(), None, escolha_procedimento)
             return {"CDA": 'Ainda deseja agendar algum dia?'}
 
+    elif registro_status.status == "EPC": # EPC: Escolha de Procedimento
+        deletar_status(db, telefone)
+        if opcao != 'Outro':
+            novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None, opcao)
+            return "Certo, poderia me informar uma data?\n\n Escreva no formato Dia/Mês"
+        else:
+            novo_status = gravar_status(db, telefone, "OPC", datetime.now().time(), None, None)
+            return "Ok, poderia me dizer em poucas palavras qual o seu principal interesse para sua consulta?"
+
     elif registro_status.status == "IHR": #IHR: Informar hora
+
+        if registro_status.observacao2 is not None:
+            escolha_procedimento = registro_status.observacao2
+        else:
+            escolha_procedimento = None
+
         if opcao != 'Nenhum desses horários é compatível comigo.':
             data_agendamento = datetime.strptime(registro_status.observacao, "%Y-%m-%d").date()
             data_normalizada = normalizar_data(data_agendamento)
@@ -171,33 +200,25 @@ def fluxo_conversa_poll(env, opcao, telefone):
             time.sleep(tempo)
             agendamentos = buscar_agendamentos_por_data(db, data_agendamento)
 
-            if env == 'malaman':
-                dia_semana = dia_da_semana(data_agendamento)
-                print(dia_semana)
-                if dia_semana == 'sÃ¡bado':
-                    horarios_disponiveis = verificar_horarios('malaman-sabado', agendamentos, data_normalizada)
-                else:
-                    horarios_disponiveis = verificar_horarios(env, agendamentos, data_normalizada)
-            else:
-                horarios_disponiveis = verificar_horarios(env, agendamentos, data_normalizada)
+            horarios_disponiveis = verificar_horarios(env, agendamentos, data_normalizada)
 
             if not horarios_disponiveis:
                 deletar_status(db, telefone)
-                novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None)
+                novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None, escolha_procedimento)
                 return f'Infelizmente, os horários para o dia {data_normalizada} se esgotaram neste exato momento.\n\nPoderia escolher outra data?'
 
             hora_formatada = hora_agendamento.strftime('%H:%M')
 
             if hora_formatada in horarios_disponiveis:
-                agendamento = gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id, False)
+                agendamento = gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id, False, escolha_procedimento)
                 deletar_status(db, telefone)
 
                 if env == 'hareware':
                     numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
+                    notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}.'
                 elif env == 'emyconsultorio':
                     numero_cliente = ['5513991701738']
-
-                notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}.'
+                    notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}, procedimento: {escolha_procedimento}.'
 
                 for n_cliente in numero_cliente:
 
@@ -208,7 +229,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
                     )
 
                 if env == 'emyconsultorio':
-                    mensagem_agendamento = (f'Estou feliz por você ter dado este passo importante para seu autocuidado 😍🙏🏻\n\n'
+                    mensagem_agendamento = (f'Estou feliz por você ter dado este passo importante para seu autocuidado 😍🙏\n\n'
                                             f'Agendamento realizado para o dia {data_normalizada} às {opcao}.')
                 elif env == 'hareware':
                     mensagem_agendamento = f'Agendamento realizado para o dia {data_normalizada} às {opcao}.'
@@ -218,28 +239,28 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 data = registro_status.observacao
                 data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
                 deletar_status(db, telefone)
-                novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data_agendamento)
+                novo_status = gravar_status(db, telefone, 'IHR', datetime.now(), data_agendamento, escolha_procedimento)
                 agendamentos = buscar_agendamentos_por_data(db, data)
 
                 horarios_livres = verificar_horarios(env, agendamentos, data_normalizada)
 
                 if not horarios_livres:
                     deletar_status(db, telefone)
-                    novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None)
+                    novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None, escolha_procedimento)
                     data_normalizada = normalizar_data(data)
                     return f'Infelizmente, os horários para o dia {data_normalizada} se esgotaram neste exato momento.\n\nPoderia escolher outra data?'
                 return {"IHR2": horarios_livres}
 
         else:
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None)
+            novo_status = gravar_status(db, telefone, "IDT", datetime.now(), None, escolha_procedimento)
             return "Tudo bem, poderia me informar uma nova data?"
 
     elif registro_status.status == 'CDA': #CDA: Confirmação de desejo de agendamento
         deletar_status(db, telefone)
 
         if opcao == 'Sim':
-            novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), None, None)
             return "Ok, poderia informar a data novamente?"
 
         return "Ok, em que mais posso ajudá-lo?"
@@ -261,7 +282,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
             if agendamento.get('data') == str(data_cancelamento) and agendamento.get('hora') == str(hora_cancelamento):
                 id_agendamento = agendamento['id']
                 deletar_agendamento(db, id_agendamento)
-                novo_status = gravar_status(db, telefone, 'RA2', datetime.now(), None)
+                novo_status = gravar_status(db, telefone, 'RA2', datetime.now(), None, None)
 
                 if env == 'hareware':
                     numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
@@ -285,7 +306,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
     elif registro_status.status == 'RA2': # Remarcar agendamento 2
         deletar_status(db, telefone)
         if opcao == 'Sim':
-            novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None)
+            novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None, None)
             return "Certo, escolha a melhor data para você!\n\n Escreva no formato Dia/Mês"
         else:
             return 'Tudo bem... precisando de mais alguma coisa é só chamar!'
@@ -322,21 +343,21 @@ def fluxo_conversa_poll(env, opcao, telefone):
             agendamento_confirmado = alterar_confirmacao_agendamento(db, int(registro_status.observacao), True)
             return f'Obrigado pela confirmação!'
         else:
-            novo_status = gravar_status(db, telefone, 'RAG', datetime.now(), registro_status.observacao)
+            novo_status = gravar_status(db, telefone, 'RAG', datetime.now(), registro_status.observacao, None)
             return {"RAG": [{'name': 'Sim'}, {'name': 'Não'}]}
 
     elif registro_status.status == 'RAG':
         deletar_status(db, telefone)
         if opcao == 'Sim':
             sucesso = deletar_agendamento(db, int(registro_status.observacao))
-            novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None)
+            novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None, None)
             return "Certo, escolha a melhor data para você!\n\n Escreva no formato DD/MM/YYYY"
         else:
             sucesso = deletar_agendamento(db, int(registro_status.observacao))
             return f'O seu agendamento foi cancelado, precisando de mais alguma coisa é só chamar!'
     else:
         deletar_status(db, telefone)
-        novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
+        novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None, None)
         return f'Você poderia me dizer o seu nome novamente?'
 
 
@@ -350,7 +371,7 @@ def fluxo_conversa_foa(prompt, telefone):
     if registro_contato is None:
 
         if registro_status is None:
-            novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None, None)
 
             return ("Olá, Seja bem-vindo! Eu sou a atendente virtual da Mmania de Bolo!\n\n"
                     "Percebi que você não está cadastrado na minha lista de contatos, poderia me dizer o seu nome?")
@@ -360,12 +381,12 @@ def fluxo_conversa_foa(prompt, telefone):
                 return "Por favor, insira um nome válido."
 
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'CNM', datetime.now(), prompt)
+            novo_status = gravar_status(db, telefone, 'CNM', datetime.now(), prompt, None)
             return {'CNM': f'Seu nome é {prompt}?'}
 
     else:
         if registro_status is None:
-            novo_status = gravar_status(db, telefone, 'EAC', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'EAC', datetime.now(), None, None)
             return {'EAC': ['Ver cardápio', 'Realizar pedido', 'Cancelar pedido'], 'mensagem': f'Olá {registro_contato.nome}!'}
 
         if registro_status.status == 'IPD': #IPD: Informar pedido
@@ -376,21 +397,21 @@ def fluxo_conversa_foa(prompt, telefone):
                 pedido_alterado = alterar_pedido(db, id=pedido.id, pedido=prompt)
 
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'CPD', datetime.now(), pedido.id)
+            novo_status = gravar_status(db, telefone, 'CPD', datetime.now(), pedido.id, None)
             return {'CPD': ['Confirmo meu pedido', 'Quero alterar', 'Desistir do pedido'], 'mensagem': f'Você confirma o seu pedido? \n\n{prompt}'}
 
         if registro_status.status == 'IED': #IED: Informar endereço
             pedido = buscar_pedido_id(db, int(registro_status.observacao))
             pedido_alterado = alterar_pedido(db, id=pedido.id, entrega=prompt)
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'CED', datetime.now(), pedido.id)
+            novo_status = gravar_status(db, telefone, 'CED', datetime.now(), pedido.id, None)
             return {'CED': ['Sim', 'Não'], 'mensagem': f'O seu endereço está correto?\n\n{prompt}'}
 
         if registro_status.status == 'IDT': #IDT: Informar data
             pedido = buscar_pedido_id(db, int(registro_status.observacao))
             pedido_alterado = alterar_pedido(db, id=pedido.id, data_entrega=prompt)
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'CDT', datetime.now(), pedido.id)
+            novo_status = gravar_status(db, telefone, 'CDT', datetime.now(), pedido.id, None)
             return {'CDT': ['Sim', 'Não'], 'mensagem': f'Confirma a data de entrega do pedido? \n\n {prompt}'}
 
 
@@ -407,17 +428,17 @@ def fluxo_conversa_poll_foa(opcao, telefone):
             novo_contato = criar_contato(db, nome=registro_status.observacao, numero_celular=telefone, email=None, pausa=False)
             registro_contato = buscar_contato(db, telefone)
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'EAC', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'EAC', datetime.now(), None, None)
             return {'EAC': ['Ver cardápio', 'Realizar pedido', 'Cancelar pedido'], 'mensagem': f'Prazer em conhecê-lo {nome}!'}
         else:
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'CNC', datetime.now(), None, None)
             return {"texto": f'Você poderia me dizer o seu nome novamente?'}
 
     if registro_status.status == 'DRP': #DRP: Deseja realizar agendamento
         if opcao == "Sim":
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None, None)
             return {"texto": 'Ok! Escreva em uma única mensagem todo o seu pedido'}
         else:
             deletar_status(db, telefone)
@@ -426,11 +447,11 @@ def fluxo_conversa_poll_foa(opcao, telefone):
     if registro_status.status == 'EAC': #EAC: Escolha de Ação
         if opcao == 'Ver cardápio':
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'DRP', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'DRP', datetime.now(), None, None)
             return {'DRP': ['Sim', 'Não'], 'cardapio': 'https://drive.google.com/uc?export=download&id=172Xbx55g_pLczsZT0PCjyCfw1cH6rswQ'}
         elif opcao == 'Realizar pedido':
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None, None)
             return {"opcao2": 'Ok! Escreva em uma única mensagem todo o seu pedido', 'cardapio': 'https://drive.google.com/uc?export=download&id=172Xbx55g_pLczsZT0PCjyCfw1cH6rswQ'}
         elif opcao == 'Cancelar pedido':
             deletar_status(db, telefone)
@@ -443,11 +464,11 @@ def fluxo_conversa_poll_foa(opcao, telefone):
         if opcao == 'Confirmo meu pedido':
             id_pedido = registro_status.observacao
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'ERE', datetime.now(), id_pedido)
+            novo_status = gravar_status(db, telefone, 'ERE', datetime.now(), id_pedido, None)
             return {'ERE': ['Entrega', 'Retirada', 'Desistir do pedido'], 'mensagem': 'Você gostaria que seu pedido fosse entregue no endereço ou prefere retirar pessoalmente? Lembrando a entrega só é válida em Araras e está 08 reais.'}
         elif opcao == 'Quero alterar':
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None)
+            novo_status = gravar_status(db, telefone, 'IPD', datetime.now(), None, None)
             return {'texto': 'Ok, escreva novamente o seu pedido completo em uma única mensagem'}
         else:
             deletar_status(db, telefone)
@@ -457,13 +478,13 @@ def fluxo_conversa_poll_foa(opcao, telefone):
         if opcao == 'Entrega':
             id_pedido = registro_status.observacao
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IED', datetime.now(), id_pedido)
+            novo_status = gravar_status(db, telefone, 'IED', datetime.now(), id_pedido, None)
             return {'texto': 'Certo, me informe o seu endereço'}
         elif opcao == "Retirada":
             pedido = buscar_pedido_id(db, int(registro_status.observacao))
             pedido_alterado = alterar_pedido(db, id=pedido.id, entrega='Retirada')
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), pedido.id)
+            novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), pedido.id, None)
             return {'texto': 'Para quando é o pedido? \n(Caso tenha preferencia de horário pode escrever também)'}
         else:
             pedido = buscar_pedido_id(db, int(registro_status.observacao))
@@ -475,12 +496,12 @@ def fluxo_conversa_poll_foa(opcao, telefone):
         if opcao == 'Sim':
             id_pedido = int(registro_status.observacao)
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), id_pedido)
+            novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), id_pedido, None)
             return {'texto': 'Para quando é o pedido? \n(Caso tenha preferencia de horário pode escrever também)'}
         else:
             id_pedido = int(registro_status.observacao)
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IED', datetime.now(), id_pedido)
+            novo_status = gravar_status(db, telefone, 'IED', datetime.now(), id_pedido, None)
             return {'texto': 'Me informe o seu endereço novamente.'}
 
     if registro_status.status == 'CDT':
@@ -492,5 +513,5 @@ def fluxo_conversa_poll_foa(opcao, telefone):
         else:
             id_pedido = int(registro_status.observacao)
             deletar_status(db, telefone)
-            novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), id_pedido)
+            novo_status = gravar_status(db, telefone, 'IDT', datetime.now(), id_pedido, None)
             return {'texto': 'Poderia me informar a data de entrega do pedido novamente?'}

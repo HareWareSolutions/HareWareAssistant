@@ -470,6 +470,17 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
                 logging.info(f"Mensagem de contato em pausa.")
                 return {"status": "Mensagem de contato em pausa."}
 
+            elif 'EPC' in resposta and isinstance(resposta['EPC'], list):
+                pergunta = 'Que bom! Qual o principal interesse para a sua consulta?'
+                opcoes = [{'name': opcao} for opcao in resposta['EPC']]
+
+                send_poll_zapi(
+                    env=env,
+                    number=numero_celular,
+                    question=pergunta,
+                    options=opcoes
+                )
+
             elif 'CAG' in resposta and isinstance(resposta['CAG'], list):
                 pergunta = 'Escolha um dos agendamentos para cancelar:'
                 opcoes = [{'name': opcao} for opcao in resposta['CAG']]

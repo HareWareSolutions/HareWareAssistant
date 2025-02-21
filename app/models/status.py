@@ -11,9 +11,10 @@ class Status(Base):
     status = Column(String, nullable=False)
     hora = Column(String, nullable=False)
     observacao = Column(String, nullable=True)
+    observacao2 = Column(String, nullable=True)
 
 
-def gravar_status(db: Session, numero_celular: str, status: str, hora: str, observacao: str):
+def gravar_status(db: Session, numero_celular: str, status: str, hora: str, observacao: str, observacao2: str):
     novo_status = Status(numero_celular=numero_celular, status=status, hora=hora, observacao=observacao)
     db.add(novo_status)
     db.commit()
