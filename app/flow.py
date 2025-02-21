@@ -62,6 +62,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
 
                 if env == 'emyconsultorio':
                     novo_status = gravar_status(db, telefone, "EPC", datetime.now().time(), None, None)
+                    print("retornei a lista")
 
                     return {"EPC": ["Profilaxia Dental (Limpeza)", "Clareamento a Laser (Em consultório)", "Restauração em Resina", "Extração de Dente", "Raspagem Gengival", "Atendimento Infantil", "Assessoria em Aleitamento Materno", "Outro"]}
                 else:
