@@ -668,6 +668,7 @@ async def pesquisarAgendaDia(empresa: str, data: str):
                 hora_obj = agendamento.get("hora")
                 id_contato = agendamento.get("id_contato")
                 confirmacao = agendamento.get("confirmacao")
+                observacao = agendamento.get("observacao")
 
                 if confirmacao:
                     confirmacao = "Sim"
@@ -699,7 +700,8 @@ async def pesquisarAgendaDia(empresa: str, data: str):
                     "id_contato": id_contato,
                     "telefone": contato.numero_celular,
                     "nome": contato.nome,
-                    "confirmacao": confirmacao
+                    "confirmacao": confirmacao,
+                    "observacao": observacao
                 }
 
                 agendamentos_dia.append(reserva)
