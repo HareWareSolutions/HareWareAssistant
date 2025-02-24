@@ -15,7 +15,7 @@ class Status(Base):
 
 
 def gravar_status(db: Session, numero_celular: str, status: str, hora: str, observacao: str, observacao2: str):
-    novo_status = Status(numero_celular=numero_celular, status=status, hora=hora, observacao=observacao)
+    novo_status = Status(numero_celular=numero_celular, status=status, hora=hora, observacao=observacao, observacao2=observacao2)
     db.add(novo_status)
     db.commit()
     db.refresh(novo_status)
