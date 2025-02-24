@@ -54,7 +54,8 @@ def buscar_agendamentos_por_data_api(db: Session, data):
         Agendamento.data,
         Agendamento.hora,
         Agendamento.contato_id,
-        Agendamento.confirmacao
+        Agendamento.confirmacao,
+        Agendamento.observacao
     ).filter(Agendamento.data == data_formatada).all()
 
     return [
@@ -63,7 +64,8 @@ def buscar_agendamentos_por_data_api(db: Session, data):
             "data": agendamento.data,
             "hora": agendamento.hora,
             "id_contato": agendamento.contato_id,
-            "confirmacao": agendamento.confirmacao
+            "confirmacao": agendamento.confirmacao,
+            "observacao": agendamento.observacao
         }
         for agendamento in agendamentos
     ]
