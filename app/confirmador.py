@@ -70,7 +70,7 @@ def notificar():
                         mensagem = mensagem_env(env, dados.get('nome_cliente'), dados.get('hora'), dados.get('data'))
 
                         deletar_status(db, dados.get('celular'))
-                        status = gravar_status(db, dados.get('celular'), 'CPA', datetime.now(), dados.get('id'))
+                        status = gravar_status(db, dados.get('celular'), 'CPA', datetime.now(), dados.get('id'), None)
 
                         opcoes = ['Sim', 'Não']
 
