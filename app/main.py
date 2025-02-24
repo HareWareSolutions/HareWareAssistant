@@ -549,7 +549,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
 
 
 @app.post("/incluir-agendamento")
-async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
+async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int, observacao: str):
     try:
         data_convertida = datetime.strptime(data, "%d/%m/%Y").strftime("%Y-%m-%d")
     except ValueError:
@@ -570,7 +570,7 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int):
         hora_formatada = hora_agendamento.strftime("%H:%M")
 
         if hora_formatada in horarios_disponiveis:
-            sucesso = gravar_agendamento(db, data_convertida, hora, contato, False)
+            sucesso = gravar_agendamento(db, data_convertida, hora, contato, False, observacao)
             if sucesso:
                 dados_contato = buscar_contato_id(db, contato)
 
