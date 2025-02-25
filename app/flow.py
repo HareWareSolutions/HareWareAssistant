@@ -7,6 +7,7 @@ from app.models.agendamento import buscar_agendamentos_por_data, gravar_agendame
 from app.utils.validacoes import caracteres_invalidos, caracteres_numericos
 from app.models.status import buscar_status, gravar_status, deletar_status
 from app.utils.rotinasDatas import extrair_data, normalizar_data, transformar_data_e_hora
+from app.utils.capturador import predicoes_arc, predicoes_iia
 from app.utils.rotinasHoras import verificar_horarios
 from app.utils.identificarDiaSemana import dia_da_semana
 from datetime import datetime
@@ -35,6 +36,8 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
 
         intencao = arc_predict(prompt)
 
+        predicoes_arc(prompt, intencao)
+
         if intencao == 0 and not registro_status:
             resposta = ask_to_openai(id_contrato, prompt)
             return resposta
@@ -42,7 +45,10 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
             if registro_status is None:
                 intencao_cancelamento = iia_predict(prompt)
 
+                predicoes_iia(prompt, intencao_cancelamento)
+
                 if intencao_cancelamento == 1:
+                    predicoes_iia(prompt, intencao_cancelamento)
                     novo_status = gravar_status(db, telefone, "CAG", datetime.now(), None, None)
                     agendamentos = buscar_agendamentos_por_contato_id_formatado(db, registro_contato.id)
                     if agendamentos is None:
