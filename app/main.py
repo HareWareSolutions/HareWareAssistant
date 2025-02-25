@@ -576,7 +576,7 @@ async def incluir_agendamento(empresa: str, data: str, hora: str, contato: int, 
 
                 if empresa == 'hareware':
                     nome_empresa = 'a HareWare Soluções Tecnológicas'
-                    telefone_cliente = ['5519997581672', '5519988246777', '5519995869852']
+                    telefone_cliente = ['5519997581672', '5519995869852']
                 elif empresa == 'emyconsultorio':
                     nome_empresa = 'a Clínica Eminy Bezerra'
                     telefone_cliente = ['5513991701738']
@@ -623,7 +623,7 @@ async def cancelarAgendamento(empresa: str, id_agendamento: int):
 
             if empresa == 'hareware':
                 nome_empresa = 'A HareWare Soluções Tecnológicas'
-                numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
+                numero_cliente = ['5519997581672', '5519995869852']
             elif empresa == 'emyconsultorio':
                 nome_empresa = 'A Clínica Eminy Bezerra'
                 numero_cliente = ['5513991701738']

@@ -215,7 +215,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 deletar_status(db, telefone)
 
                 if env == 'hareware':
-                    numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
+                    numero_cliente = ['5519997581672', '5519995869852']
                     notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}.'
                 elif env == 'emyconsultorio':
                     numero_cliente = ['5513991701738']
@@ -286,7 +286,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
                 novo_status = gravar_status(db, telefone, 'RA2', datetime.now(), None, None)
 
                 if env == 'hareware':
-                    numero_cliente = ['5519997581672', '5519988246777', '5519995869852']
+                    numero_cliente = ['5519997581672', '5519995869852']
                 elif env == 'emyconsultorio':
                     numero_cliente = ['5513991701738']
 
