@@ -3,7 +3,7 @@ import os
 
 
 def predicoes_arc(prompt, target):
-    arquivo_excel = 'arc.xlsx'
+    arquivo_excel = '/home/hwadmin/HareWareAssistant/app/utils/data/arc.xlsx'
 
     if os.path.exists(arquivo_excel):
         df = pd.read_excel(arquivo_excel)
@@ -17,7 +17,7 @@ def predicoes_arc(prompt, target):
 
 
 def predicoes_iia(prompt, target):
-    arquivo_excel = 'iia.xlsx'
+    arquivo_excel = '/home/hwadmin/HareWareAssistant/app/utils/data/iia.xlsx'
 
     if os.path.exists(arquivo_excel):
         df = pd.read_excel(arquivo_excel)
