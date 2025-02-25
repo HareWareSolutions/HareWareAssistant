@@ -10,7 +10,7 @@ def predicoes_arc(prompt, target):
     else:
         df = pd.DataFrame(columns=['prompt', 'target'])
 
-    nova_linha = pd.DataFrame({'prompt': [prompt], 'target': [target]})
+    nova_linha = pd.DataFrame({'prompt': [prompt], 'target': target})
     df = pd.concat([df, nova_linha], ignore_index=True)
 
     df.to_excel(arquivo_excel, index=False)
@@ -24,7 +24,7 @@ def predicoes_iia(prompt, target):
     else:
         df = pd.DataFrame(columns=['prompt', 'target'])
 
-    nova_linha = pd.DataFrame({'prompt': [prompt], 'target': [target]})
+    nova_linha = pd.DataFrame({'prompt': [prompt], 'target': target})
     df = pd.concat([df, nova_linha], ignore_index=True)
 
     df.to_excel(arquivo_excel, index=False)
