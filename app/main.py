@@ -23,6 +23,8 @@ logging.basicConfig(level=logging.INFO)
 
 encoding = tiktoken.get_encoding("cl100k_base")
 
+PLANILHAS_PASTA = '/home/hwadmin/HareWareAssistant/app/utils/data/'
+
 app = FastAPI()
 
 app.add_middleware(
@@ -1166,3 +1168,13 @@ async def logar(usuario: str, senha: str):
             return {"status": "Usuário ou senha incorretos"}
     finally:
         db.close()
+
+
+@app.get("/baixar_planilha/{nome_arquivo}")
+async def baixar_planilha(nome_arquivo: str):
+    caminho_arquivo = os.path.join(PLANILHAS_PASTA, nome_arquivo)
+
+    if not os.path.exists(caminho_arquivo):
+        raise HTTPException(status_code=404, detail="Arquivo não encontrado")
+
+    return FileResponse(caminho_arquivo, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=nome_arquivo)
