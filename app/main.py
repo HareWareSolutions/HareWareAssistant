@@ -895,7 +895,7 @@ async def cadastrar_contato(empresa: str, nome: str, numero_celular: str, email:
             else:
                 raise HTTPException(status_code=500, detail="Erro ao cadastrar o contato.")
         else:
-            raise HTTPException(status_code=500, detail="Erro: Já existe um contato com esse número.")
+            raise HTTPException(status_code=404, detail="Já existe um contato com esse número.")
     finally:
         db.close()
 
@@ -907,7 +907,7 @@ async def excluir_contato(empresa: str, id: int):
         contato_existente = buscar_contato(db, id)
 
         if contato_existente is None:
-            raise HTTPException(status_code=500, detail="Erro: Não existe um contato com esse id.")
+            raise HTTPException(status_code=404, detail="Não existe um contato com esse id.")
         else:
             sucesso = deletar_contato(db, id)
             if sucesso:
