@@ -197,10 +197,17 @@ def fluxo_conversa_poll(env, opcao, telefone):
         deletar_status(db, telefone)
         if opcao != 'Outro':
             novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None, opcao)
-            return "Certo, poderia me informar uma data?\n\n Escreva no formato Dia/Mês"
+
+            if env == 'emyconsultorio':
+                mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
+                                    'Lembre-se, o agendamento aqui é gratuito. Pessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber com muita atenção! 😀')
+            else:
+                mensagem_retorno = "Ótimo! Agora, escolha a data que for mais conveniente para você.\n\n Escreva no formato Dia/Mês"
+
+            return mensagem_retorno
         else:
             novo_status = gravar_status(db, telefone, "OPC", datetime.now().time(), None, None)
-            return "Ok, poderia me dizer em poucas palavras qual o seu principal interesse para sua consulta?"
+            return "Ótimo! Poderia me informar, em poucas palavras, qual é o principal objetivo da sua consulta?"
 
     elif registro_status.status == "IHR": #IHR: Informar hora
 
