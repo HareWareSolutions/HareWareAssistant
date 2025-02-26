@@ -4,7 +4,7 @@ import tiktoken
 from datetime import datetime, date, timedelta, time
 from app.db.db import get_db
 from app.utils.relatorio_ag import gerar_relatorio_pdf
-from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato_id, buscar_contato
+from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato_id
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento, buscar_agendamento_por_id
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
 from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
@@ -887,15 +887,11 @@ async def visualizar_contatos(empresa: str):
 async def cadastrar_contato(empresa: str, nome: str, numero_celular: str, email: str = None):
     db = next(get_db(empresa))
     try:
-        contato_existente = buscar_contato(db, numero_celular)
-        if contato_existente is None:
-            sucesso = criar_contato(db, nome, numero_celular, email, False)
-            if sucesso:
-                return {"status": "sucess", "message": "Contato cadastrado com sucesso."}
-            else:
-                raise HTTPException(status_code=500, detail="Erro ao cadastrar o contato.")
+        sucesso = criar_contato(db, nome, numero_celular, email, False)
+        if sucesso:
+            return {"status": "sucess", "message": "Contato cadastrado com sucesso."}
         else:
-            raise HTTPException(status_code=404, detail="Já existe um contato com esse número.")
+            raise HTTPException(status_code=500, detail="Erro ao cadastrar o contato.")
     finally:
         db.close()
 
@@ -904,16 +900,11 @@ async def cadastrar_contato(empresa: str, nome: str, numero_celular: str, email:
 async def excluir_contato(empresa: str, id: int):
     db = next(get_db(empresa))
     try:
-        contato_existente = buscar_contato(db, id)
-
-        if contato_existente is None:
-            raise HTTPException(status_code=404, detail="Não existe um contato com esse id.")
+        sucesso = deletar_contato(db, id)
+        if sucesso:
+            return {"status": "sucess", "message": "Contato excluido com sucesso."}
         else:
-            sucesso = deletar_contato(db, id)
-            if sucesso:
-                return {"status": "sucess", "message": "Contato excluido com sucesso."}
-            else:
-                raise HTTPException(status_code=500, detail="Erro ao excluir contato.")
+            raise HTTPException(status_code=500, detail="Erro ao excluir contato.")
     finally:
         db.close()
 
