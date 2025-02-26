@@ -76,7 +76,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
 
                     if env == 'emyconsultorio':
                         mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
-                                            'Lembre-se, o agendamento aqui não há custo. \n\nPessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber com muita atenção! 😀')
+                                            'Lembre-se, o agendamento aqui não há custo. \n\nPessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber! 😀')
                     else:
                         mensagem_retorno = "Ótimo! Agora, escolha a data que for mais conveniente para você.\n\n Escreva no formato Dia/Mês"
 
@@ -89,7 +89,7 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
 
                 if env == 'emyconsultorio':
                     mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
-                                         'Lembre-se, o agendamento aqui não há custo. \n\nPessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber com muita atenção! 😀')
+                                         'Lembre-se, o agendamento aqui não há custo. \n\nPessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber! 😀')
                 else:
                     mensagem_retorno = "Ótimo! Agora, escolha a data que for mais conveniente para você.\n\n Escreva no formato Dia/Mês"
 
@@ -200,7 +200,7 @@ def fluxo_conversa_poll(env, opcao, telefone):
 
             if env == 'emyconsultorio':
                 mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
-                                    'Lembre-se, o agendamento aqui não há custo. \n\nPessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber com muita atenção! 😀')
+                                    'Lembre-se, o agendamento aqui não há custo. \n\nPessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber! 😀')
             else:
                 mensagem_retorno = "Ótimo! Agora, escolha a data que for mais conveniente para você.\n\n Escreva no formato Dia/Mês"
 
