@@ -74,13 +74,26 @@ def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato:
                 else:
                     novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None, None)
 
-                    return "Certo, poderia me informar uma data?\n\n Escreva no formato Dia/Mês"
+                    if env == 'emyconsultorio':
+                        mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
+                                            'Lembre-se, o agendamento aqui é gratuito. Pessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber com muita atenção! 😀')
+                    else:
+                        mensagem_retorno = "Ótimo! Agora, escolha a data que for mais conveniente para você.\n\n Escreva no formato Dia/Mês"
+
+                    return mensagem_retorno
 
             if registro_status.status == 'OPC': # OPC: Outro procedimento
                 procedimento = prompt
                 deletar_status(db, telefone)
                 novo_status = gravar_status(db, telefone, "IDT", datetime.now().time(), None, procedimento)
-                return "Certo, poderia me informar uma data?\n\n Escreva no formato Dia/Mês"
+
+                if env == 'emyconsultorio':
+                    mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
+                                        'Lembre-se, o agendamento aqui é gratuito. Pessoalmente, a Dra. Eminy explicará todos os detalhes que você precisa saber com muita atenção! 😀')
+                else:
+                    mensagem_retorno = "Ótimo! Agora, escolha a data que for mais conveniente para você.\n\n Escreva no formato Dia/Mês"
+
+                return mensagem_retorno
 
             if registro_status.status == 'IDT':  # IDT = Informando Data
 
