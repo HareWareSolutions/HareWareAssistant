@@ -1,23 +1,28 @@
-import logging
-import os
-import tiktoken
-from datetime import datetime, date, timedelta, time
-from app.db.db import get_db
-from app.utils.relatorio_ag import gerar_relatorio_pdf
-from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato_id
 from app.models.agendamento import buscar_agendamentos_por_data, buscar_agendamentos_por_data_api, gravar_agendamento, deletar_agendamento, buscar_agendamento_por_id
 from app.models.clientes import buscar_cliente_cpfcnpj, criar_cliente, buscar_cliente_email, listar_clientes, editar_clientes, buscar_cliente
+from app.models.contato import buscar_contato_id, criar_contato, listar_contatos, deletar_contato, editar_contato, buscar_contato_id
 from app.models.contrato import criar_contrato, editar_contrato, deletar_contrato, listar_contratos, buscar_contrato_por_id
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
-from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Request, HTTPException, BackgroundTasks, UploadFile, File, Form
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
-from app.utils.rotinasDatas import normalizar_data
-from app.utils.rotinasHoras import verificar_horarios
+from app.utils.manipulador_pdf import gerar_processado, extrair
+from app.utils.processador_documento import processar_documento
 from app.utils.validador_documento import validar_documento
+from app.utils.relatorio_ag import gerar_relatorio_pdf
+from app.utils.rotinasHoras import verificar_horarios
+from datetime import datetime, date, timedelta, time
 from fastapi.middleware.cors import CORSMiddleware
+from app.utils.rotinasDatas import normalizar_data
+from app.models.documento import gravar_documento
 from fastapi.responses import FileResponse
+from app.db.db import get_db
 from threading import Lock
+import tiktoken
+import logging
+import shutil
 import emoji
+import os
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -435,9 +440,21 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             logging.info(f"Imagem recebida: {imagem_url}")
             if captions:
                 logging.info(f"Captions da imagem: {captions}")
-            resposta = "Infelizmente no momento ainda não consigo analisar imagens..."
+            resposta = "Desculpa por não poder te ajudar, no momento não consigo visualizar imagens :("
             logging.info("Mensagens de imagem.")
-            return {"Retorno": "Ignorado, mensagem de imagem."}
+
+            send_message_zapi(
+                env=env,
+                number=numero_celular,
+                message=resposta,
+                delay_typing=1
+            )
+
+        audio_url = data.get("audio", {}).get("audioUrl")
+
+        if audio_url:
+            logging.info(f"Audio recebido: {audio_url}")
+            resposta = "Desculpa, poderia escrever a sua mensagem? No momento ainda não sei escutar áudios :("
 
             send_message_zapi(
                 env=env,
@@ -1178,3 +1195,34 @@ async def baixar_planilha(nome_arquivo: str):
         raise HTTPException(status_code=404, detail="Arquivo não encontrado")
 
     return FileResponse(caminho_arquivo, media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename=nome_arquivo)
+
+
+'''
+@app.post("/upload-knowledge-base")
+async def administrador(env, nome_pdf: str = Form(...), arquivo_pdf: UploadFile = File(...)):
+    db = next(get_db(env))
+    try:
+        with open(os.path.join('/home/hwadmin/HareWareAssistant/app/utils/documentos/', arquivo_pdf.filename),"wb") as buffer:
+            shutil.copyfileobj(arquivo_pdf.file, buffer)
+
+        conteudo_documento = await extrair(arquivo_pdf.filename)
+        conteudo_processado = await processar_documento(conteudo_documento)
+        await gerar_processado(conteudo_processado, arquivo_pdf.filename)
+
+        caminho_original = '/home/hwadmin/HareWareAssistant/app/utils/documentos/' + arquivo_pdf.filename
+        with open(caminho_original, 'rb') as arquivo:
+            binario_original = arquivo.read()
+
+        caminho_processado = '/home/hwadmin/HareWareAssistant/app/utils/documentos-processados/' + arquivo_pdf.filename
+        with open(caminho_processado, 'rb') as arquivo:
+            binario_processado = arquivo.read()
+
+        gravar_documento(db, nome_pdf, len(conteudo_processado), binario_original, binario_processado)
+
+        os.remove(caminho_original)
+        os.remove(caminho_processado)
+
+        return 'Documento cadastrado com sucesso!'
+    finally:
+        db.close()
+'''

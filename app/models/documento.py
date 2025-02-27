@@ -28,6 +28,6 @@ def ler_documento(db: Session, id: int):
     return db.query(Documento).filter(Documento.id == id).first()
 
 
-def somar_pdf_original(db: Session):
+def somar_quantidade_tokens(db: Session):
     soma = db.query(func.sum(Documento.quantidade_tokens)).scalar()
     return soma
