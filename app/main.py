@@ -5,8 +5,8 @@ from app.models.contrato import criar_contrato, editar_contrato, deletar_contrat
 from app.flow import fluxo_conversa, fluxo_conversa_poll, fluxo_conversa_poll_foa, fluxo_conversa_foa
 from fastapi import FastAPI, Request, HTTPException, BackgroundTasks, UploadFile, File, Form
 from app.utils.zapi import send_message_zapi, send_poll_zapi, send_document_zapi
-from app.utils.manipulador_pdf import gerar_processado, extrair
-from app.utils.processador_documento import processar_documento
+#from app.utils.manipulador_pdf import gerar_processado, extrair
+#from app.utils.processador_documento import processar_documento
 from app.utils.validador_documento import validar_documento
 from app.utils.relatorio_ag import gerar_relatorio_pdf
 from app.utils.rotinasHoras import verificar_horarios
