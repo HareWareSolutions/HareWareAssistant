@@ -19,7 +19,7 @@ from app.utils.zapi import send_message_zapi
 import pytz
 
 
-def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato: int = None):
+async def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_contrato: int = None):
     db = next(get_db(env))
 
     registro_status = buscar_status(db, telefone)

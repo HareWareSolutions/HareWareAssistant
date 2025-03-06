@@ -470,7 +470,7 @@ async def receive_message(request: Request, background_tasks: BackgroundTasks):
             tokens_entrada = encoding.encode(prompt)
             num_tokens = len(tokens_entrada)
 
-            resposta = fluxo_conversa(env, prompt, numero_celular, nome_contato, id_contrato)
+            resposta = await fluxo_conversa(env, prompt, numero_celular, nome_contato, id_contrato)
 
             if 'CDT' in resposta:
                 pergunta = f'Você deseja realizar um agendamento na data de {resposta["CDT"]}?'
