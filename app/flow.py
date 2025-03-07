@@ -38,7 +38,7 @@ async def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_con
             predicoes_arc(prompt, intencao)
 
             if intencao == 0 and not registro_status:
-                resposta = await ask_to_openai(id_contrato, prompt)
+                resposta = ask_to_openai(id_contrato, prompt)
                 return resposta
             else:
                 if registro_status is None:

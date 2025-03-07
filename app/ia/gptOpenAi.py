@@ -15,7 +15,7 @@ def get_credentials(code):
         db.close()
 
 
-async def ask_to_openai(id_contrato, pergunta):
+def ask_to_openai(id_contrato, pergunta):
     try:
         api_key, assistant_id = get_credentials(id_contrato)
 
