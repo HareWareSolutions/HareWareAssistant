@@ -71,7 +71,8 @@ async def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_con
 
                         return {"EPC": ["Profilaxia Dental (Limpeza)", "Clareamento a Laser (Em consultório)", "Restauração em Resina", "Extração de Dente", "Raspagem Gengival", "Atendimento Infantil", "Assessoria em Aleitamento Materno", "Outro"]}
                     else:
-                        novo_status = await gravar_status(db, telefone, "IDT", datetime.now().time(), None, None)
+                        hora_atual = datetime.now().time().strftime("%H:%M:%S")
+                        novo_status = await gravar_status(db, telefone, "IDT", hora_atual, None, None)
 
                         if env == 'emyconsultorio':
                             mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
@@ -84,7 +85,8 @@ async def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_con
                 if registro_status.status == 'OPC': # OPC: Outro procedimento
                     procedimento = prompt
                     await deletar_status(db, telefone)
-                    novo_status = await gravar_status(db, telefone, "IDT", datetime.now().time(), None, procedimento)
+                    hora_atual = datetime.now().time().strftime("%H:%M:%S")
+                    novo_status = await gravar_status(db, telefone, "IDT", hora_atual, None, procedimento)
 
                     if env == 'emyconsultorio':
                         mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
@@ -113,12 +115,14 @@ async def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_con
 
                     if data_extraida.date() < data_atual.date():
                         await deletar_status(db, telefone)
-                        novo_status = await gravar_status(db, telefone, "IDT", datetime.now(), None, escolha_procedimento)
+                        hora_atual = datetime.now().time().strftime("%H:%M:%S")
+                        novo_status = await gravar_status(db, telefone, "IDT", hora_atual, None, escolha_procedimento)
                         return "A data informada é anterior à data de hoje. Por favor escolha outra data..."
 
                     if data is None:
                         await deletar_status(db, telefone)
-                        novo_status = await gravar_status(db, telefone, "IDT", datetime.now(), None, escolha_procedimento)
+                        hora_atual = datetime.now().time().strftime("%H:%M:%S")
+                        novo_status = await gravar_status(db, telefone, "IDT", hora_atual, None, escolha_procedimento)
                         return "Não entendi qual data você deseja agendar, poderia me informar novamente?"
 
                     dia_semana = await dia_da_semana(data)
@@ -194,7 +198,8 @@ async def fluxo_conversa_poll(env, opcao, telefone):
         elif registro_status.status == "EPC": # EPC: Escolha de Procedimento
             await deletar_status(db, telefone)
             if opcao != 'Outro':
-                novo_status = await gravar_status(db, telefone, "IDT", datetime.now().time(), None, opcao)
+                hora_atual = datetime.now().time().strftime("%H:%M:%S")
+                novo_status = await gravar_status(db, telefone, "IDT", hora_atual, None, opcao)
 
                 if env == 'emyconsultorio':
                     mensagem_retorno = ('Perfeito! Agora, por favor, informe uma data no formato dia/mês.\n\n'
@@ -278,7 +283,8 @@ async def fluxo_conversa_poll(env, opcao, telefone):
 
             else:
                 await deletar_status(db, telefone)
-                novo_status = await gravar_status(db, telefone, "IDT", datetime.now(), None, escolha_procedimento)
+                hora_atual = datetime.now().time().strftime("%H:%M:%S")
+                novo_status = await gravar_status(db, telefone, "IDT", hora_atual, None, escolha_procedimento)
                 return "Tudo bem, poderia me informar uma nova data?"
 
         elif registro_status.status == 'CDA': #CDA: Confirmação de desejo de agendamento
@@ -331,7 +337,8 @@ async def fluxo_conversa_poll(env, opcao, telefone):
         elif registro_status.status == 'RA2': # Remarcar agendamento 2
             await deletar_status(db, telefone)
             if opcao == 'Sim':
-                novo_status = await gravar_status(db, telefone, "IDT", datetime.now().time(), None, None)
+                hora_atual = datetime.now().time().strftime("%H:%M:%S")
+                novo_status = await gravar_status(db, telefone, "IDT", hora_atual, None, None)
                 return "Certo, escolha a melhor data para você!\n\n Escreva no formato Dia/Mês"
             else:
                 return 'Tudo bem... precisando de mais alguma coisa é só chamar!'
@@ -375,7 +382,8 @@ async def fluxo_conversa_poll(env, opcao, telefone):
             await deletar_status(db, telefone)
             if opcao == 'Sim':
                 sucesso = await deletar_agendamento(db, int(registro_status.observacao))
-                novo_status = await gravar_status(db, telefone, "IDT", datetime.now().time(), None, None)
+                hora_atual = datetime.now().time().strftime("%H:%M:%S")
+                novo_status = await gravar_status(db, telefone, "IDT", hora_atual, None, None)
                 return "Certo, escolha a melhor data para você!\n\n Escreva no formato DD/MM/YYYY"
             else:
                 sucesso = await deletar_agendamento(db, int(registro_status.observacao))
