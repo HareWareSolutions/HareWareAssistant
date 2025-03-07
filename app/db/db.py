@@ -1,6 +1,6 @@
-import os
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
+from contextlib import asynccontextmanager
 
 DATABASE_URL_HAREWARE = "postgresql+asyncpg://hareware:HareWare402025@localhost/harewareassistant"
 DATABASE_URL_MMANIA = "postgresql+asyncpg://hareware:HareWare402025@localhost/mmaniadeboloassistant"
@@ -34,10 +34,15 @@ def get_engine_and_session(env: str = "hareware"):
 Base = declarative_base()
 
 
+@asynccontextmanager
 async def get_db(env: str = "hareware"):
     engine, SessionLocal = get_engine_and_session(env)
     async with SessionLocal() as db:
         try:
             yield db
+            await db.commit()
+        except Exception as e:
+            await db.rollback()
+            raise e
         finally:
             await db.close()
