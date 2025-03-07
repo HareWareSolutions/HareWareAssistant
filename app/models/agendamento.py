@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Boolean, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import relationship
 from sqlalchemy.future import select
@@ -20,8 +20,10 @@ class Agendamento(Base):
     contato = relationship("Contato", back_populates="agendamentos")
 
 
-async def gravar_agendamento(db: AsyncSession, data, hora, contato_id: int, confirmacao: bool = False, observacao: str = None):
-    novo_agendamento = Agendamento(data=data, hora=hora, contato_id=contato_id, confirmacao=confirmacao, observacao=observacao)
+async def gravar_agendamento(db: AsyncSession, data, hora, contato_id: int, confirmacao: bool = False,
+                             observacao: str = None):
+    novo_agendamento = Agendamento(data=data, hora=hora, contato_id=contato_id, confirmacao=confirmacao,
+                                   observacao=observacao)
     db.add(novo_agendamento)
     await db.commit()
     await db.refresh(novo_agendamento)
@@ -31,10 +33,13 @@ async def gravar_agendamento(db: AsyncSession, data, hora, contato_id: int, conf
 async def deletar_agendamento(db: AsyncSession, agendamento_id: int):
     result = await db.execute(select(Agendamento).filter(Agendamento.id == agendamento_id))
     agendamento = result.scalar_one_or_none()
+
     if not agendamento:
         raise ValueError("Agendamento não encontrado.")
-    await db.delete(agendamento)
+
+    await db.execute(delete(Agendamento).where(Agendamento.id == agendamento.id))
     await db.commit()
+
     return {"message": "Agendamento deletado com sucesso."}
 
 
@@ -79,8 +84,10 @@ async def buscar_agendamentos_por_data_api(db: AsyncSession, data):
 async def buscar_agendamentos_por_contato_id(db: AsyncSession, contato_id: int):
     result = await db.execute(select(Agendamento).filter(Agendamento.contato_id == contato_id))
     agendamentos = result.scalars().all()
+
     if not agendamentos:
         return None
+
     return [
         {
             "id": agendamento.id,
@@ -131,7 +138,7 @@ async def deletar_agendamento_por_data_hora(db: AsyncSession, data: str, hora: s
     if not agendamento:
         raise ValueError("Nenhum agendamento encontrado para a data e hora especificadas.")
 
-    await db.delete(agendamento)
+    await db.execute(delete(Agendamento).where(Agendamento.id == agendamento.id))
     await db.commit()
 
     return {"message": "Agendamento cancelado com sucesso."}
@@ -140,8 +147,10 @@ async def deletar_agendamento_por_data_hora(db: AsyncSession, data: str, hora: s
 async def alterar_confirmacao_agendamento(db: AsyncSession, agendamento_id: int, confirmacao: bool):
     result = await db.execute(select(Agendamento).filter(Agendamento.id == agendamento_id))
     agendamento = result.scalar_one_or_none()
+
     if not agendamento:
         raise ValueError("Agendamento não encontrado.")
+
     agendamento.confirmacao = confirmacao
     await db.commit()
     await db.refresh(agendamento)
