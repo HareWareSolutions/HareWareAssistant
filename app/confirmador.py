@@ -73,7 +73,8 @@ async def notificar():
                             mensagem = await mensagem_env(env, dados.get('nome_cliente'), dados.get('hora'), dados.get('data'))
 
                             await deletar_status(db, dados.get('celular'))
-                            status = gravar_status(db, dados.get('celular'), 'CPA', datetime.now(), dados.get('id'), None)
+                            hora_atual_status = datetime.now().time().strftime("%H:%M:%S")
+                            status = gravar_status(db, dados.get('celular'), 'CPA', hora_atual_status, dados.get('id'), None)
 
                             opcoes = ['Sim', 'Não']
 
