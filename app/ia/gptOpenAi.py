@@ -20,21 +20,21 @@ async def ask_to_openai(id_contrato, pergunta):
 
         client = OpenAI(api_key=api_key)
 
-        thread = await client.beta.threads.create()
+        thread = client.beta.threads.create()
 
-        await client.beta.threads.messages.create(
+        client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
             content=pergunta
         )
 
-        run = await client.beta.threads.runs.create_and_poll(
+        run = client.beta.threads.runs.create_and_poll(
             thread_id=thread.id,
             assistant_id=assistant_id
         )
 
         if run.status == "completed":
-            messages = await client.beta.threads.messages.list(thread_id=thread.id)
+            messages = client.beta.threads.messages.list(thread_id=thread.id)
             return messages.data[0].content[0].text.value
         elif run.status == "failed":
             return "Desculpa, mas meu sistema cognitivo falhou. Poderia escrever novamente sua mensagem?"
