@@ -185,14 +185,11 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                 await deletar_status(db, telefone)
                 hora_atual = datetime.now().time().strftime("%H:%M:%S")
                 novo_status = await gravar_status(db, telefone, 'IHR', hora_atual, data, escolha_procedimento)
-                print("passei na gravação do IHR")
                 agendamentos = await buscar_agendamentos_por_data(db, data_agendamento)
-                print("passei na busca de agendamentos por data")
+
                 data_normalizada = await normalizar_data(data_agendamento)
-                print("passei na normalização da data")
 
                 horarios_livres = await verificar_horarios(env, agendamentos, data_normalizada)
-                print("Passei nos horários livres")
 
                 if not horarios_livres:
                     await deletar_status(db, telefone)

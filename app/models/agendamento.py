@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Boolean
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import relationship
+from sqlalchemy.future import select
 from app.db.db import Base
 from datetime import datetime
 import pytz
@@ -28,8 +29,8 @@ async def gravar_agendamento(db: AsyncSession, data, hora, contato_id: int, conf
 
 
 async def deletar_agendamento(db: AsyncSession, agendamento_id: int):
-    agendamento = await db.execute(db.query(Agendamento).filter(Agendamento.id == agendamento_id))
-    agendamento = agendamento.scalar_one_or_none()
+    result = await db.execute(select(Agendamento).filter(Agendamento.id == agendamento_id))
+    agendamento = result.scalar_one_or_none()
     if not agendamento:
         raise ValueError("Agendamento não encontrado.")
     await db.delete(agendamento)
@@ -38,21 +39,21 @@ async def deletar_agendamento(db: AsyncSession, agendamento_id: int):
 
 
 async def buscar_agendamentos_por_data(db: AsyncSession, data):
-    agendamentos = await db.execute(db.query(Agendamento.hora).filter(Agendamento.data == data))
-    agendamentos = [agendamento[0].strftime("%H:%M:%S") for agendamento in agendamentos]
+    result = await db.execute(select(Agendamento.hora).filter(Agendamento.data == data))
+    agendamentos = [agendamento[0].strftime("%H:%M:%S") for agendamento in result.scalars()]
     return agendamentos
 
 
 async def buscar_agendamentos_por_data_ntf(db: AsyncSession, data):
-    agendamentos = await db.execute(db.query(Agendamento).filter(Agendamento.data == data))
-    return agendamentos.scalars().all()
+    result = await db.execute(select(Agendamento).filter(Agendamento.data == data))
+    return result.scalars().all()
 
 
 async def buscar_agendamentos_por_data_api(db: AsyncSession, data):
     data_formatada = datetime.strptime(data, "%d/%m/%Y").date()
 
-    agendamentos = await db.execute(
-        db.query(
+    result = await db.execute(
+        select(
             Agendamento.id,
             Agendamento.data,
             Agendamento.hora,
@@ -71,13 +72,13 @@ async def buscar_agendamentos_por_data_api(db: AsyncSession, data):
             "confirmacao": agendamento.confirmacao,
             "observacao": agendamento.observacao
         }
-        for agendamento in agendamentos.scalars().all()
+        for agendamento in result.scalars().all()
     ]
 
 
 async def buscar_agendamentos_por_contato_id(db: AsyncSession, contato_id: int):
-    agendamentos = await db.execute(db.query(Agendamento).filter(Agendamento.contato_id == contato_id))
-    agendamentos = agendamentos.scalars().all()
+    result = await db.execute(select(Agendamento).filter(Agendamento.contato_id == contato_id))
+    agendamentos = result.scalars().all()
     if not agendamentos:
         return None
     return [
@@ -95,8 +96,8 @@ async def buscar_agendamentos_por_contato_id_formatado(db: AsyncSession, contato
     fuso_brasileiro = pytz.timezone('America/Sao_Paulo')
     agora = datetime.now(fuso_brasileiro)
 
-    agendamentos = await db.execute(
-        db.query(Agendamento)
+    result = await db.execute(
+        select(Agendamento)
         .filter(
             Agendamento.contato_id == contato_id,
             (Agendamento.data > agora.date()) |
@@ -104,7 +105,7 @@ async def buscar_agendamentos_por_contato_id_formatado(db: AsyncSession, contato
         )
     )
 
-    agendamentos = agendamentos.scalars().all()
+    agendamentos = result.scalars().all()
 
     if not agendamentos:
         return None
@@ -119,13 +120,13 @@ async def deletar_agendamento_por_data_hora(db: AsyncSession, data: str, hora: s
     data_formatada = datetime.strptime(data, "%d/%m/%Y").date()
     hora_formatada = datetime.strptime(hora, "%H:%M").time()
 
-    agendamento = await db.execute(
-        db.query(Agendamento).filter(
+    result = await db.execute(
+        select(Agendamento).filter(
             Agendamento.data == data_formatada,
             Agendamento.hora == hora_formatada
         )
     )
-    agendamento = agendamento.scalar_one_or_none()
+    agendamento = result.scalar_one_or_none()
 
     if not agendamento:
         raise ValueError("Nenhum agendamento encontrado para a data e hora especificadas.")
@@ -137,8 +138,8 @@ async def deletar_agendamento_por_data_hora(db: AsyncSession, data: str, hora: s
 
 
 async def alterar_confirmacao_agendamento(db: AsyncSession, agendamento_id: int, confirmacao: bool):
-    agendamento = await db.execute(db.query(Agendamento).filter(Agendamento.id == agendamento_id))
-    agendamento = agendamento.scalar_one_or_none()
+    result = await db.execute(select(Agendamento).filter(Agendamento.id == agendamento_id))
+    agendamento = result.scalar_one_or_none()
     if not agendamento:
         raise ValueError("Agendamento não encontrado.")
     agendamento.confirmacao = confirmacao
@@ -148,8 +149,8 @@ async def alterar_confirmacao_agendamento(db: AsyncSession, agendamento_id: int,
 
 
 async def buscar_agendamento_por_id(db: AsyncSession, agendamento_id: int):
-    agendamento = await db.execute(db.query(Agendamento).filter(Agendamento.id == agendamento_id))
-    agendamento = agendamento.scalar_one_or_none()
+    result = await db.execute(select(Agendamento).filter(Agendamento.id == agendamento_id))
+    agendamento = result.scalar_one_or_none()
 
     if not agendamento:
         raise ValueError("Agendamento não encontrado.")
