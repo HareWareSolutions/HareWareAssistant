@@ -25,7 +25,7 @@ async def gravar_status(db: AsyncSession, numero_celular: str, status: str, hora
 
 async def deletar_status(db: AsyncSession, numero_celular: str):
     result = await db.execute(select(Status).filter(Status.numero_celular == numero_celular))
-    status = result.scalar_one_or_none()
+    status = result.scalars().first()
     if status:
         await db.delete(status)
         await db.commit()
@@ -35,4 +35,4 @@ async def deletar_status(db: AsyncSession, numero_celular: str):
 
 async def buscar_status(db: AsyncSession, numero_celular: str):
     result = await db.execute(select(Status).filter(Status.numero_celular == numero_celular))
-    return result.scalar_one_or_none()
+    return result.scalars().first()
