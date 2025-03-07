@@ -33,7 +33,7 @@ async def send_message_zapi(env, number, message, delay_typing=0):
     if isinstance(message, list):
         message = message[0].text.value
 
-    edited_message = remove_word(message)
+    edited_message = await remove_word(message)
 
     url = f"https://api.z-api.io/instances/{zapi_instance}/token/{token_zapi}/send-text"
     headers = {
