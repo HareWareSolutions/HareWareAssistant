@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import relationship
 from app.db.db import Base
 
 
@@ -15,38 +17,43 @@ class Contato(Base):
     agendamentos = relationship("Agendamento", back_populates="contato", cascade="all, delete-orphan")
 
 
-def criar_contato(db: Session, nome: str, numero_celular: str, email: str = None, pausa: bool = False):
+async def criar_contato(db: AsyncSession, nome: str, numero_celular: str, email: str = None, pausa: bool = False):
     novo_contato = Contato(nome=nome, numero_celular=numero_celular, email=email, pausa=pausa)
     db.add(novo_contato)
-    db.commit()
-    db.refresh(novo_contato)
+    await db.commit()
+    await db.refresh(novo_contato)
     return novo_contato
 
 
-def listar_contatos(db: Session):
-    return db.query(Contato).all()
+async def listar_contatos(db: AsyncSession):
+    result = await db.execute(select(Contato))
+    return result.scalars().all()
 
 
-def buscar_contato(db: Session, numero_celular: str):
-    return db.query(Contato).filter(Contato.numero_celular == numero_celular).first()
+async def buscar_contato(db: AsyncSession, numero_celular: str):
+    result = await db.execute(select(Contato).filter(Contato.numero_celular == numero_celular))
+    return result.scalar_one_or_none()
 
 
-def buscar_contato_id(db: Session, id: int):
-    return db.query(Contato).filter(Contato.id == id).first()
+async def buscar_contato_id(db: AsyncSession, id: int):
+    result = await db.execute(select(Contato).filter(Contato.id == id))
+    return result.scalar_one_or_none()
 
 
-def deletar_contato(db: Session, id: int):
-    contato = db.query(Contato).filter(Contato.id == id).first()
+async def deletar_contato(db: AsyncSession, id: int):
+    result = await db.execute(select(Contato).filter(Contato.id == id))
+    contato = result.scalar_one_or_none()
 
     if contato:
-        db.delete(contato)
-        db.commit()
+        await db.delete(contato)
+        await db.commit()
         return True
     return False
 
 
-def editar_contato(db: Session, id: int, nome: str = None, numero_celular: str = None, email: str = None, pausa: bool = None):
-    contato = db.query(Contato).filter(Contato.id == id).first()
+async def editar_contato(db: AsyncSession, id: int, nome: str = None, numero_celular: str = None, email: str = None, pausa: bool = None):
+    result = await db.execute(select(Contato).filter(Contato.id == id))
+    contato = result.scalar_one_or_none()
 
     if contato:
         if nome:
@@ -58,8 +65,8 @@ def editar_contato(db: Session, id: int, nome: str = None, numero_celular: str =
         if pausa is not None:
             contato.pausa = pausa
 
-        db.commit()
-        db.refresh(contato)
+        await db.commit()
+        await db.refresh(contato)
         return contato
     else:
         return None

@@ -4,7 +4,7 @@ import pytz
 fuso_brasil = pytz.timezone("America/Sao_Paulo")
 
 
-def normalizar_data(data):
+async def normalizar_data(data):
     if data:
         if isinstance(data, str):
             try:
@@ -15,7 +15,7 @@ def normalizar_data(data):
     return None
 
 
-def extrair_data(frase):
+async def extrair_data(frase):
     meses = {
         "janeiro": 1, "fevereiro": 2, "março": 3, "abril": 4, "maio": 5, "junho": 6,
         "julho": 7, "agosto": 8, "setembro": 9, "outubro": 10, "novembro": 11, "dezembro": 12,
@@ -75,7 +75,7 @@ def extrair_data(frase):
     return None
 
 
-def transformar_data_e_hora(data_hora_str: str):
+async def transformar_data_e_hora(data_hora_str: str):
     data_hora = datetime.strptime(data_hora_str, "%d/%m/%Y %H:%M")
     data_hora = fuso_brasil.localize(data_hora)
     data = data_hora.date()

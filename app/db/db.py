@@ -1,12 +1,12 @@
 import os
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL_HAREWARE = "postgresql+pg8000://hareware:HareWare402025@localhost/harewareassistant"
-DATABASE_URL_MMANIA = "postgresql+pg8000://hareware:HareWare402025@localhost/mmaniadeboloassistant"
-DATABASE_URL_HWADMIN = "postgresql+pg8000://hareware:HareWare402025@localhost/hareware"
-DATABASE_URL_MALAMAN = "postgresql+pg8000://hareware:HareWare402025@localhost/malamanassistant"
-DATABASE_URL_EMINY = "postgresql+pg8000://hareware:HareWare402025@localhost/eminyassistant"
+DATABASE_URL_HAREWARE = "postgresql+asyncpg://hareware:HareWare402025@localhost/harewareassistant"
+DATABASE_URL_MMANIA = "postgresql+asyncpg://hareware:HareWare402025@localhost/mmaniadeboloassistant"
+DATABASE_URL_HWADMIN = "postgresql+asyncpg://hareware:HareWare402025@localhost/hareware"
+DATABASE_URL_MALAMAN = "postgresql+asyncpg://hareware:HareWare402025@localhost/malamanassistant"
+DATABASE_URL_EMINY = "postgresql+asyncpg://hareware:HareWare402025@localhost/eminyassistant"
 
 
 def get_database_url(env: str = "hareware"):
@@ -24,18 +24,20 @@ def get_database_url(env: str = "hareware"):
 
 def get_engine_and_session(env: str = "hareware"):
     DATABASE_URL = get_database_url(env)
-    engine = create_engine(DATABASE_URL)
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    engine = create_async_engine(DATABASE_URL, echo=True)
+    SessionLocal = sessionmaker(
+        engine, class_=AsyncSession, autocommit=False, autoflush=False
+    )
     return engine, SessionLocal
 
 
 Base = declarative_base()
 
 
-def get_db(env: str = "hareware"):
+async def get_db(env: str = "hareware"):
     engine, SessionLocal = get_engine_and_session(env)
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    async with SessionLocal() as db:
+        try:
+            yield db
+        finally:
+            await db.close()

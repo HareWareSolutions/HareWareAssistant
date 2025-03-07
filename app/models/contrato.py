@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, Date, ForeignKey
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import relationship
 from app.db.db import Base
 
 
@@ -19,8 +21,8 @@ class Contrato(Base):
     cliente = relationship("Cliente")
 
 
-def criar_contrato(
-    db: Session,
+async def criar_contrato(
+    db: AsyncSession,
     tipo: str,
     pagamento: bool,
     pacote: str,
@@ -41,13 +43,13 @@ def criar_contrato(
         api_key_ia=api_key_ia,
     )
     db.add(novo_contrato)
-    db.commit()
-    db.refresh(novo_contrato)
+    await db.commit()
+    await db.refresh(novo_contrato)
     return novo_contrato
 
 
-def editar_contrato(
-    db: Session,
+async def editar_contrato(
+    db: AsyncSession,
     contrato_id: int,
     tipo: str = None,
     pagamento: bool = None,
@@ -57,7 +59,9 @@ def editar_contrato(
     assistant_id: str = None,
     api_key_ia: str = None,
 ):
-    contrato = db.query(Contrato).filter(Contrato.id == contrato_id).first()
+    result = await db.execute(select(Contrato).filter(Contrato.id == contrato_id))
+    contrato = result.scalar_one_or_none()
+
     if contrato:
         if tipo is not None:
             contrato.tipo = tipo
@@ -73,29 +77,34 @@ def editar_contrato(
             contrato.assistant_id = assistant_id
         if api_key_ia is not None:
             contrato.api_key_ia = api_key_ia
-        db.commit()
-        db.refresh(contrato)
+
+        await db.commit()
+        await db.refresh(contrato)
         return contrato
     return None
 
 
-def listar_contratos(db: Session):
-    return db.query(Contrato).all()
+async def listar_contratos(db: AsyncSession):
+    result = await db.execute(select(Contrato))
+    return result.scalars().all()
 
 
-def deletar_contrato(db: Session, contrato_id: int):
-    contrato = db.query(Contrato).filter(Contrato.id == contrato_id).first()
+async def deletar_contrato(db: AsyncSession, contrato_id: int):
+    result = await db.execute(select(Contrato).filter(Contrato.id == contrato_id))
+    contrato = result.scalar_one_or_none()
+
     if contrato:
-        db.delete(contrato)
-        db.commit()
+        await db.delete(contrato)
+        await db.commit()
         return True
     return False
 
 
-def buscar_contrato_por_id(db: Session, contrato_id: int):
-    return db.query(Contrato).filter(Contrato.id == contrato_id).first()
+async def buscar_contrato_por_id(db: AsyncSession, contrato_id: int):
+    result = await db.execute(select(Contrato).filter(Contrato.id == contrato_id))
+    return result.scalar_one_or_none()
 
 
-def buscar_contrato_por_id_cliente(db: Session, id_cliente: int):
-    return db.query(Contrato).filter(Contrato.id_cliente == id_cliente).all()
-
+async def buscar_contrato_por_id_cliente(db: AsyncSession, id_cliente: int):
+    result = await db.execute(select(Contrato).filter(Contrato.id_cliente == id_cliente))
+    return result.scalars().all()

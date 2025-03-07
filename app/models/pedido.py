@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.db.db import Base
 
 
@@ -14,8 +15,8 @@ class Pedido(Base):
     nome_cliente = Column(String, nullable=True)
 
 
-def criar_pedido(db: Session, pedido: str = None, entrega: str = None, data_entrega: str = None, numero_cliente: str = None,
-                 nome_cliente: str = None):
+async def criar_pedido(db: AsyncSession, pedido: str = None, entrega: str = None, data_entrega: str = None, numero_cliente: str = None,
+                        nome_cliente: str = None):
     novo_pedido = Pedido(
         pedido=pedido,
         entrega=entrega,
@@ -24,26 +25,30 @@ def criar_pedido(db: Session, pedido: str = None, entrega: str = None, data_entr
         nome_cliente=nome_cliente
     )
     db.add(novo_pedido)
-    db.commit()
-    db.refresh(novo_pedido)
+    await db.commit()
+    await db.refresh(novo_pedido)
     return novo_pedido
 
 
-def listar_pedidos(db: Session):
-    return db.query(Pedido).all()
+async def listar_pedidos(db: AsyncSession):
+    result = await db.execute(select(Pedido))
+    return result.scalars().all()
 
 
-def buscar_pedido(db: Session, numero_cliente: str):
-    return db.query(Pedido).filter(Pedido.numero_cliente == numero_cliente).all()
+async def buscar_pedido(db: AsyncSession, numero_cliente: str):
+    result = await db.execute(select(Pedido).filter(Pedido.numero_cliente == numero_cliente))
+    return result.scalars().all()
 
 
-def buscar_pedido_id(db: Session, id: int):
-    return db.query(Pedido).filter(Pedido.id == id).first()
+async def buscar_pedido_id(db: AsyncSession, id: int):
+    result = await db.execute(select(Pedido).filter(Pedido.id == id))
+    return result.scalar_one_or_none()
 
 
-def alterar_pedido(db: Session, id: int, pedido: str = None, entrega: str = None, data_entrega: str = None, numero_cliente: str = None,
-                   nome_cliente: str = None):
-    pedido_existente = db.query(Pedido).filter(Pedido.id == id).first()
+async def alterar_pedido(db: AsyncSession, id: int, pedido: str = None, entrega: str = None, data_entrega: str = None, numero_cliente: str = None,
+                          nome_cliente: str = None):
+    result = await db.execute(select(Pedido).filter(Pedido.id == id))
+    pedido_existente = result.scalar_one_or_none()
 
     if not pedido_existente:
         return None
@@ -59,17 +64,18 @@ def alterar_pedido(db: Session, id: int, pedido: str = None, entrega: str = None
     if nome_cliente is not None:
         pedido_existente.nome_cliente = nome_cliente
 
-    db.commit()
-    db.refresh(pedido_existente)
+    await db.commit()
+    await db.refresh(pedido_existente)
     return pedido_existente
 
 
-def excluir_pedido(db: Session, id: int):
-    pedido_existente = db.query(Pedido).filter(Pedido.id == id).first()
+async def excluir_pedido(db: AsyncSession, id: int):
+    result = await db.execute(select(Pedido).filter(Pedido.id == id))
+    pedido_existente = result.scalar_one_or_none()
 
     if not pedido_existente:
         return None
 
-    db.delete(pedido_existente)
-    db.commit()
+    await db.delete(pedido_existente)
+    await db.commit()
     return pedido_existente

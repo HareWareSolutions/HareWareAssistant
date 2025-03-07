@@ -36,7 +36,7 @@ def is_round_hour():
     return current_time.minute == 0 and current_time.second == 0
 
 
-def notificar():
+async def notificar():
     envs = ['hareware', 'emyconsultorio']
 
     while True:
@@ -47,43 +47,44 @@ def notificar():
                     notificacoes_enviadas.pop(agendamento_id)
 
             for env in envs:
-                db = next(get_db(env))
-                try:
-                    hoje = agora.date()
-                    agendamentos = buscar_agendamentos_por_data_ntf(db, hoje)
-                    hora_atual = agora
+                async with get_db(env) as db:
+                    try:
+                        hoje = agora.date()
+                        agendamentos = await buscar_agendamentos_por_data_ntf(db, hoje)
+                        hora_atual = agora
 
-                    for agendamento in agendamentos:
-                        if agendamento.id in notificacoes_enviadas:
-                            continue
+                        for agendamento in agendamentos:
+                            if agendamento.id in notificacoes_enviadas:
+                                continue
 
-                        hora_agendada = datetime.combine(hoje, agendamento.hora)
-                        hora_agendada = hora_agendada.replace(
-                            tzinfo=pytz.timezone('America/Sao_Paulo').localize(datetime.now()).tzinfo
-                        )
-
-                        if hora_agendada - timedelta(hours=1) <= hora_atual <= hora_agendada:
-                            contato = buscar_contato_id(db, agendamento.contato_id)
-
-                            dados = {
-                                'hora': agendamento.hora,
-                                'nome_cliente': contato.nome,
-                                'celular': contato.numero_celular
-                            }
-
-                            mensagem = mensagem_env(env, dados.get('nome_cliente'), dados.get('hora'))
-
-                            send_message_zapi(
-                                env=env,
-                                number=dados.get('celular'),
-                                message=mensagem,
-                                delay_typing=2
+                            hora_agendada = datetime.combine(hoje, agendamento.hora)
+                            hora_agendada = hora_agendada.replace(
+                                tzinfo=pytz.timezone('America/Sao_Paulo').localize(datetime.now()).tzinfo
                             )
 
-                            notificacoes_enviadas[agendamento.id] = agora
+                            if hora_agendada - timedelta(hours=1) <= hora_atual <= hora_agendada:
+                                contato = await buscar_contato_id(db, agendamento.contato_id)
 
-                finally:
-                    db.close()
+                                dados = {
+                                    'hora': agendamento.hora,
+                                    'nome_cliente': contato.nome,
+                                    'celular': contato.numero_celular
+                                }
+
+                                mensagem = mensagem_env(env, dados.get('nome_cliente'), dados.get('hora'))
+
+                                send_message_zapi(
+                                    env=env,
+                                    number=dados.get('celular'),
+                                    message=mensagem,
+                                    delay_typing=2
+                                )
+
+                                notificacoes_enviadas[agendamento.id] = agora
+                    except Exception as e:
+                        print("status: error ", "message", str(e))
+                    #finally:
+                    #    db.close()
         else:
             time.sleep(1)
 

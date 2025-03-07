@@ -5,7 +5,7 @@ with open('/home/hwadmin/HareWareAssistant/app/ml_models/model_iia.pkl', 'rb') a
     clf, vectorizer = pickle.load(f)
 
 
-def iia_predict(prompt):
+async def iia_predict(prompt):
     text_processor = TextProcessorBuilder().set_stem(False).set_remove_stopwords(False).build()
     texto_processado = text_processor.process(prompt)
     nova_entrada = vectorizer.transform([texto_processado]).toarray()

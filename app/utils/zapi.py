@@ -27,7 +27,7 @@ def get_credentials(env):
     return client_token_zapi, zapi_instance, token_zapi
 
 
-def send_message_zapi(env, number, message, delay_typing=0):
+async def send_message_zapi(env, number, message, delay_typing=0):
     client_token_zapi, zapi_instance, token_zapi = get_credentials(env)
 
     if isinstance(message, list):
@@ -57,7 +57,7 @@ def send_message_zapi(env, number, message, delay_typing=0):
         print(f"Erro ao enviar a mensagem: {e}")
 
 
-def send_poll_zapi(env, number, question, options):
+async def send_poll_zapi(env, number, question, options):
     client_token_zapi, zapi_instance, token_zapi = get_credentials(env)
 
     url = f"https://api.z-api.io/instances/{zapi_instance}/token/{token_zapi}/send-poll"
@@ -83,7 +83,7 @@ def send_poll_zapi(env, number, question, options):
         print(f"Erro ao enviar a enquete: {e}")
 
 
-def send_document_zapi(env, number, document_url, file_name):
+async def send_document_zapi(env, number, document_url, file_name):
     client_token_zapi, zapi_instance, token_zapi = get_credentials(env)
 
     url = f"https://api.z-api.io/instances/{zapi_instance}/token/{token_zapi}/send-document/pdf"
@@ -108,7 +108,7 @@ def send_document_zapi(env, number, document_url, file_name):
         print(f"Erro ao enviar o documento: {e}")
 
 
-def send_button_message_zapi(env, number, message, title, footer, buttons):
+async def send_button_message_zapi(env, number, message, title, footer, buttons):
     client_token_zapi, zapi_instance, token_zapi = get_credentials(env)
 
     url = f"https://api.z-api.io/instances/{zapi_instance}/token/{token_zapi}/send-button-actions"
@@ -135,7 +135,7 @@ def send_button_message_zapi(env, number, message, title, footer, buttons):
         print(f"Erro ao enviar a mensagem com botões: {e}")
 
 
-def remove_word(sentence):
+async def remove_word(sentence):
     sentence_without_source = re.sub(r'【\d+:\d+†\([^\)]+\)】', '', sentence)
     sentence_without_source = re.sub(r'【\d+:\d+†[^\]]+】', '', sentence_without_source)
     return sentence_without_source

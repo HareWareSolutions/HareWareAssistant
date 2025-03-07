@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, LargeBinary, Boolean
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.db.db import Base
 
 
@@ -17,8 +18,9 @@ class Produto(Base):
     acesso = Column(Integer, nullable=False, default=0)
 
 
-def criar_produto(db: Session, nome: str, descricao: str, texto_promocional: str = None, imagem_1: bytes = None,
-                  imagem_2: bytes = None, imagem_3: bytes = None, ativo: bool = True, acesso: int = 0):
+async def criar_produto(db: AsyncSession, nome: str, descricao: str, texto_promocional: str = None,
+                        imagem_1: bytes = None,
+                        imagem_2: bytes = None, imagem_3: bytes = None, ativo: bool = True, acesso: int = 0):
     novo_produto = Produto(
         nome=nome,
         descricao=descricao,
@@ -30,32 +32,37 @@ def criar_produto(db: Session, nome: str, descricao: str, texto_promocional: str
         acesso=acesso
     )
     db.add(novo_produto)
-    db.commit()
-    db.refresh(novo_produto)
+    await db.commit()
+    await db.refresh(novo_produto)
     return novo_produto
 
 
-def buscar_produto_por_id(db: Session, produto_id: int):
-    return db.query(Produto).filter(Produto.id == produto_id).first()
+async def buscar_produto_por_id(db: AsyncSession, produto_id: int):
+    result = await db.execute(select(Produto).filter(Produto.id == produto_id))
+    return result.scalar_one_or_none()
 
 
-def buscar_produtos(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Produto).offset(skip).limit(limit).all()
+async def buscar_produtos(db: AsyncSession, skip: int = 0, limit: int = 100):
+    result = await db.execute(select(Produto).offset(skip).limit(limit))
+    return result.scalars().all()
 
 
-def deletar_produto(db: Session, produto_id: int):
-    produto = db.query(Produto).filter(Produto.id == produto_id).first()
+async def deletar_produto(db: AsyncSession, produto_id: int):
+    result = await db.execute(select(Produto).filter(Produto.id == produto_id))
+    produto = result.scalar_one_or_none()
     if produto:
-        db.delete(produto)
-        db.commit()
+        await db.delete(produto)
+        await db.commit()
         return produto
     return None
 
 
-def alterar_produto(db: Session, produto_id: int, nome: str = None, descricao: str = None,
-                    texto_promocional: str = None, imagem_1: bytes = None, imagem_2: bytes = None,
-                    imagem_3: bytes = None, ativo: bool = None, acesso: int = None):
-    produto = db.query(Produto).filter(Produto.id == produto_id).first()
+async def alterar_produto(db: AsyncSession, produto_id: int, nome: str = None, descricao: str = None,
+                          texto_promocional: str = None, imagem_1: bytes = None, imagem_2: bytes = None,
+                          imagem_3: bytes = None, ativo: bool = None, acesso: int = None):
+    result = await db.execute(select(Produto).filter(Produto.id == produto_id))
+    produto = result.scalar_one_or_none()
+
     if produto:
         if nome:
             produto.nome = nome
@@ -74,7 +81,7 @@ def alterar_produto(db: Session, produto_id: int, nome: str = None, descricao: s
         if acesso is not None:
             produto.acesso = acesso
 
-        db.commit()
-        db.refresh(produto)
+        await db.commit()
+        await db.refresh(produto)
         return produto
     return None

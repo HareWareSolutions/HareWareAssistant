@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.db.db import Base
 
 
@@ -14,22 +15,24 @@ class Status(Base):
     observacao2 = Column(String, nullable=True)
 
 
-def gravar_status(db: Session, numero_celular: str, status: str, hora: str, observacao: str, observacao2: str):
+async def gravar_status(db: AsyncSession, numero_celular: str, status: str, hora: str, observacao: str, observacao2: str):
     novo_status = Status(numero_celular=numero_celular, status=status, hora=hora, observacao=observacao, observacao2=observacao2)
     db.add(novo_status)
-    db.commit()
-    db.refresh(novo_status)
+    await db.commit()
+    await db.refresh(novo_status)
     return novo_status
 
 
-def deletar_status(db: Session, numero_celular: str):
-    status = db.query(Status).filter(Status.numero_celular == numero_celular).first()
+async def deletar_status(db: AsyncSession, numero_celular: str):
+    result = await db.execute(select(Status).filter(Status.numero_celular == numero_celular))
+    status = result.scalar_one_or_none()
     if status:
-        db.delete(status)
-        db.commit()
+        await db.delete(status)
+        await db.commit()
         return True
     return False
 
 
-def buscar_status(db: Session, numero_celular: str):
-    return db.query(Status).filter(Status.numero_celular == numero_celular).first()
+async def buscar_status(db: AsyncSession, numero_celular: str):
+    result = await db.execute(select(Status).filter(Status.numero_celular == numero_celular))
+    return result.scalar_one_or_none()

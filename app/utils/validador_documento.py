@@ -32,7 +32,7 @@ def validar_cnpj(cnpj: str) -> bool:
     return cnpj[-2:] == f"{digito1}{digito2}"
 
 
-def validar_documento(documento: str) -> bool:
+async def validar_documento(documento: str) -> bool:
     documento = documento.strip()
     if len(documento) in [11, 14]:
         if len(documento) == 11:

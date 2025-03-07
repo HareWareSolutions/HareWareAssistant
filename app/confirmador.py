@@ -15,11 +15,13 @@ from utils.rotinasDatas import normalizar_data
 
 notificacoes_enviadas = {}
 
-def get_hora_brasil():
+
+async def get_hora_brasil():
     brasil_tz = pytz.timezone('America/Sao_Paulo')
     return datetime.now(brasil_tz)
 
-def mensagem_env(env, nome, hora, data):
+
+async def mensagem_env(env, nome, hora, data):
     match env:
         case 'hareware':
             return (f'Olá, {nome},\n\n'
@@ -31,62 +33,64 @@ def mensagem_env(env, nome, hora, data):
                     f'A clínica está localizada em Araras-SP, na Rua Marechal Deodoro, 704 - Centro, CEP 13600-110.\n\n'
                     f'Você confirma a sua presença?')
 
-def notificar():
+
+async def notificar():
     envs = ['hareware', 'emyconsultorio']
 
     while True:
-        agora = get_hora_brasil()
+        agora = await get_hora_brasil()
         for agendamento_id, hora_notificada in list(notificacoes_enviadas.items()):
             if agora - hora_notificada > timedelta(days=1):
                 notificacoes_enviadas.pop(agendamento_id)
 
         for env in envs:
-            db = next(get_db(env))
-            try:
-                hoje = agora.date()
-                agendamentos = buscar_agendamentos_por_data_ntf(db, hoje)
-                hora_atual = agora
-                limite = hora_atual + timedelta(hours=3)
+            async with get_db(env) as db:
+                try:
+                    hoje = agora.date()
+                    agendamentos = await buscar_agendamentos_por_data_ntf(db, hoje)
+                    hora_atual = agora
+                    limite = hora_atual + timedelta(hours=3)
 
-                for agendamento in agendamentos:
-                    hora_agendada = datetime.combine(hoje, agendamento.hora)
-                    hora_agendada = hora_agendada.replace(
-                        tzinfo=pytz.timezone('America/Sao_Paulo').localize(datetime.now()).tzinfo
-                    )
-
-                    if hora_atual <= hora_agendada <= limite and agendamento.id not in notificacoes_enviadas and agendamento.confirmacao != True:
-                        contato = buscar_contato_id(db, agendamento.contato_id)
-
-                        data_normalizada = normalizar_data(agendamento.data)
-
-                        dados = {
-                            'id': agendamento.id,
-                            'hora': agendamento.hora,
-                            'data': data_normalizada,
-                            'nome_cliente': contato.nome,
-                            'celular': contato.numero_celular
-                        }
-
-                        mensagem = mensagem_env(env, dados.get('nome_cliente'), dados.get('hora'), dados.get('data'))
-
-                        deletar_status(db, dados.get('celular'))
-                        status = gravar_status(db, dados.get('celular'), 'CPA', datetime.now(), dados.get('id'), None)
-
-                        opcoes = ['Sim', 'Não']
-
-                        options = [{'name': opcao} for opcao in opcoes]
-
-                        send_poll_zapi(
-                            env=env,
-                            number=dados.get('celular'),
-                            question=mensagem,
-                            options=options
+                    for agendamento in agendamentos:
+                        hora_agendada = datetime.combine(hoje, agendamento.hora)
+                        hora_agendada = hora_agendada.replace(
+                            tzinfo=pytz.timezone('America/Sao_Paulo').localize(datetime.now()).tzinfo
                         )
 
-                        notificacoes_enviadas[agendamento.id] = agora
+                        if hora_atual <= hora_agendada <= limite and agendamento.id not in notificacoes_enviadas and agendamento.confirmacao != True:
+                            contato = await buscar_contato_id(db, agendamento.contato_id)
 
-            finally:
-                db.close()
+                            data_normalizada = normalizar_data(agendamento.data)
+
+                            dados = {
+                                'id': agendamento.id,
+                                'hora': agendamento.hora,
+                                'data': data_normalizada,
+                                'nome_cliente': contato.nome,
+                                'celular': contato.numero_celular
+                            }
+
+                            mensagem = await mensagem_env(env, dados.get('nome_cliente'), dados.get('hora'), dados.get('data'))
+
+                            await deletar_status(db, dados.get('celular'))
+                            status = gravar_status(db, dados.get('celular'), 'CPA', datetime.now(), dados.get('id'), None)
+
+                            opcoes = ['Sim', 'Não']
+
+                            options = [{'name': opcao} for opcao in opcoes]
+
+                            await send_poll_zapi(
+                                env=env,
+                                number=dados.get('celular'),
+                                question=mensagem,
+                                options=options
+                            )
+
+                            notificacoes_enviadas[agendamento.id] = agora
+                except Exception as e:
+                    print("status: error ", "message", str(e))
+                #finally:
+                #    db.close()
 
         time.sleep(3600)
 

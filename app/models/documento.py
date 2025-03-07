@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, LargeBinary, func
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.db.db import Base
 
 
@@ -12,22 +13,24 @@ class Documento(Base):
     pdf_processado = Column(LargeBinary, nullable=False)
 
 
-def gravar_documento(db: Session, titulo: str, quantidade_tokens: int, pdf_original: bytes, pdf_processado: bytes):
+async def gravar_documento(db: AsyncSession, titulo: str, quantidade_tokens: int, pdf_original: bytes, pdf_processado: bytes):
     novo_documento = Documento(titulo=titulo, quantidade_tokens=quantidade_tokens, pdf_original=pdf_original, pdf_processado=pdf_processado)
     db.add(novo_documento)
-    db.commit()
-    db.refresh(novo_documento)
+    await db.commit()
+    await db.refresh(novo_documento)
     return novo_documento
 
 
-def ler_documentos(db: Session):
-    return db.query(Documento).all()
+async def ler_documentos(db: AsyncSession):
+    result = await db.execute(select(Documento))
+    return result.scalars().all()
 
 
-def ler_documento(db: Session, id: int):
-    return db.query(Documento).filter(Documento.id == id).first()
+async def ler_documento(db: AsyncSession, id: int):
+    result = await db.execute(select(Documento).filter(Documento.id == id))
+    return result.scalar_one_or_none()
 
 
-def somar_quantidade_tokens(db: Session):
-    soma = db.query(func.sum(Documento.quantidade_tokens)).scalar()
-    return soma
+async def somar_quantidade_tokens(db: AsyncSession):
+    result = await db.execute(select(func.sum(Documento.quantidade_tokens)))
+    return result.scalar_one_or_none()

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.db.db import Base
 
 
@@ -16,7 +17,7 @@ class Cliente(Base):
     ativo = Column(Boolean, nullable=False)
 
 
-def criar_cliente(db: Session, nome: str, empresa: str, email: str, telefone: str, cpfcnpj: str, senha: str, ativo: bool):
+async def criar_cliente(db: AsyncSession, nome: str, empresa: str, email: str, telefone: str, cpfcnpj: str, senha: str, ativo: bool):
     novo_cliente = Cliente(
         nome=nome,
         empresa=empresa,
@@ -27,42 +28,49 @@ def criar_cliente(db: Session, nome: str, empresa: str, email: str, telefone: st
         ativo=ativo
     )
     db.add(novo_cliente)
-    db.commit()
-    db.refresh(novo_cliente)
+    await db.commit()
+    await db.refresh(novo_cliente)
     return novo_cliente
 
 
-def listar_clientes(db: Session):
-    return db.query(Cliente).all()
+async def listar_clientes(db: AsyncSession):
+    result = await db.execute(select(Cliente))
+    return result.scalars().all()
 
 
-def buscar_cliente(db: Session, cliente_id: int):
-    return db.query(Cliente).filter(Cliente.id == cliente_id).first()
+async def buscar_cliente(db: AsyncSession, cliente_id: int):
+    result = await db.execute(select(Cliente).filter(Cliente.id == cliente_id))
+    return result.scalar_one_or_none()
 
 
-def buscar_cliente_nome(db: Session, nome: str):
-    return db.query(Cliente).filter(Cliente.nome.ilike(f"%{nome}%")).all()
+async def buscar_cliente_nome(db: AsyncSession, nome: str):
+    result = await db.execute(select(Cliente).filter(Cliente.nome.ilike(f"%{nome}%")))
+    return result.scalars().all()
 
 
-def deletar_cliente(db: Session, cliente_id: int):
-    cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
+async def deletar_cliente(db: AsyncSession, cliente_id: int):
+    cliente = await db.execute(select(Cliente).filter(Cliente.id == cliente_id))
+    cliente = cliente.scalar_one_or_none()
     if cliente:
-        db.delete(cliente)
-        db.commit()
+        await db.delete(cliente)
+        await db.commit()
         return True
     return False
 
 
-def buscar_cliente_cpfcnpj(db: Session, cpfcnpj: str):
-    return db.query(Cliente).filter(Cliente.cpfcnpj == cpfcnpj).first()
+async def buscar_cliente_cpfcnpj(db: AsyncSession, cpfcnpj: str):
+    result = await db.execute(select(Cliente).filter(Cliente.cpfcnpj == cpfcnpj))
+    return result.scalar_one_or_none()
 
 
-def buscar_cliente_email(db: Session, email: str):
-    return db.query(Cliente).filter(Cliente.email == email).first()
+async def buscar_cliente_email(db: AsyncSession, email: str):
+    result = await db.execute(select(Cliente).filter(Cliente.email == email))
+    return result.scalar_one_or_none()
 
 
-def editar_clientes(db: Session, cliente_id: int, **kwargs):
-    cliente = db.query(Cliente).filter(Cliente.id == cliente_id).first()
+async def editar_clientes(db: AsyncSession, cliente_id: int, **kwargs):
+    result = await db.execute(select(Cliente).filter(Cliente.id == cliente_id))
+    cliente = result.scalar_one_or_none()
     if not cliente:
         return None
 
@@ -70,8 +78,6 @@ def editar_clientes(db: Session, cliente_id: int, **kwargs):
         if hasattr(cliente, key):
             setattr(cliente, key, value)
 
-    db.commit()
-    db.refresh(cliente)
+    await db.commit()
+    await db.refresh(cliente)
     return cliente
-
-
