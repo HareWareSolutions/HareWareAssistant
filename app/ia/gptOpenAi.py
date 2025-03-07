@@ -5,19 +5,19 @@ from app.models.clientes import buscar_cliente_nome
 from app.models.contrato import buscar_contrato_por_id
 
 
-def get_credentials(code):
-    db = next(get_db('hwadmin'))
+async def get_credentials(code):
+    async with get_db('hwadmin') as db:
+        try:
+            contrato = await buscar_contrato_por_id(db, code)
+
+            return contrato.api_key_ia, contrato.assistant_id
+        except Exception as e:
+            return f"Erro ao buscar contrato: {str(e)}"
+
+
+async def ask_to_openai(id_contrato, pergunta):
     try:
-        contrato = buscar_contrato_por_id(db, code)
-
-        return contrato.api_key_ia, contrato.assistant_id
-    finally:
-        db.close()
-
-
-def ask_to_openai(id_contrato, pergunta):
-    try:
-        api_key, assistant_id = get_credentials(id_contrato)
+        api_key, assistant_id = await get_credentials(id_contrato)
 
         client = OpenAI(api_key=api_key)
 
