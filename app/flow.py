@@ -28,7 +28,7 @@ async def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_con
         if registro_contato is None:
             novo_contato = await criar_contato(db, nome=nome_contato, numero_celular=telefone, email=None, pausa=False)
             registro_contato = await buscar_contato(db, telefone)
-            id_contato = registro_contato.id
+            identificador_contato = registro_contato.id
 
         if registro_contato is not None:
             if registro_contato.pausa == True:
@@ -51,7 +51,7 @@ async def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_con
                         predicoes_iia(prompt, intencao_cancelamento)
                         hora_atual = datetime.now().time().strftime("%H:%M:%S")
                         novo_status = await gravar_status(db, telefone, "CAG", hora_atual, None, None)
-                        agendamentos = await buscar_agendamentos_por_contato_id_formatado(db, id_contato)
+                        agendamentos = await buscar_agendamentos_por_contato_id_formatado(db, identificador_contato)
                         if agendamentos is None:
                             await deletar_status(db, telefone)
                             return f'Você não tem nenhum horário agendado.'
