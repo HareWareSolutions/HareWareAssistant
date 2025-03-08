@@ -257,27 +257,19 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                     agendamento = await gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id, False, escolha_procedimento)
                     await deletar_status(db, telefone)
 
-                    print('Pós gravacao agendamento')
-                    print(nome_contato, 'Nome do contato')
                     if env == 'hareware':
-                        print('entrei no env hareware')
                         numero_cliente = ['5519997581672', '5519995869852']
                         notificacao_cliente = f'{nome_contato} marcou um horário para o dia {data_normalizada} às {opcao}.'
-                        print(notificacao_cliente)
                     elif env == 'emyconsultorio':
                         numero_cliente = ['5513991701738']
                         notificacao_cliente = f'{nome_contato} marcou um horário para o dia {data_normalizada} às {opcao}, procedimento: {escolha_procedimento}.'
 
-                    print('Vou iniciar o loop')
                     for n_cliente in numero_cliente:
-                        print('inicio loop')
-
                         await send_message_zapi(
                             env=env,
                             number=n_cliente,
                             message=notificacao_cliente
                         )
-                        print('fim loop enviei mensagem')
 
                     if env == 'emyconsultorio':
                         mensagem_agendamento = (f'Estou feliz por você ter dado este passo importante para seu autocuidado 😍🙏\n\n'
