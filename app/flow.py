@@ -224,13 +224,14 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                 return "Ótimo! Poderia me informar, em poucas palavras, qual é o principal objetivo da sua consulta?"
 
         elif registro_status.status == "IHR": #IHR: Informar hora
-
+            print('Entrei no IHR')
             if registro_status.observacao2 is not None:
                 escolha_procedimento = registro_status.observacao2
             else:
                 escolha_procedimento = None
 
             if opcao != 'Nenhum desses horários é compatível comigo.':
+                print('Escolheram um horário')
                 data_agendamento = datetime.strptime(registro_status.observacao, "%Y-%m-%d").date()
                 data_normalizada = await normalizar_data(data_agendamento)
                 hora_agendamento = datetime.strptime(opcao, "%H:%M").time()
@@ -239,11 +240,16 @@ async def fluxo_conversa_poll(env, opcao, telefone):
 
                 tempo = random.uniform(1, 3)
                 time.sleep(tempo)
+
+                print('Normalizei todas as datas')
                 agendamentos = await buscar_agendamentos_por_data(db, data_agendamento)
+                print('Busquei os agendamentos por data')
 
                 horarios_disponiveis = await verificar_horarios(env, agendamentos, data_normalizada)
+                print('Verifiquei horários disponíveis')
 
                 if not horarios_disponiveis:
+                    print('Não tem horários disponíveis')
                     await deletar_status(db, telefone)
                     hora_atual = datetime.now().time().strftime("%H:%M:%S")
                     novo_status = await gravar_status(db, telefone, 'IDT', hora_atual, None, escolha_procedimento)
@@ -252,7 +258,9 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                 hora_formatada = hora_agendamento.strftime('%H:%M')
 
                 if hora_formatada in horarios_disponiveis:
+                    print('entrei no teste de horas disponíveis')
                     agendamento = await gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id, False, escolha_procedimento)
+                    print('Gravei o agendamento')
                     await deletar_status(db, telefone)
 
                     if env == 'hareware':
