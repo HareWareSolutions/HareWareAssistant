@@ -181,10 +181,11 @@ async def fluxo_conversa_poll(env, opcao, telefone):
 
             if opcao == "Sim":
                 data = registro_status.observacao
-                data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
                 await deletar_status(db, telefone)
                 hora_atual = datetime.now().time().strftime("%H:%M:%S")
                 novo_status = await gravar_status(db, telefone, 'IHR', hora_atual, data, escolha_procedimento)
+
+                data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
                 agendamentos = await buscar_agendamentos_por_data(db, data_agendamento)
 
                 data_normalizada = await normalizar_data(data_agendamento)

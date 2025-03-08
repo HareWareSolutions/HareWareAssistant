@@ -45,7 +45,7 @@ async def deletar_agendamento(db: AsyncSession, agendamento_id: int):
 
 async def buscar_agendamentos_por_data(db: AsyncSession, data):
     result = await db.execute(select(Agendamento.hora).filter(Agendamento.data == data))
-    agendamentos = [agendamento[0].strftime("%H:%M:%S") for agendamento in result.scalars()]
+    agendamentos = [agendamento[0].strftime("%H:%M:%S") for agendamento in result.fetchall()]
     return agendamentos
 
 
