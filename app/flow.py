@@ -255,6 +255,7 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                     agendamento = await gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id, False, escolha_procedimento)
                     await deletar_status(db, telefone)
 
+                    print('Pós gravacao agendamento')
                     if env == 'hareware':
                         numero_cliente = ['5519997581672', '5519995869852']
                         notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}.'
@@ -262,6 +263,7 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                         numero_cliente = ['5513991701738']
                         notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}, procedimento: {escolha_procedimento}.'
 
+                    print('Vou iniciar o loop')
                     for n_cliente in numero_cliente:
                         print('inicio loop')
 
