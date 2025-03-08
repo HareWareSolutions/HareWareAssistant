@@ -172,6 +172,7 @@ async def fluxo_conversa_poll(env, opcao, telefone):
 
         registro_contato = await buscar_contato(db, telefone)
         nome_contato = registro_contato.nome
+        identificador_contato = registro_contato.id
 
         if registro_contato.pausa == True:
             return {"PAUSA": "Contato em pausa de conversa."}
@@ -256,7 +257,7 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                 hora_formatada = hora_agendamento.strftime('%H:%M')
 
                 if hora_formatada in horarios_disponiveis:
-                    agendamento = await gravar_agendamento(db, data_agendamento, hora_agendamento, registro_contato.id, False, escolha_procedimento)
+                    agendamento = await gravar_agendamento(db, data_agendamento, hora_agendamento, identificador_contato, False, escolha_procedimento)
                     await deletar_status(db, telefone)
 
                     if env == 'hareware':
@@ -324,7 +325,7 @@ async def fluxo_conversa_poll(env, opcao, telefone):
 
             data_cancelamento, hora_cancelamento = await transformar_data_e_hora(opcao)
 
-            agendamentos = await buscar_agendamentos_por_contato_id(db, registro_contato.id)
+            agendamentos = await buscar_agendamentos_por_contato_id(db, identificador_contato)
 
             for agendamento in agendamentos:
 
