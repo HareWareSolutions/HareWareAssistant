@@ -183,7 +183,7 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                 data = registro_status.observacao
                 data_agendamento = datetime.strptime(data, "%Y-%m-%d").date()
                 await deletar_status(db, telefone)
-                hora_atual = datetime.now().time()
+                hora_atual = datetime.now().time().strftime("%H:%M:%S")
                 novo_status = await gravar_status(db, telefone, 'IHR', hora_atual, data, escolha_procedimento)
                 agendamentos = await buscar_agendamentos_por_data(db, data_agendamento)
 
@@ -193,14 +193,14 @@ async def fluxo_conversa_poll(env, opcao, telefone):
 
                 if not horarios_livres:
                     await deletar_status(db, telefone)
-                    hora_atual = datetime.now().time()
+                    hora_atual = datetime.now().time().strftime("%H:%M:%S")
                     novo_status = await gravar_status(db, telefone, 'IDT', hora_atual, None, escolha_procedimento)
                     data_normalizada = await normalizar_data(data_agendamento)
                     return f'Infelizmente, todos os meus horários para o dia {data_normalizada} já estão preenchidos.\n\nPoderia informar outra data?'
                 return {"IHR": horarios_livres}
             else:
                 await deletar_status(db, telefone)
-                hora_atual = datetime.now().time()
+                hora_atual = datetime.now().time().strftime("%H:%M:%S")
                 novo_status = await gravar_status(db, telefone, 'CDA', hora_atual, None, escolha_procedimento)
                 return {"CDA": 'Ainda deseja agendar algum dia?'}
 
