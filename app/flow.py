@@ -28,9 +28,8 @@ async def fluxo_conversa(env, prompt, telefone, nome_contato: str = None, id_con
         if registro_contato is None:
             novo_contato = await criar_contato(db, nome=nome_contato, numero_celular=telefone, email=None, pausa=False)
             registro_contato = await buscar_contato(db, telefone)
-            print("capturando identificador de contato")
-            identificador_contato = registro_contato.id
-            print('capturei: ', identificador_contato)
+
+        identificador_contato = registro_contato.id
 
         if registro_contato is not None:
             if registro_contato.pausa == True:
