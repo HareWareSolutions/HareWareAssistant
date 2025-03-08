@@ -341,7 +341,7 @@ async def fluxo_conversa_poll(env, opcao, telefone):
 
                     data_cancelamento_normalizada = await normalizar_data(data_cancelamento)
 
-                    notificacao_cliente = f'{registro_contato.nome} cancelou um horário para o dia {data_cancelamento_normalizada} às {hora_cancelamento}.'
+                    notificacao_cliente = f'{nome_contato} cancelou um horário para o dia {data_cancelamento_normalizada} às {hora_cancelamento}.'
 
                     for n_cliente in numero_cliente:
 
