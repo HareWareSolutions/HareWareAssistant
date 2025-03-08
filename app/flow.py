@@ -169,6 +169,8 @@ async def fluxo_conversa_poll(env, opcao, telefone):
         print(registro_status.status)
 
         registro_contato = await buscar_contato(db, telefone)
+        nome_contato = registro_contato.nome
+
         if registro_contato.pausa == True:
             return {"PAUSA": "Contato em pausa de conversa."}
 
@@ -256,7 +258,6 @@ async def fluxo_conversa_poll(env, opcao, telefone):
                     await deletar_status(db, telefone)
 
                     print('Pós gravacao agendamento')
-                    nome_contato = registro_contato.nome
                     print(nome_contato, 'Nome do contato')
                     if env == 'hareware':
                         print('entrei no env hareware')
