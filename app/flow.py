@@ -257,8 +257,12 @@ async def fluxo_conversa_poll(env, opcao, telefone):
 
                     print('Pós gravacao agendamento')
                     if env == 'hareware':
+                        print('entrei no env hareware')
                         numero_cliente = ['5519997581672', '5519995869852']
+                        print('passei do numero do cliente')
+                        print('Registro do contato ', registro_contato)
                         notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}.'
+                        print(notificacao_cliente)
                     elif env == 'emyconsultorio':
                         numero_cliente = ['5513991701738']
                         notificacao_cliente = f'{registro_contato.nome} marcou um horário para o dia {data_normalizada} às {opcao}, procedimento: {escolha_procedimento}.'
